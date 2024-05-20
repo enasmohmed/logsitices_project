@@ -1,0 +1,31 @@
+- Create Models ( admin - users - companys )
+    - Models :
+        - admin ( HC Business ) forenkey (OneToOne) الادمن يكون متاح له اختيارين يا اما يشوف الشركات كلها او شركه معينة
+        - user ( data of sheet MOD-Taif - data dashbord users)
+        - companys ( view dashbord - export data exel and pdf and report email ) يظهر الداش بورد الخاصه بالداتا تبع
+          الشركه المختارة من الادمن
+
+- Create and Update dashbord :
+
+اقدر ادخل الداتا الخاصه باليوزر عن طريق اكسل شيت
+
+- Create Registration:
+    - create login users  ( email - password )
+    - create register users ( user name - email - phone number - password )
+    - create profile ( edit date register - selection company )
+
+- Create veiws and urls
+
+- Create dashboard:
+    - create date
+    - create design ( تصميم لشركة معينه - تصميم لكل الشركات )
+    - كل شركه ليها permations معينة
+
+
+- Create website:
+    - selection template and buy
+    - create sections of website
+    - create pages
+    - add date company ( email - phonenumber - whatsapp )
+
+    
