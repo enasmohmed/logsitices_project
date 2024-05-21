@@ -8,7 +8,8 @@ from django.db import models
 class Owner(models.Model):
     owner = models.OneToOneField(User, related_name='owner_profile', on_delete=models.CASCADE)
     can_view_all_companies = models.BooleanField(default=False)
-    total_quantities = models.CharField(max_length=255)
+    total_quantities = models.CharField(max_length=255, blank=True, null=True)
+    Total_No_of_Employees = models.CharField(max_length=255, blank=True, null=True)
 
     # Add other fields related to admin permissions
 
@@ -36,13 +37,94 @@ class CustomUser(AbstractUser):
         wed = "Wednesday", "Wednesday"
         thu = "Thursday", "Thursday"
         fri = "Friday", "Friday"
-        sun = "Sunday", "Sunday"
+        sund = "Sunday", "Sunday"
 
     assigned_day = models.CharField(max_length=10, choices=Weekday.choices)
     inbound_entries = models.ManyToManyField('Inbound', related_name='inbound_entries_customuser', blank=True)
 
-    # inbound = models.ForeignKey(Inbound, related_name='user_inbound', on_delete=models.CASCADE, blank=True, null=True)
-    # inbound_data = models.ManyToManyField('Inbound', related_name='inbound_data_custom')
+    OBD = models.CharField(max_length=255, blank=True, null=True)
+    INVOICE = models.CharField(max_length=255, blank=True, null=True)
+    PO = models.CharField(max_length=255, blank=True, null=True)
+
+    class SELECTION(models.TextChoices):
+        default = "...", "..."
+        sur = "Surgical Innovation", "Surgical Innovation"
+        pat = "Patient Monitoring", "Patient Monitoring"
+        res = "Respiratory Interventions", "Respiratory Interventions"
+        ent = "ENT", "ENT"
+        neu = "Neurovascular", "Neurovascular"
+        end = "Endovenous", "Endovenous"
+        cor = "Coronary", "Coronary"
+        foc = "FOC", "FOC"
+        wm = "WM", "WM"
+
+    OU = models.CharField(max_length=255, choices=SELECTION.choices, default='....')
+    Ship_to_Location = models.CharField(max_length=255, blank=True, null=True)
+    Shipment_dash = models.CharField(max_length=255, blank=True, null=True)
+    PGI_Date = models.CharField(max_length=255, blank=True, null=True)
+    Q = models.CharField(max_length=255, blank=True, null=True)
+    ASN_Appointment = models.CharField(max_length=255, blank=True, null=True)
+    ASN = models.CharField(max_length=255, blank=True, null=True)
+
+    class ASNSTATUSSELECTION(models.TextChoices):
+        default = "...", "..."
+        rga = "RGA", "RGA"
+        deliv = "Delivered", "Delivered"
+        app = "Approved", "Approved"
+        new = "New", "New"
+        re = "Return", "Return"
+        re_as = "Re-ASN", "Re-ASN"
+        rej = "Rejected", "Rejected"
+        iss = "Issue", "Issue"
+        not_deliv = "Not Delivered", "Not Delivered"
+        under = "Under RGA", "Under RGA"
+
+    ASN_Status = models.CharField(max_length=255, choices=ASNSTATUSSELECTION.choices, default='....')
+
+    class PODSELECTION(models.TextChoices):
+        default = "...", "..."
+        cn = "CN", "CN"
+        pod = "POD", "POD"
+
+    POD = models.CharField(max_length=255, choices=PODSELECTION.choices, default='....')
+
+    class GRNASNSELECTION(models.TextChoices):
+        default = "...", "..."
+        gr = "GR Issued", "GR Issued"
+        nodeliv = "Not Delivered", "Not Delivered"
+        phy = "Physically Received", "Physically Received"
+        na = "N/A", "N/A"
+
+    GRN_ASN = models.CharField(max_length=255, choices=GRNASNSELECTION.choices, default='....')
+
+    OLD_ASN = models.CharField(max_length=255, blank=True, null=True)
+    Date_of_OLD_ASN = models.CharField(max_length=255, blank=True, null=True)
+    OLD_ASN_Status = models.CharField(max_length=255, blank=True, null=True)
+
+    class ISSUESELECTION(models.TextChoices):
+        default = "...", "..."
+        po = "PO Expiry Date", "PO Expiry Date"
+        appo = "Appointment canceled from NUPCO", "Appointment canceled from NUPCO"
+        asn = "ASN QTY Mismatch", "ASN QTY Mismatch"
+        size = "Size of item", "Size of item"
+        ship = "Ship to Location", "Ship to Location"
+        war = "Warehouse Transfer", "Warehouse Transfer"
+        tra = "Transportation issue", "Transportation issue"
+        wro = "Wrong/Missing Information", "Wrong/Missing Information"
+        sho = "Short Notice Approval from Nupco", "Short Notice Approval from Nupco"
+        dis = "Dispatch request before PO Due Date (early)", "Dispatch request before PO Due Date (early)"
+        ann = "Annual Cycle Count", "Annual Cycle Count"
+        qty = "QTY Issue", "QTY Issue"
+        shi = "Shipment closed/not visible on NUPCO portal", "Shipment closed/not visible on NUPCO portal"
+        inv = "Invoice Issue", "Invoice Issue"
+        poiss = "PO Issue", "PO Issue"
+        shel = "Short shelf life of item", "Short shelf life of item"
+        nup = "NUPCO Deleted some lines from the ASN", "NUPCO Deleted some lines from the ASN"
+        enin = "Eninvoicing Issue", "Eninvoicing Issue"
+
+    Issue = models.CharField(max_length=255, choices=ISSUESELECTION.choices, default='....')
+    Remark_1 = models.CharField(max_length=255, blank=True, null=True)
+    Remark_2 = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.username
@@ -105,6 +187,59 @@ class Expiry(models.Model):
     total_expired_SKUS_disposed = models.CharField(max_length=255, blank=True, null=True)
     nearly_expired_1_to_3_months = models.CharField(max_length=255, blank=True, null=True)
     nearly_expired_3_to_6_months = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Damage(models.Model):
+    custom_user = models.ForeignKey(CustomUser, related_name='damage_data', on_delete=models.CASCADE)
+    total_dash_SKUs_Audited_in_Inventory = models.CharField(max_length=255, blank=True, null=True)
+    dash_of_SKUs_with_discripancy = models.CharField(max_length=255, blank=True, null=True)
+    Total_QTYs_Damaged_by_WH = models.CharField(max_length=255, blank=True, null=True)
+    Number_of_Damaged_during_receiving = models.CharField(max_length=255, blank=True, null=True)
+    Total_Damaged_QTYs_Disposed = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class TravelDistance(models.Model):
+    custom_user = models.ForeignKey(CustomUser, related_name='travel_distance_data', on_delete=models.CASCADE)
+    Total_no_of_Customers_deliverd = models.CharField(max_length=255, blank=True, null=True)
+    Total_no_of_Pallet_deliverd = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Inventory(models.Model):
+    custom_user = models.ForeignKey(CustomUser, related_name='inventory_data', on_delete=models.CASCADE)
+    Total_Locations_Audited = models.CharField(max_length=255, blank=True, null=True)
+    Total_Locations_with_Incorrect_SKU_and_Qty = models.CharField(max_length=255, blank=True, null=True)
+    Total_SKUs_Reconciliation = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class PalletLocationAvailability(models.Model):
+    custom_user = models.ForeignKey(CustomUser, related_name='pallet_location_availability_data',
+                                    on_delete=models.CASCADE)
+    Total_Storage_Pallet = models.CharField(max_length=255, blank=True, null=True)
+    Total_Storage_Bin = models.CharField(max_length=255, blank=True, null=True)
+    Total_Storage_pallet_empty = models.CharField(max_length=255, blank=True, null=True)
+    Total_Storage_Bin_empty = models.CharField(max_length=255, blank=True, null=True)
+    Total_occupied_pallet_location = models.CharField(max_length=255, blank=True, null=True)
+    Total_occupied_pallet_locaiton2 = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class HSE(models.Model):
+    custom_user = models.ForeignKey(CustomUser, related_name='hse_data', on_delete=models.CASCADE)
+    Total_Incidents_on_the_side = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
