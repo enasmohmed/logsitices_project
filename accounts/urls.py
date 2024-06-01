@@ -1,13 +1,13 @@
 from django.urls import path
-from .views import profile, profile_edit, signup, my_reservation, add_feedback, my_listing
+
+from .views import RegisterView, admin_dashboard, company_dashboard, CustomLoginView, CustomLogoutView
 
 app_name = 'accounts'
 
 urlpatterns = [
-    path('signup/', signup, name='signup'),
-    path('profile/', profile, name='profile'),
-    path('profile/edit', profile_edit, name='profile_edit'),
-    path('profile/booking', my_reservation, name='my_reservation'),
-    path('profile/listing', my_listing, name='listing'),
-    path('profile/booking/<slug:slug>/review', add_feedback, name='add_feedback')
+    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('admin_dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('company_dashboard/', company_dashboard, name='company_dashboard'),
 ]

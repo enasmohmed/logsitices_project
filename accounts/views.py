@@ -1,57 +1,64 @@
+from django.contrib.auth import login, authenticate
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView as AuthLoginView
+from django.shortcuts import render, redirect
+from django.views import View
+
+from .forms import CustomUserCreationForm
+
+
 # Create your views here.
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect, render
-from django.urls import reverse
 
-from .forms import UserForm, ProfileForm, UserCreateForm
-from .models import Profile
+class CustomLoginView(AuthLoginView):
+    template_name = 'accounts/login.html'
 
-
-# Create your views here.
-
-def signup(request):
-    if request.method == 'POST':
-        signup_form = UserCreateForm(request.POST)
-        if signup_form.is_valid():
-            signup_form.save()
-            # return redirect(reverse('login'))
-            username = signup_form.cleaned_data['username']
-            password = signup_form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            return redirect(reverse('accounts:profile'))
-
-    else:
-        signup_form = UserCreateForm()
-
-    return render(request, 'registration/signup.html', {'signup_form': signup_form})
+    def form_valid(self, form):
+        user = form.get_user()
+        login(self.request, user)
+        if user.is_superuser:
+            return redirect('admin_dashboard')
+        elif user.is_company:
+            return redirect('company_dashboard')
+        else:
+            return redirect('/')
 
 
-def profile(request):
-    profile = Profile.objects.get(user=request.user)
-    return render(request, 'profile/profile.html', {'profile': profile})
+class RegisterView(View):
+    form_class = CustomUserCreationForm
+    template_name = 'accounts/register.html'
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            user = form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            if user is not None:
+                login(request, user)
+                if user.is_superuser:
+                    return redirect('/accounts/admin_dashboard/')
+                elif user.is_company:
+                    return redirect('/accounts/company_dashboard/')
+                else:
+                    return redirect('home')
+        return render(request, self.template_name, {'form': form})
 
 
-def profile_edit(request):
-    profile = Profile.objects.get(user=request.user)
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+@login_required
+def admin_dashboard(request):
+    return render(request, 'accounts/admin_dashboard.html')
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            my_form = profile_form.save(commit=False)
-            my_form.user = request.user
-            my_form.save()
-            messages.success(request, 'Profile details updated.')
-            return redirect(reverse('accounts:profile'))
 
-    else:
-        user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm(instance=profile)
+@login_required
+def company_dashboard(request):
+    return render(request, 'accounts/company_dashboard.html')
 
-    return render(request, 'profile/profile_edit.html', {
-        'user_form': user_form,
-        'profile_form': profile_form
-    })
+
+class CustomLogoutView(auth_views.LogoutView):
+    next_page = '/accounts/login/'

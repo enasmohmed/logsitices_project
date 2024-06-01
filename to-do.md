@@ -28,4 +28,10 @@
     - create pages
     - add date company ( email - phonenumber - whatsapp )
 
-    
+
+* Models
+    * Models admin
+        - data for (file dashboard for admin "sheet1" ) كل الداتا الموجوده في شيت وان ماعدا hc bussiness
+
+    * Models Company or customer
+        - data for (file dashboard for company "MOD-Taif") ما عدا سطر الادمن 
