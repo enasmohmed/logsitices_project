@@ -123,7 +123,7 @@ hr {
 
 
         .selling-product .card-body {
-            display: flex;
+
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: nowrap;
@@ -174,9 +174,9 @@ hr {
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body d-block">
                     <div class="table-responsive custom-scrollbar overflow-hidden">
-                        <table class="table display" style="width:100%">
+                        <table class="table display">
                             <tbody>
                             <tr>
                                 <td>
@@ -186,13 +186,13 @@ hr {
                                             viewBox="0 0 24 24"><path fill="green"
                                                                       d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/></svg>
                                     </span>
-                                        <div class="flex-grow-0 ms-2 mt-2"><span>Number of vehicles daily</span></div>
+                                        <div class="flex-grow-0 ms-2 mt-3"><span>Number of vehicles daily</span></div>
                                     </div>
                                 </td>
 
                                 <td></td>
                                 <td>
-                                    <span style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{ total_vehicles_daily }}</span>
+                                    <span class="mt-4" style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{ total_vehicles_daily }}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -203,13 +203,13 @@ hr {
                                                 viewBox="0 0 24 24"><path fill="black"
                                                                           d="M16.78 21.84a1.998 1.998 0 1 1-1.56-3.68a1.998 1.998 0 1 1 1.56 3.68M7.62 6c1.11 0 2-.89 2-2a2 2 0 0 0-2-2c-1.12 0-2 .9-2 2c0 1.11.88 2 2 2m14.43 10.34L18.2 18c.22.22.42.5.56.82c.14.33.2.68.24 1l3.83-1.64zM10.16 8.78l.74 1.81c-.24-.09-.46-.21-.64-.33c-.6-.39-1.04-.88-1.33-1.46l-.74-1.57c-.19-.35-.42-.61-.74-.79c-.29-.17-.6-.26-.92-.26s-.62.08-.91.22c-1.4 1.1-1.75 3.14-1.75 3.14l-.34 1.57c-.09.52-.14 1.04-.14 1.57v4.96L1 20.87L2.5 22l2.77-3.75l.17-3.25l1.68 2.34V22h1.85v-6.06l-1.85-2.61v-.65c0-.44 0-.87.11-1.29l.35-1.2c.38.55.84 1.03 1.39 1.44c.45.34 1.71.94 2.9 1.23L14 17.8c.22-.22.5-.42.83-.56c.32-.14.67-.2.99-.24L12 8zm5.2 3.34l1.96 4.6l5.63-2.41L21 9.72"/></svg>
                                         </span>
-                                        <div class="flex-grow-0 ms-2 mt-2"><span>Number Of pallets</span></div>
+                                        <div class="flex-grow-0 ms-2 mt-3"><span>Number Of pallets</span></div>
                                     </div>
                                 </td>
 
                                 <td></td>
                                 <td>
-                                    <span style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{total_pallets}}</span>
+                                    <span class="mt-3" style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{total_pallets}}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -220,13 +220,13 @@ hr {
                                                 viewBox="0 0 24 24"><path fill="black"
                                                                           d="M3 4a2 2 0 0 0-2 2v11h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h6a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2v-5l-3-4h-3V4m-7 2l4 4l-4 4v-3H4V9h6m7 .5h2.5l1.97 2.5H17M6 15.5A1.5 1.5 0 0 1 7.5 17A1.5 1.5 0 0 1 6 18.5A1.5 1.5 0 0 1 4.5 17A1.5 1.5 0 0 1 6 15.5m12 0a1.5 1.5 0 0 1 1.5 1.5a1.5 1.5 0 0 1-1.5 1.5a1.5 1.5 0 0 1-1.5-1.5a1.5 1.5 0 0 1 1.5-1.5"/></svg>
                                         </span>
-                                        <div class="flex-grow-0 ms-2 mt-2"><span>No of shipments</span></div>
+                                        <div class="flex-grow-0 ms-2 mt-3"><span>No of shipments</span></div>
                                     </div>
                                 </td>
 
                                 <td></td>
                                 <td>
-                                    <span style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{ total_no_of_shipments }}</span>
+                                    <span class="mt-3" style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{ total_no_of_shipments }}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -237,13 +237,13 @@ hr {
                                                 viewBox="0 0 20 20"><path fill="black"
                                                                           d="M2.042 9.889v4.361c0 .966.784 1.75 1.75 1.75h.258a2.5 2.5 0 0 0 4.9 0h1.1a2.5 2.5 0 0 0 4.9 0h1.55a1.5 1.5 0 0 0 1.5-1.5v-3.764a1.5 1.5 0 0 0-.158-.67l-1.618-3.237A1.5 1.5 0 0 0 14.882 6H14V4.75A1.75 1.75 0 0 0 12.25 3h-2.09c.218.324.341.712.341 1.118v3.764a2 2 0 0 1-1.105 1.789l-3 1.5a2 2 0 0 1-1.789 0zM14 7h.882a.5.5 0 0 1 .448.276L16.692 10H14zm-7.5 7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m4.5 1.5a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0M1.5 4.118v3.764a1 1 0 0 0 .553.895l3 1.5a1 1 0 0 0 .894 0l3-1.5a1 1 0 0 0 .553-.895V4.118a1 1 0 0 0-.553-.894l-3-1.5a1 1 0 0 0-.894 0l-3 1.5a1 1 0 0 0-.553.894m1.694-.078l2.306.973l2.306-.973a.5.5 0 0 1 .388.92L6 5.888V8.5a.5.5 0 1 1-1 0V5.887l-2.194-.926a.5.5 0 1 1 .388-.921"/></svg>
                                         </span>
-                                        <div class="flex-grow-0 ms-2 mt-2"><span>Pending shipments</span></div>
+                                        <div class="flex-grow-0 ms-2 mt-3"><span>Pending shipments</span></div>
                                     </div>
                                 </td>
 
                                 <td></td>
                                 <td>
-                                    <span style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;"> {{ total_pending_shipments }} </span>
+                                    <span class="mt-3" style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;"> {{ total_pending_shipments }} </span>
                                 </td>
                             </tr>
                             </tbody>
@@ -456,7 +456,7 @@ hr {
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body d-flex">
                     <div class="info-box">
                         <div class="icon">
                             <!-- يمكنك وضع أيقونة SVG أو صورة هنا -->
@@ -513,7 +513,7 @@ hr {
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="height: 100px; overflow-y: auto;">
                     <div class="table-responsive custom-scrollbar">
                         <table class="table display" style="width:100%">
                             <tbody>
@@ -554,7 +554,7 @@ hr {
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="stat-box">
+                    <div class="stat-box" style="height: 70px; overflow-y: auto;">
                         {% for year in years %}
                         <option value="{{ year.year }}">{{ year.year }}</option>
                         {% endfor %}
@@ -580,9 +580,9 @@ hr {
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="stat-box">
-                        {% for month in months %}
-                        <option value="{{ month.month }}">{{ month.month }}</option>
+                    <div class="stat-box" style="height: 70px; overflow-y: auto;">
+                      {% for month in months %}
+                                <option value="{{ month }}" {% if selected_month == month %}selected{% endif %}>{{ month }}</option>
                         {% endfor %}
                     </div>
                 </div>
@@ -606,7 +606,7 @@ hr {
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="stat-box">
+                    <div class="stat-box" style="height: 70px; overflow-y: auto;">
                         {% for day in days %}
                         <option value="{{ day }}">{{ day }}</option>
                         {% endfor %}
@@ -632,32 +632,36 @@ hr {
                 </div>
                 <div class="card-body">
 
-                    <form method="GET" class="w-100">
-                        <div class="row">
-                            <div class="col">
-                                <label for="hc_business">HC Business:</label>
-                                <select id="hc_business" name="hc_business" class="form-control">
+                     <form method="GET" class="mb-4 w-100">
+                         <div class="row mb-4">
+                             <div class="col">
+                                <label for="hc_business" class="mr-2">HC Business:</label>
+                                <select id="hc_business" name="hc_business" class="form-control mr-2">
                                     <option value="">All</option>
-                                    {% for hc_business in businesses %}
-                                    <option value="{{ hc_business }}">{{ hc_business }}</option>
+                                    {% for business in businesses %}
+                                        <option value="{{ business }}" {% if hc_business == business %}selected{% endif %}>{{ business }}</option>
                                     {% endfor %}
                                 </select>
-                            </div>
+                             </div>
+
                             <div class="col">
                                 <label for="year" class="mr-2">Year:</label>
                                 <select id="year" name="year" class="form-control mr-2">
                                     <option value="">All</option>
                                     {% for year in years %}
-                                    <option value="{{ year.year }}">{{ year.year }}</option>
+                                        <option value="{{ year.year }}" {% if year.year|stringformat:"s" == selected_year %}selected{% endif %}>{{ year.year }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col">
                                 <label for="month" class="mr-2">Month:</label>
                                 <select id="month" name="month" class="form-control mr-2">
                                     <option value="">All</option>
                                     {% for month in months %}
-                                    <option value="{{ month.month }}">{{ month|date:"F" }}</option>
+                                            <option value="{{ forloop.counter }}" {% if selected_month == forloop.counter %}selected{% endif %}>{{ month }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -666,17 +670,21 @@ hr {
                                 <select id="day" name="day" class="form-control mr-2">
                                     <option value="">All</option>
                                     {% for day in days %}
-                                    <option value="{{ day }}">{{ day }}</option>
+                                        <option value="{{ day }}" {% if day|stringformat:"s" == selected_day %}selected{% endif %}>{{ day }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary mt-3 d-block m-auto">Filter</button>
+
+                        <button type="submit" class="btn btn-primary mt-5 m-auto d-block">Filter</button>
                     </form>
+
+
 
                 </div>
             </div>
         </div>
+
 
     </div>
 </div>

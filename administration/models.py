@@ -16,7 +16,7 @@ class AdminData(models.Model):
 
 class Inbound(models.Model):
     time = models.DateField()
-    admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, related_name='inbounds')
+    admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
     class Weekday(models.TextChoices):
         mon = "Monday", "Monday"
@@ -43,6 +43,7 @@ class Inbound(models.Model):
 
 class Outbound(models.Model):
     time = models.DateField()
+    admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
     class Weekday(models.TextChoices):
         mon = "Monday", "Monday"
@@ -67,6 +68,7 @@ class Outbound(models.Model):
 
 class Returns(models.Model):
     time = models.DateField()
+    admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
     class Weekday(models.TextChoices):
         mon = "Monday", "Monday"
@@ -87,6 +89,7 @@ class Returns(models.Model):
 
 class Capacity(models.Model):
     time = models.DateField()
+    admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
     class Weekday(models.TextChoices):
         mon = "Monday", "Monday"
@@ -105,6 +108,7 @@ class Capacity(models.Model):
 
 class Inventory(models.Model):
     time = models.DateField()
+    admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
     class Weekday(models.TextChoices):
         mon = "Monday", "Monday"
