@@ -1,0 +1,56 @@
+{% load static %}
+{% load sass_tags %}
+
+<!-- user profile first-style start-->
+<div class="col-sm-12">
+    <div class="card hovercard text-center">
+        <div class="cardheader"></div>
+        <div class="user-image">
+            <div class="avatar"><img alt="" src="{% static 'assets/images/user/7.jpg' %}"></div>
+            <div class="icon-wrapper"><i class="icofont icofont-pencil-alt-5"></i></div>
+        </div>
+        <div class="info">
+            <div class="row">
+                <div class="col-sm-6 col-lg-4 order-sm-1 order-xl-0">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="ttl-info text-start">
+                                <h5><i class="fa fa-envelope"></i>   Email</h5><span>{{ user.email }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="ttl-info text-start">
+                                <h5><i class="fa fa-calendar"></i>   Date Joined</h5><span>{{ date_joined }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-lg-4 order-sm-0 order-xl-1">
+                    <div class="user-designation">
+                        <div class="title" style="text-transform: capitalize;">{{ user.username }}</div>
+                        {% if is_admin %}
+                        <div class="desc">Admin</div>
+                        {% endif %}
+                        {% if is_company %}
+                        <div class="desc">Customer</div>
+                        {% endif %}
+
+
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4 order-sm-2 order-xl-2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="ttl-info text-start">
+                                <h5><i class="fa fa-phone"></i>   Last Login</h5><span>{{ last_login }}</span>
+                            </div>
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+<!-- user profile first-style end-->

@@ -130,4 +130,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'selected_day': day,
         })
 
+        current_user = self.request.user
+        user_type = "Admin" if current_user.is_admin else "Company"
+        context['current_user'] = self.request.user
+        context['user_type'] = "Admin"
+
         return context

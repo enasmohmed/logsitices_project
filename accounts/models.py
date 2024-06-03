@@ -11,6 +11,12 @@ class CustomUser(AbstractUser):
     is_company = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        # إذا كان المستخدم مُسجل كمسؤول
         if self.is_admin:
+            # جعله فعالًا
+            self.is_active = True
+            # جعله موظفًا
+            self.is_staff = True
+            # جعله مشرفًا
             self.is_superuser = True
         super().save(*args, **kwargs)

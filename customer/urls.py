@@ -1,6 +1,9 @@
+from django.urls import path
+
+from customer.views import CustomerDashboardView
+
 app_name = "customer"
 
 urlpatterns = [
-    # path("", views.index, name="index"),
-    # path('export_to_excel/', views.export_to_excel, name='export_to_excel'),
+    path('customer_dashboard/', CustomerDashboardView.as_view(), name='customer_dashboard'),
 ]

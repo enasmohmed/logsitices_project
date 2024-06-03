@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'sass_processor',
     'widget_tweaks',
     'accounts',
+    "bootstrap4",
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -56,10 +57,18 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'project.urls'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    # BASE_DIR / 'administration/static',  # أضف أي مسارات ثابتة أخرى إذا كانت موجودة
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         # 'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -114,6 +123,14 @@ USE_I18N = True
 
 USE_TZ = True
 
+# STATICFILES_FINDERS = [
+#     'django.contrib.staticfiles.finders.FileSystemFinder',
+#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#     'sass_processor.finders.CssFinder',
+# ]
+
+SASS_PROCESSOR_ROOT = BASE_DIR / 'static'
+
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -123,11 +140,11 @@ STATICFILES_FINDERS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/logistics/administration/static/'
-
-STATIC_ROOT = BASE_DIR / 'administration/static'
-
-SASS_PROCESSOR_ROOT = BASE_DIR / 'static'
+# STATIC_URL = '/logistics/administration/static/'
+#
+# STATIC_ROOT = BASE_DIR / 'administration/static'
+#
+# SASS_PROCESSOR_ROOT = BASE_DIR / 'static'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

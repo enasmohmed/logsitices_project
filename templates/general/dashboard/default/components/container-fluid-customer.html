@@ -1,0 +1,328 @@
+{% load static %}
+{% load sass_tags %}
+
+<style>
+
+    .vertical-hr {
+       border-left: 2px solid #231c1c;
+       height: 100%;
+       margin-right: 60px;
+   }
+   .custom-box {
+       border: 1px solid #6c757d;
+       border-radius: 0.25rem;
+       padding: 10px;
+       transition: background-color 0.3s, color 0.3s;
+       text-align: center;
+       margin-bottom: 15px;
+   }
+   .container {
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       margin: 10px;
+       margin-bottom: 25px;
+   }
+
+
+   .header-top{
+       position: relative;
+   }
+   .line-button{
+       position: absolute;
+       width: 100%;
+       bottom: -13px;
+       border: 1px solid #118dec;
+       margin-top: 10px;
+       opacity: unset;
+
+   }
+   h4{
+       color: #118dec;
+   }
+    #box1{
+        border: 1px solid #118dec;
+        border-radius: 0.25rem;
+        padding: 6px;
+        text-align: center;
+        margin-bottom: 15px;
+        width: 50%;
+        font-size: 28px;
+        background-color: #118DF0;
+        color: #fff;
+        font-weight: 500;
+
+    }
+
+     #box2{
+        border: 1px solid #2ECC71;
+        border-radius: 0.25rem;
+        padding: 6px;
+        text-align: center;
+        margin-bottom: 15px;
+        width: 50%;
+        font-size: 28px;
+        background-color: #2ECC71;
+        color: #fff;
+        font-weight: 500;
+    }
+
+     #box3{
+        border: 1px solid #118DF0;
+        border-radius: 0.25rem;
+        padding: 6px;
+        text-align: center;
+        margin-bottom: 15px;
+        width: 50%;
+        font-size: 28px;
+        background-color: #118DF0;
+        color: #fff;
+        font-weight: 500;
+    }
+    .box-title{
+        color: #000;
+    }
+
+
+</style>
+
+<!-- Container-fluid starts-->
+<div class="container-fluid default-dashboard general-widget">
+    <div class="row">
+        <div class="col-xl-2 col-xl-2 col-md-2 box-col-4e">
+            <div class="card selling-product">
+                <div class="card-header pb-0">
+                    <div class="header-top">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                            <path fill="#118dec"
+                                  d="M19 4h-2V3a1 1 0 0 0-2 0v1H9V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3m1 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7h16Zm0-9H4V7a1 1 0 0 1 1-1h2v1a1 1 0 0 0 2 0V6h6v1a1 1 0 0 0 2 0V6h2a1 1 0 0 1 1 1Z"/>
+                        </svg>
+                        <hr class="line-button">
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card transaction-history">
+                        <div class="card-header pb-0">
+                            <div class="header-top">
+                                <h4>Years</h4>
+                                <hr class="line-button">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-box" style="height: 70px; overflow-y: auto;">
+                                {% for year in years %}
+                                <option value="{{ year.year }}">{{ year.year }}</option>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card transaction-history">
+                        <div class="card-header pb-0">
+                            <div class="header-top">
+                                <h4>Months</h4>
+                                <hr class="line-button">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-box" style="height: 70px; overflow-y: auto;">
+                                {% for month in months %}
+                                <option value="{{ month }}">{{ month }}</option>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card transaction-history">
+                        <div class="card-header pb-0">
+                            <div class="header-top">
+                                <h4>Day</h4>
+                                <hr class="line-button">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-box" style="height: 70px; overflow-y: auto;">
+                                {% for day in days %}
+                                <option value="{{ day }}">{{ day }}</option>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-12 col-lg-10 box-col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="header-top">
+                        <h4>Inbound</h4>
+                        <hr class="line-button">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row" style="margin-top: 4%;">
+                        <!-- النصف الأيسر -->
+                        <div class="col-md-5">
+                            <!-- مربعات -->
+                            <div class="container">
+                                <div id="box1" class="custom-box">
+                                    <div class="box-number">{{ total_received_completely }}</div>
+                                </div>
+                                <div class="box-header">
+                                    <h4 class="box-title">Received Completely</h4>
+                                </div>
+
+                            </div>
+                            <div class="container">
+                                <div id="box2" class="custom-box">
+                                    <div class="box-number">{{ total_received_partially }}</div>
+                                </div>
+                                <div class="box-header">
+                                    <h4 class="box-title">Received Partially</h4>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div id="box3" class="custom-box">
+                                    <div class="box-number">{{ total_rejected_completely }}</div>
+                                </div>
+                                <div class="box-header">
+                                    <h4 class="box-title">Rejected Completely</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                            <hr class="vertical-hr">
+                        </div>
+                        <!-- النصف الأيمن -->
+                        <div class="col-md-6">
+                            <!-- شارتات -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="chart-asn" style="margin-left: -50px;"></div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <p class="mt-3">No. of Orders</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div id="chart3"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="chart4"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <p class="mt-3">Order type</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    window.chartData = {
+        totalShipmentsInASN: {{ total_shipments_in_asn }},
+        totalArrived: {{ total_arrived }},
+        totalNoShow: {{ total_no_show }},
+    };
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var data = window.chartData;
+
+        // التأكد من أن البيانات تُمرر بشكل صحيح
+        console.log(data);
+
+        var options = {
+            series: [{
+                data: [data.totalShipmentsInASN, data.totalArrived, data.totalNoShow]
+            }],
+
+            chart: {
+                type: 'bar',
+                height: 150,
+                toolbar: {
+                    show: false  // إخفاء الشرطات الثلاث على اليمين
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 0,  // إزالة الزوايا الدائرية
+                    horizontal: true,
+                    barHeight: '80%',  // تقليل حجم البارات لتقريب المسافات بينها
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function (val) {
+                    return val;
+                },
+                style: {
+                    fontSize: '14px'
+                },
+                offsetX: 0,
+                offsetY: -5
+            },
+            xaxis: {
+                categories: ['Total Shipments in ASN', 'Total Arrived', 'Total No Show'],
+                labels: {
+                    style: {
+                        fontSize: '16px'  // تكبير حجم الخط لمحور x
+                    },
+                    show: false  // إخفاء الأرقام على المحور x
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        fontSize: '13px',  // تكبير حجم الخط لمحور y
+                        whiteSpace: 'nowrap',  // ضمان عدم التفاف النص
+                        maxWidth: 600,  // تحديد أقصى عرض للنص
+                    },
+                    offsetX: -10,  // ضبط المسافة بين النص والمحور
+                    padding: {
+                        left: 0,
+                        right: 0
+                    }
+                }
+            },
+            grid: {
+                show: false  // إخفاء الشبكة
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val;  // عرض القيمة فقط بدون أي نص إضافي
+                    }
+                }
+            },
+            stroke: {
+                show: false  // إخفاء الخطوط حول الأعمدة
+            },
+
+
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart-asn"), options);
+        chart.render();
+    });
+</script>
+<!-- Container-fluid Ends-->

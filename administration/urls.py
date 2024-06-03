@@ -5,5 +5,5 @@ from administration.views import DashboardView
 app_name = "administration"
 
 urlpatterns = [
-    path('', DashboardView.as_view(), name='index'),
+    path('admin_dashboard/', DashboardView.as_view(), name='admin_dashboard'),
 ]
