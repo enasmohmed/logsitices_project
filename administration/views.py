@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from django.views.generic import TemplateView
 
-from .models import Inbound, Outbound, Returns, Capacity, Inventory, AdminData
+from .models import AdminInbound, AdminOutbound, AdminReturns, AdminCapacity, AdminInventory, AdminData
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -15,7 +15,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         # بيانات فتات الخبز
         context['breadcrumb'] = {
-            "title": "Dashboard For Admin",
+            "title": "Healthcare Dachshund",
             "parent": "Dashboard",
             "child": "Default"
         }
@@ -27,11 +27,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         day = self.request.GET.get('day')
 
         # تصفية البيانات بناءً على المعايير المحددة
-        inbound_data = Inbound.objects.all()
-        outbound_data = Outbound.objects.all()
-        returns_data = Returns.objects.all()
-        capacity_data = Capacity.objects.all()
-        inventory_data = Inventory.objects.all()
+        inbound_data = AdminInbound.objects.all()
+        outbound_data = AdminOutbound.objects.all()
+        returns_data = AdminReturns.objects.all()
+        capacity_data = AdminCapacity.objects.all()
+        inventory_data = AdminInventory.objects.all()
 
         if hc_business:
             inbound_data = inbound_data.filter(admin_data__hc_business=hc_business)
@@ -99,12 +99,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['total_last_movement'] = inventory_data.aggregate(Sum('last_movement'))['last_movement__sum'] or 0
 
         # احتساب عدد السنين، الشهور، والأيام
-        year_count = Inbound.objects.dates('time', 'year').count()
-        month_count = Inbound.objects.dates('time', 'month').count()
-        day_count = Inbound.objects.dates('time', 'day').count()
+        year_count = AdminInbound.objects.dates('time', 'year').count()
+        month_count = AdminInbound.objects.dates('time', 'month').count()
+        day_count = AdminInbound.objects.dates('time', 'day').count()
 
         # الحصول على جميع السنين والشهور والأيام
-        years = Inbound.objects.dates('time', 'year')
+        years = AdminInbound.objects.dates('time', 'year')
         months = list(calendar.month_name)[1:]
         days = range(1, 32)  # للحصول على أيام الشهر
 

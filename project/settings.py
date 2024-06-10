@@ -41,7 +41,16 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'accounts',
     "bootstrap4",
+
+    'import_export',
+    'django_tables2',
+    'django_datatables_view',
+
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
@@ -152,6 +161,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL: str = 'accounts.CustomUser'
 
-LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = "/"

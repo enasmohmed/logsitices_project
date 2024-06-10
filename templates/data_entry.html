@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Entry</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+        }
+
+        .tabs {
+            display: flex;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            justify-content: center;
+            border-top: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .tab {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-right: 2px;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f1f1;
+        }
+
+        .numbering {
+            width: 30px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function showTabContent(event, tabContentId) {
+            var tabContents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            document.getElementById(tabContentId).classList.add('active');
+        }
+
+        function addRowNumbers() {
+            var tables = document.getElementsByTagName('table');
+            for (var i = 0; i < tables.length; i++) {
+                var rows = tables[i].getElementsByTagName('tr');
+                for (var j = 1; j < rows.length; j++) {
+                    var cell = document.createElement('td');
+                    cell.className = 'numbering';
+                    cell.innerHTML = j;
+                    rows[j].insertBefore(cell, rows[j].firstChild);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addRowNumbers();
+        });
+    </script>
+</head>
+<body>
+<div class="content">
+    <div id="inbound" class="tab-content active">
+        {% load django_tables2 %}
+        <table>
+            <thead>
+            <tr>
+                <th class="numbering">#</th>
+                <th>Time</th>
+                <th>Assigned Day</th>
+                <th>Total Shipments in ASN</th>
+                <th>Arrived</th>
+                <th>No Show</th>
+                <th>Received Completely</th>
+                <th>Rejected Completely</th>
+                <th>Received Partially</th>
+                <th>Under Tamer Inspection</th>
+                <th>Waiting for MOD Inspection</th>
+                <th>Waiting for NUPCO Action</th>
+                <th>Total Dash of GR Reports Shared</th>
+                <th>Dash of GR Reports with Discrepancy</th>
+                <th>Total SKUs Received</th>
+                <th>Dash of SKUs Damaged During Receiving</th>
+                <th>Total Received with Putaway</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in table_inbound.data %}
+            <tr>
+                <td></td>
+                <td>{{ row.time }}</td>
+                <td>{{ row.assigned_day }}</td>
+                <td>{{ row.total_shipments_in_asn }}</td>
+                <td>{{ row.arrived }}</td>
+                <td>{{ row.no_show }}</td>
+                <td>{{ row.received_completely }}</td>
+                <td>{{ row.rejected_completely }}</td>
+                <td>{{ row.received_partially }}</td>
+                <td>{{ row.under_tamer_inspection }}</td>
+                <td>{{ row.waiting_for_mod_inspection }}</td>
+                <td>{{ row.waiting_for_nupco_action }}</td>
+                <td>{{ row.total_dash_of_gr_reports_shared }}</td>
+                <td>{{ row.dash_of_gr_reports_with_discrepancy }}</td>
+                <td>{{ row.total_skus_received }}</td>
+                <td>{{ row.dash_of_skus_damaged_during_receiving }}</td>
+                <td>{{ row.total_received_with_putaway }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Repeat similar structure for other tables -->
+</div>
+<div class="tabs">
+    <div class="tab" onclick="showTabContent(event, 'inbound')">Inbound</div>
+    <div class="tab" onclick="showTabContent(event, 'outbound')">Outbound</div>
+    <div class="tab" onclick="showTabContent(event, 'returns')">Returns</div>
+    <div class="tab" onclick="showTabContent(event, 'expiry')">Expiry</div>
+    <div class="tab" onclick="showTabContent(event, 'damage')">Damage</div>
+    <div class="tab" onclick="showTabContent(event, 'travel_distance')">Travel Distance</div>
+    <div class="tab" onclick="showTabContent(event, 'inventory')">Inventory</div>
+    <div class="tab" onclick="showTabContent(event, 'pallet_location_availability')">Pallet Location Availability</div>
+    <div class="tab" onclick="showTabContent(event, 'hse')">HSE</div>
+</div>
+</body>
+</html>

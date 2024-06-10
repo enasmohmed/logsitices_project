@@ -6,17 +6,16 @@ from django.db import models
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(unique=True)
+    is_customer = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    is_company = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
+    is_employee = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        # إذا كان المستخدم مُسجل كمسؤول
-        if self.is_admin:
-            # جعله فعالًا
+        if self.is_employee:
             self.is_active = True
-            # جعله موظفًا
             self.is_staff = True
-            # جعله مشرفًا
-            self.is_superuser = True
+        elif self.is_admin:
+            self.is_active = True
+            self.is_staff = True
         super().save(*args, **kwargs)

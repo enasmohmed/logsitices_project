@@ -1,19 +1,19 @@
 from django.contrib import admin
 
-from customer.models import Inbound, Company, Outbound, Returns, Expiry, Damage, \
-    TravelDistance, \
-    Inventory, PalletLocationAvailability, HSE
+from customer.models import CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
+    CustomerTravelDistance, \
+    CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, Customer
 
 # Register your models here.
 
 
-admin.site.register(Company)
-admin.site.register(Inbound)
-admin.site.register(Outbound)
-admin.site.register(Returns)
-admin.site.register(Expiry)
-admin.site.register(Damage)
-admin.site.register(TravelDistance)
-admin.site.register(Inventory)
-admin.site.register(PalletLocationAvailability)
-admin.site.register(HSE)
+admin.site.register(Customer)
+admin.site.register(CustomerInbound)
+admin.site.register(CustomerOutbound)
+admin.site.register(CustomerReturns)
+admin.site.register(CustomerExpiry)
+admin.site.register(CustomerDamage)
+admin.site.register(CustomerTravelDistance)
+admin.site.register(CustomerInventory)
+admin.site.register(CustomerPalletLocationAvailability)
+admin.site.register(CustomerHSE)

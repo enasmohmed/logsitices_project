@@ -27771,7 +27771,7 @@ footer {
   right: 0;
 }
 .login-card .login-main .theme-form input {
-  background-color: rgba(92, 97, 242, 0.1);
+  background-color: rgb(92 97 242);
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }

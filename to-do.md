@@ -34,4 +34,11 @@
         - data for (file dashboard for admin "sheet1" ) كل الداتا الموجوده في شيت وان ماعدا hc bussiness
 
     * Models Company or customer
-        - data for (file dashboard for company "MOD-Taif") ما عدا سطر الادمن 
+        - data for (file dashboard for company "MOD-Taif") ما عدا سطر الادمن
+
+حاليا ابغا واجهات
+
+- [ ] واجهتي ( اوافق على المستخدمين واقدر اعدل على الداتا وكل الداشبورد تظهرلي )
+- [ ] واجه مدير  ( داش بورد الادمن )
+- [ ] واجه موظف  ( يشوف الداش بورد تبع العميل ويظيف داتا )
+- [ ] واجه عميل ( يشوف الداش بورد تبع شركتوا وينزل الداتا ويظيف تعليقات )

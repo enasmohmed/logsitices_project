@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Entry</title>
+
+    <style>
+        *{box-sizing: border-box;}
+             table th{background: #eee;padding: 3px 0px; text-align: center; font-size: 14px; min-width: 100px; width: 100px; border-right: 1px solid #ccc;}
+             table tr th:first-child{width: 40px;min-width: 40px;  }
+             th .dgSel{border: 3px solid transparent; width: 1px; height: 20px; float: right; }
+             th .dgSel:hover{border: 3px solid #444; }
+             table td{font-size: 14px;text-align: center;}
+             table tr td:first-child{width: 40px; background: #eee; border-bottom: 1px solid #ccc; text-align: center; font-size: 12px}
+             table tr:first-child td input{border-top: 1px solid #ccc;}
+             table td input{border-top: 0px; border-left: 0px; border-color: #ccc; caret-color: transparent;width:100%  ; -moz-user-select: none;  -khtml-user-select: none;-webkit-user-select: none; -ms-user-select: none;  user-select: none;}
+             table td input.active{border: 1px solid blue; }
+             table td input.sel { caret-color: black ; -moz-user-select: all !important;  -khtml-user-select: all;-webkit-user-select: all !important; -ms-user-select: all !important;  user-select: all !important;}
+             table td input.msel{background: #cae9ff}
+           .hdTbBx {width: 92%;float: left;}
+             .drgLine{position: absolute; height: 100vh; width: 1px ;background: blue; display: none;}
+             .unselectable { -moz-user-select: none;  -khtml-user-select: none;-webkit-user-select: none; -ms-user-select: none;  user-select: none;}
+    .tabs{
+        position: absolute;
+        bottom: 0px;
+    }
+    .tab {
+        cursor: pointer;
+        padding: 8px 16px;
+        background-color: #f1f1f1;
+        border: 1px solid #ccc;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .tab-content {
+        display: none;
+    }
+      #table-container {
+
+        overflow-y: scroll; /* تمكين التمرير العمودي */
+        border: 1px solid #ccc; /* إضافة حدود لل div */
+    }
+
+    table {
+        width: 100%; /* عرض الجدول يأخذ عرض ال div */
+    }
+
+     .content-tab {
+        display: none;
+        height: 100%; /* ارتفاع الصفحة */
+        overflow-y: auto; /* تمكين التمرير العمودي */
+    }
+    .table-bordered {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .table-bordered th, .table-bordered td {
+        border: 1px solid #ddd;  /* لون الحدود */
+        padding: 8px;
+    }
+
+    .table-bordered tr:nth-child(even) {
+        background-color: #f9f9f9;  /* لون الخلفية للصفوف الزوجية */
+    }
+
+    .table-bordered tr:hover {
+        background-color: #f1f1f1;  /* لون الخلفية عند التمرير */
+    }
+    </style>
+
+
+
+</head>
+<body>
+
+
+
+
+<div class="tabs">
+    <div class="tab" onclick="showTab('companies-tab')">Company</div>
+    <div class="tab" onclick="showTab('inbounds-tab')">Inbound</div>
+    <div class="tab" onclick="showTab('outbounds-tab')">Outbound</div>
+    <div class="tab" onclick="showTab('returns-tab')">Return</div>
+    <div class="tab" onclick="showTab('expiries-tab')">ExpirY</div>
+    <div class="tab" onclick="showTab('damages-tab')">Damage</div>
+    <div class="tab" onclick="showTab('travel_distances-tab')">Travel Distances</div>
+    <div class="tab" onclick="showTab('inventories-tab')">Inventories</div>
+    <div class="tab" onclick="showTab('pallet_location_availabilities-tab')">Pallet location Availabilities</div>
+    <div class="tab" onclick="showTab('hses-tab-tab')">HSE</div>
+</div>
+
+
+<div id="companies-tab" class="content-tab">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">User</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+       {% for company in companies %}
+        <tr>
+            <td>{{ company.id }}</td>
+            <td contenteditable="true" onblur="updateCompany({{ company.id }}, 'name_company', this.innerText)">{{ company.name_company }}</td>
+            <td contenteditable="true" onblur="updateCompany({{ company.id }}, 'user.username', this.innerText)">{{ request.user.username }}</td>
+            <td>
+                <button type="button" onclick="deleteCompany({{ company.id }})">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+</div>
+
+
+<div id="inbounds-tab" class="content-tab">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Time</th>
+            <th scope="col">Day</th>
+            <th scope="col">Total Shipments in ASN</th>
+            <th scope="col">Arrived</th>
+            <th scope="col">No show</th>
+            <th scope="col">Received Completely</th>
+            <th scope="col">Rejected Completely</th>
+            <th scope="col">Received Partially</th>
+            <th scope="col">Under Tamer Inspection</th>
+            <th scope="col">Waiting for MOD Inspection</th>
+            <th scope="col">Waiting for NUPCO Action</th>
+            <th scope="col">Total # of GR Reports Shared</th>
+            <th scope="col"># of GR reports with Discripancy</th>
+            <th scope="col">Total SKUS received</th>
+            <th scope="col"># of SKUS Damaged During Receiving</th>
+            <th scope="col">Total Received with Putaway</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for inbound in inbounds %}
+        <tr>
+            <td>{{ inbound.id }}</td>
+            <td>{{ inbound.time }}</td>
+            <td>{{ inbound.assigned_day }}</td>
+            <td>{{ inbound.total_shipments_in_asn }}</td>
+            <td>{{ inbound.arrived }}</td>
+            <td>{{ inbound.no_show }}</td>
+            <td>{{ inbound.received_completely }}</td>
+            <td>{{ inbound.rejected_completely }}</td>
+            <td>{{ inbound.received_partially }}</td>
+            <td>{{ inbound.under_tamer_inspection }}</td>
+            <td>{{ inbound.waiting_for_mod_inspection }}</td>
+            <td>{{ inbound.waiting_for_NUPCO_action }}</td>
+            <td>{{ inbound.total_dash_of_GR_reports_shared }}</td>
+            <td>{{ inbound.dash_of_GR_reports_with_discripancy }}</td>
+            <td>{{ inbound.total_SKUS_received }}</td>
+            <td>{{ inbound.dash_of_skus_damaged_during_receiving }}</td>
+            <td>{{ inbound.total_received_with_putaway }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+<script>
+    edit = 0;
+ sedit = 0;
+ crow = 1;
+ ccolumn = 1;
+ mdrag = 0;
+ frmDid = 0;
+ dst_x = 0;
+ dst_y = 0;
+ hst_x = 0;
+ hst_y = 0;
+ sd_clm = 0;
+ sd_row = 0;
+ ld_clm = 0;
+ ld_row = 0;
+ selection = 0;
+ isCut = 0;
+
+
+
+ $(document).on('keypress', '.inputbx', function(e)
+ {
+     if (e.key !== "Enter")
+     {
+         if (sedit == 0)
+         {
+             $(this).val("");
+             sedit = 1;
+         }
+     }
+ })
+
+ dr_th_width = 0;
+ dr_th_tag = 0;
+ dr_th_x = 0;
+ dr_y = 0;
+ $(document).on('mousedown', '.dgSel', function(e)
+ {
+     tag = $(this).attr("tag") || '';
+     width = $(this).attr("width") || '';
+     dr_th_x = e.clientX;
+     dr_th_y = e.clientY
+     dr_th_width = parseInt(width);
+     dr_th_tag = parseInt(tag);
+     $('.drgLine').css("margin-left", dr_th_x);
+     $('.drgLine').show();
+ })
+
+
+ $(document).on('mousedown', '.edbdy', function(e)
+ {
+     if ($(e.target).closest(".hdLfBx").length === 0)
+     {
+         $('.inputbx').removeClass("msel");
+         if (sedit == 0)
+         {
+             dst_x = e.clientX;
+             dst_y = e.clientY;
+             frmDid = e.target.id;
+             sd_clm = $('#' + frmDid).attr("column") || '';
+             sd_row = $('#' + frmDid).attr("row")
+             mdrag = 1;
+         }
+     }
+ })
+
+ $(document).on('mousemove', 'body', function(e)
+ {
+
+     if (mdrag == 1)
+     {
+         e.preventDefault()
+         hst_x = e.clientX;
+         hst_y = e.clientY;
+
+         element = document.elementFromPoint(e.clientX, e.clientY);
+         endDid = element.id;
+         ld_clm2 = $('#' + endDid).attr("column") || '';
+         ld_row2 = $('#' + endDid).attr("row");
+         if (ld_clm != ld_clm2 || ld_row != ld_row2)
+         {
+             $('.inputbx').removeClass("msel")
+             ld_clm = ld_clm2;
+             ld_row = ld_row2;
+             createSelectCell()
+         }
+     }
+     else if (dr_th_tag != 0)
+     {
+         e.preventDefault()
+         dm_th_x = e.clientX;
+         $('.drgLine').css("margin-left", dm_th_x);
+     }
+ })
+
+ function createSelectCell()
+ {
+     ld_row = parseInt(ld_row);
+     sd_row = parseInt(sd_row);
+
+     sd_clm = parseInt(sd_clm);
+     ld_clm = parseInt(ld_clm);
+
+     if (ld_row != sd_row || ld_clm != sd_clm)
+     {
+         selection = 1;
+         if (ld_row >= sd_row)
+         {
+             for (i = sd_row; i <= ld_row; i++)
+             {
+                 for (j = sd_clm; j <= ld_clm; j++)
+                 {
+                     $('.crw' + i + j).addClass("msel");
+                 }
+             }
+         }
+     }
+     else
+     {
+         selection = 0;
+     }
+ }
+
+
+ $(document).on('mouseup', 'body', function(e)
+ {
+     mdrag = 0;
+     if (dr_th_tag != 0)
+     {
+         dm_th_x = e.clientX;
+         dm_th_y = e.clientY;
+
+         diff_x = dm_th_x - dr_th_x;
+         diff_y = dm_th_y - dr_th_y;
+
+         nwidth = parseInt(dr_th_width) + diff_x;
+         if (nwidth > 50)
+         {
+             $('.dgSel' + dr_th_tag).attr("width", nwidth);
+             $('.thd_th' + dr_th_tag).css("min-width", nwidth + 'px');
+         }
+         lstDrg = dr_th_tag;
+         dr_th_tag = 0;
+         $('.drgLine').hide();
+        //send to backend
+         $.post("action.php",
+         {
+             updateColumnWidth: 'true',
+             column: lstDrg,
+             width: nwidth
+         }, function(data) {})
+
+     }
+
+ })
+ $(document).on('change', '.inputbx', function()
+ {
+     val = $(this).val() || '';
+     row = $(this).attr("row");
+     column = $(this).attr("column");
+     $.post("action.php",
+     {
+         updateColumn: 'true',
+         val: val,
+         row: row,
+         column: column
+     }, function(data) {
+
+     })
+ })
+
+ $(document).on('dblclick', '.inputbx', function(e)
+ {
+     if (window.getSelection().empty)
+     { // Chrome
+         window.getSelection().empty();
+     }
+     else if (window.getSelection().removeAllRanges)
+     { // Firefox
+         window.getSelection().removeAllRanges();
+     };
+     val = $(this).val() || '';
+     row = $(this).attr("row");
+     column = $(this).attr("column");
+     edit = 1;
+     sedit = 1;
+     crow = row;
+     ccolumn = column;
+     $('.crw' + crow + ccolumn).addClass("sel");
+
+
+ })
+
+ $(document).on('click', '.inputbx', function()
+ {
+     val = $(this).val() || '';
+     row = $(this).attr("row");
+     column = $(this).attr("column");
+
+     if (sedit == 1 && crow == row && ccolumn == column)
+     {}
+     else
+     {
+         crow = row;
+         ccolumn = column;
+         sedit = 0;
+
+         $('.inputbx').removeClass("active");
+         $('.inputbx').removeClass("sel");
+         $('.crw' + crow + ccolumn).addClass("active");
+         $('.crw' + crow + ccolumn).focus()
+     }
+ })
+
+ $(document).on('keyup', '.inputbx', function(e)
+ {
+     if (e.key === "Enter")
+     {
+         if (edit == 1)
+         {
+             row = $(this).attr("row");
+             column = $(this).attr("column");
+
+             nrow = parseInt(row) + 1;
+             crow = nrow;
+             ccolumn = column;
+             $('.inputbx').removeClass("active");
+             $('.inputbx').removeClass("sel");
+             $('.crw' + crow + ccolumn).addClass("active");
+
+             var v = $('.crw' + nrow + column).val();
+             $('.crw' + nrow + column).focus().val("").val(v);
+             edit = 0;
+             sedit = 0;
+         }
+         else
+         {
+             edit = 1
+             sedit = 1;
+             $('.crw' + crow + ccolumn).addClass("sel");
+         }
+     }
+ })
+
+ document.onkeydown = checkKey;
+
+ function checkKey(e)
+ {
+     e = e || window.event;
+     if (e.keyCode >= 37 && e.keyCode <= 40)
+     {
+         if (edit == 0)
+         {
+             if (e.keyCode == '37')
+             {
+                 // left arrow
+                 if (ccolumn > 1)
+                 {
+                     ccolumn = ccolumn - 1;
+                 }
+             }
+             else if (e.keyCode == '38')
+             {
+                 // up arrow
+                 if (crow > 1)
+                 {
+                     crow = crow - 1;
+                 }
+             }
+             else if (e.keyCode == '39')
+             {
+                 if (ccolumn < 20)
+                 {
+                     ccolumn = parseInt(ccolumn) + 1;
+                 }
+             }
+             else if (e.keyCode == '40')
+             {
+                 // down arrow
+                 if (crow < 20)
+                 {
+                     crow = parseInt(crow) + 1;
+                 }
+             }
+             if (e.keyCode >= 37 && e.keyCode <= 40)
+             {
+                 sedit = 0;
+             }
+             $('.inputbx').removeClass("active");
+             $('.crw' + crow + ccolumn).addClass("active");
+             $('.crw' + crow + ccolumn).focus();
+         }
+     }
+
+     if (e.ctrlKey && e.keyCode == 68)
+     {
+         e.preventDefault();
+         if (selection == 1)
+         {
+             chtml = $('.crw' + sd_row + sd_clm).val() || '';
+             $('.inputbx.msel').val(chtml);
+             updateSelectedBox();
+         }
+     }
+     else if (e.ctrlKey && e.keyCode == 86)
+     {
+         // paste copy items // ctrl + c
+         if (selection == 1)
+         {
+             row = sd_row;
+             column = sd_clm;
+         }
+         else
+         {
+             row = $('.inputbx.active').attr("row");
+             column = $('.inputbx.active').attr("column");
+         }
+
+         e.preventDefault();
+         navigator.clipboard.readText().then(text =>
+         {
+             var cpText = text;
+             cnt = 0;
+             txtAr = cpText.split("\n");
+             txtAr2 = cpText.split("\t");
+             if (txtAr.length > 1 || txtAr2.length > 1)
+             {
+                 $('.inputbx').removeClass("msel");
+                 for (ii in txtAr)
+                 {
+                     nrow = parseInt(row) + parseInt(ii);
+                     sbtxt = txtAr[ii];
+                     sbTxtAr = sbtxt.split("\t");
+                     cnt++;
+                     for (jj in sbTxtAr)
+                     {
+                         nclm = parseInt(column) + parseInt(jj);
+                         $('.crw' + nrow + nclm).val(sbTxtAr[jj])
+                         $('.crw' + nrow + nclm).addClass("msel")
+                     }
+                 }
+             }
+             else if (selection == 1)
+             {
+                 $('.inputbx.msel').val(cpText);
+             }
+             else
+             {
+                 $('.crw' + row + column).val(cpText)
+             }
+             if (cnt > 1)
+             {
+                 selection = 1;
+             }
+
+             if (isCut == 1)
+             {
+                 if (cutArr != '')
+                 {
+                     for (ii in cutArr)
+                     {
+                         txt = cutArr[ii];
+                         txtAr = txt.split("_");
+                         ct_row = txtAr[0];
+                         ct_clm = txtAr[1];
+                         $('.crw' + ct_row + ct_clm).val('');
+                     }
+                 }
+                 navigator.clipboard.writeText('')
+             }
+             updateSelectedBox();
+         })
+     }
+     else if (e.ctrlKey && e.keyCode == 65)
+     {
+         // select all // ctrl + a
+         $('.inputbx').addClass("msel");
+         selection = 1;
+     }
+     else if (e.key == "Delete")
+     {
+         e.preventDefault();
+         if (selection == 1)
+         {
+             chtml = $('.crw' + sd_row + sd_clm).val() || '';
+             $('.inputbx.msel').val('');
+             updateSelectedBox();
+         }
+     }
+     if (e.ctrlKey && e.keyCode == 67 && edit == 0)
+     {
+         isCut = 0;
+         e.preventDefault();
+         copyText(e);
+     }
+     if (e.ctrlKey && e.keyCode == 88 && edit == 0)
+     {
+         isCut = 1;
+         e.preventDefault();
+         copyText(e, 1);
+     }
+ }
+
+ function copyText(event = '', isCut = 0)
+ {
+     if (selection == 1)
+     {
+         htm = '';
+         lastRw = sd_row;
+         cutArr = [];
+         i = 0;
+         $('.inputbx.msel').each(function()
+         {
+             row = $(this).attr("row");
+             column = $(this).attr("column");
+             val = $(this).val() || '';
+
+             if (isCut == 1)
+             {
+                 cutArr[i] = row + '_' + column;
+             }
+
+             if (row == lastRw)
+             {
+                 if (sd_clm == column)
+                 {
+                     htm += val;
+                 }
+                 else
+                 {
+                     htm += "\t" + val;
+                 }
+             }
+             else
+             {
+                 if (sd_clm == column)
+                 {
+                     htm += "\n" + val;
+                 }
+                 else
+                 {
+                     htm += "\t" + val;
+                 }
+             }
+             lastRw = row;
+             i++;
+         })
+     }
+     else
+     {
+         frmDid = event.target.id;
+         htm = $('#' + frmDid).val() || '';
+
+         if (isCut == 1)
+         {
+             i = 0;
+             cutArr = [];
+             row = $('#' + frmDid).attr("row")
+             column = $('#' + frmDid).attr("column")
+             cutArr[i] = row + '_' + column;
+         }
+     }
+     navigator.clipboard.writeText(htm)
+ }
+
+ function updateSelectedBox()
+ {
+     alArr = [];
+     i = 0
+     $('.inputbx.msel').each(function()
+     {
+         row = $(this).attr("row");
+         column = $(this).attr("column");
+         val = $(this).val() || '';
+         val = val.replace(/"/g, '&#x22;');
+         val = val.replace(/'/g, '&#x27;');
+         jsn = '{"r":' + row + ', "c":' + column + ', "val":"' + val + '"}';
+         arr = JSON.parse(jsn);
+         alArr[i] = arr;
+         i++;
+     })
+
+     if (isCut == 1)
+     {
+         if (cutArr != '')
+         {
+             for (ii in cutArr)
+             {
+                 txt = cutArr[ii];
+                 txtAr = txt.split("_");
+                 ct_row = txtAr[0];
+                 ct_clm = txtAr[1];
+
+                 jsn = '{"r":' + ct_row + ', "c":' + ct_clm + ', "val":""}';
+                 arr = JSON.parse(jsn);
+                 alArr[i] = arr;
+                 i++;
+             }
+         }
+         isCut = 0;
+         cutArr = [];
+     }
+   //send to backend
+     $.post("action.php",
+     {
+         updateBulkColumn: 'update',
+         data: alArr
+     }, function(data) {})
+
+ }
+
+ $(document).on('click', '.hdTbBx', function(e)
+ {
+     if (!window.event.ctrlKey)
+     {
+         $('.inputbx').removeClass("msel")
+     }
+     column = $(this).attr("tag");
+     $('.tby_td' + column + ' .inputbx').addClass("msel");
+     if (!window.event.ctrlKey)
+     {
+         sd_row = $('.tby_td' + column + ' .inputbx').attr("row") || 1
+         sd_clm = column
+     }
+     selection = 1
+ })
+ $(document).on('click', '.hdLfBx', function(e)
+ {
+     if (!window.event.ctrlKey)
+     {
+         $('.inputbx').removeClass("msel")
+     }
+     row = $(this).attr("tag");
+     $('.tbx_td' + row + ' .inputbx').addClass("msel");
+     if (!window.event.ctrlKey)
+     {
+         sd_row = row;
+         sd_clm = $('.tbx_td' + row + ' .inputbx').attr("column") || 1
+     }
+     selection = 1
+ })
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        showTab('companies-tab');
+    });
+
+    function showTab(tabName) {
+        var tabs = document.getElementsByClassName("content-tab");
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].style.display = "none";
+        }
+        document.getElementById(tabName).style.display = "block";
+    }
+</script>
+
+<script>
+    function updateCompany(id, field, value) {
+        fetch("{% url 'customer:data_entry' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'update': {
+                    'id': id,
+                    [field]: value
+                }
+            })
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  console.log('Data updated successfully');
+              } else {
+                  console.error('Error updating data');
+              }
+          });
+    }
+
+    function deleteCompany(id) {
+        fetch("{% url 'customer:data_entry' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ 'delete': { 'id': id } })
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  location.reload();
+              } else {
+                  console.error('Error deleting data');
+              }
+          });
+    }
+</script>
+
+
+</body>
+</html>

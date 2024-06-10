@@ -14,7 +14,7 @@ class AdminData(models.Model):
         return f'{self.user.username} - {self.hc_business}'
 
 
-class Inbound(models.Model):
+class AdminInbound(models.Model):
     time = models.DateField()
     admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
@@ -41,7 +41,7 @@ class Inbound(models.Model):
         return str(self.id)
 
 
-class Outbound(models.Model):
+class AdminOutbound(models.Model):
     time = models.DateField()
     admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
@@ -66,7 +66,7 @@ class Outbound(models.Model):
         return str(self.id)
 
 
-class Returns(models.Model):
+class AdminReturns(models.Model):
     time = models.DateField()
     admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
@@ -87,7 +87,7 @@ class Returns(models.Model):
         return str(self.id)
 
 
-class Capacity(models.Model):
+class AdminCapacity(models.Model):
     time = models.DateField()
     admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 
@@ -106,7 +106,7 @@ class Capacity(models.Model):
         return str(self.id)
 
 
-class Inventory(models.Model):
+class AdminInventory(models.Model):
     time = models.DateField()
     admin_data = models.ForeignKey(AdminData, on_delete=models.CASCADE, default=1)
 

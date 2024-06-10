@@ -1,0 +1,414 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Data</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group legend {
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Choose the data type</legend>
+            <div class="form-group">
+                <label for="data_type">Data Type </label>
+                <select id="data_type" name="data_type" class="form-control">
+                    <option value="admin">Admin</option>
+                    <option value="customer">Customer</option>
+                </select>
+            </div>
+        </fieldset>
+
+         <fieldset id="admin_data">
+            <legend>Data Admin</legend>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ admin_data_form.user|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_data_form.total_quantities|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_data_form.total_no_of_employees|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_data_form.hc_business|as_crispy_field }}
+                </div>
+                 <legend>Inbound</legend>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.number_of_vehicles_daily|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.number_of_pallets|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.bulk|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.mix|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.cold|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.frozen|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.ambient|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inbound_form.pending_shipments|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-12">
+                    {{ admin_inbound_form.no_of_shipments|as_crispy_field }}
+                </div>
+                <legend>Outbound</legend>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.tender|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.private|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.lines|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.total_quantities|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.bulk|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_outbound_form.loose|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-12">
+                    {{ admin_outbound_form.pending_orders|as_crispy_field }}
+                </div>
+                <legend>Return</legend>
+                <div class="form-group col-md-6">
+                    {{ admin_returns_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_returns_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_returns_form.no_of_return|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_returns_form.no_of_lines|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-12">
+                    {{ admin_returns_form.total_quantities|as_crispy_field }}
+                </div>
+                <legend>Capacity</legend>
+                <div class="form-group col-md-6">
+                    {{ admin_capacity_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_capacity_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-12">
+                    {{ admin_capacity_form.total_available_locations_and_accupied|as_crispy_field }}
+                </div>
+                <legend>Inventory</legend>
+                <div class="form-group col-md-6">
+                    {{ admin_inventory_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ admin_inventory_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-12">
+                    {{ admin_inventory_form.last_movement|as_crispy_field }}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset id="customer_data" style="display: none;">
+            <legend>Data Customer</legend>
+            <div class="form-row">
+                <legend>General Information</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_form.name_company|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_form.user|as_crispy_field }}
+                </div>
+
+                 <legend>Inbound</legend>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.time|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.assigned_day|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.total_shipments_in_asn|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.arrived|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.no_show|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.received_completely|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.rejected_completely|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.received_partially|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.under_tamer_inspection|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.waiting_for_mod_inspection|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.waiting_for_NUPCO_action|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.total_dash_of_GR_reports_shared|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.dash_of_GR_reports_with_discripancy|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.total_SKUS_received|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.dash_of_skus_damaged_during_receiving|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.number_of_vehicles_daily|as_crispy_field }}
+                 </div>
+                 <div class="form-group col-md-6">
+                    {{ customer_inbound_form.total_received_with_putaway|as_crispy_field }}
+                 </div>
+
+                <legend>Outbound</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.order_received_from_npco|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.pending_orders|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_order_not_yet_picked|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_orders_waiting_for_mod_qc|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_orders_that_are_ready_for_dispatch|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_orders_that_are_delivered_today|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.justification_for_the_delay_order_by_order|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.total_skus_picked|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.total_dash_of_SKU_discripancy_in_Order|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_PODs_collected_on_time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_outbound_form.number_of_PODs_collected_Late|as_crispy_field }}
+                </div>
+
+                <legend>Returns</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_returns_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_returns_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_returns_form.total_orders_items_returned|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_returns_form.number_of_return_items_orders_updated_on_time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_returns_form.number_of_return_items_orders_updated_late|as_crispy_field }}
+                </div>
+
+                <legend>Expiry</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_expiry_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_expiry_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_expiry_form.total_SKUs_expired|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_expiry_form.total_expired_SKUS_disposed|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_expiry_form.nearly_expired_1_to_3_months|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_expiry_form.nearly_expired_3_to_6_months|as_crispy_field }}
+                </div>
+
+                <legend>Damage</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_damage_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_damage_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_damage_form.Total_QTYs_Damaged_by_WH|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_damage_form.Number_of_Damaged_during_receiving|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_damage_form.Total_Damaged_QTYs_Disposed|as_crispy_field }}
+                </div>
+
+                <legend>Travel Distance</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_travel_distance_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_travel_distance_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_travel_distance_form.Total_no_of_Customers_deliverd|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_travel_distance_form.Total_no_of_Pallet_deliverd|as_crispy_field }}
+                </div>
+
+                <legend>Inventory</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_inventory_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_inventory_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_inventory_form.Total_Locations_Audited|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_inventory_form.Total_Locations_with_Incorrect_SKU_and_Qty|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_inventory_form.Total_SKUs_Reconciliation|as_crispy_field }}
+                </div>
+
+                <legend>Pallet Location Availability</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.Total_Storage_Pallet|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.Total_Storage_Bin|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.Total_Storage_pallet_empty|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.Total_Storage_Bin_empty|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.Total_occupied_pallet_location|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_pallet_location_availability_form.Total_occupied_Bin_location|as_crispy_field }}
+                </div>
+
+                 <legend>HSE</legend>
+                <div class="form-group col-md-6">
+                    {{ customer_hse_form.time|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_hse_form.assigned_day|as_crispy_field }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ customer_hse_form.Total_Incidents_on_the_side|as_crispy_field }}
+                </div>
+
+            </div>
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary mt-3">Add Data</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('data_type').addEventListener('change', function() {
+        var adminData = document.getElementById('admin_data');
+        var customerData = document.getElementById('customer_data');
+        if (this.value === 'admin') {
+            adminData.style.display = 'block';
+            customerData.style.display = 'none';
+        } else {
+            adminData.style.display = 'none';
+            customerData.style.display = 'block';
+        }
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+</body>
+</html>

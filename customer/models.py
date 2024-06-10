@@ -5,15 +5,15 @@ from django.db import models
 # Create your models here.
 
 
-class Company(models.Model):
+class Customer(models.Model):
     name_company = models.CharField(max_length=255)
-    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name_company
 
 
-class Inbound(models.Model):
+class CustomerInbound(models.Model):
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -24,7 +24,7 @@ class Inbound(models.Model):
         fri = "Friday", "Friday"
         sund = "Sunday", "Sunday"
 
-    assigned_day = models.CharField(max_length=10, choices=Weekday.choices)
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
 
     total_shipments_in_asn = models.IntegerField(blank=True, null=True)
     arrived = models.IntegerField(blank=True, null=True)
@@ -41,174 +41,178 @@ class Inbound(models.Model):
     dash_of_skus_damaged_during_receiving = models.IntegerField(blank=True, null=True)
     total_received_with_putaway = models.IntegerField(blank=True, null=True)
 
-    OBD = models.CharField(max_length=255, blank=True, null=True)
-    INVOICE = models.CharField(max_length=255, blank=True, null=True)
-    PO = models.CharField(max_length=255, blank=True, null=True)
+    def __str__(self):
+        return str(self.id)
 
-    class SELECTION(models.TextChoices):
-        default = "...", "..."
-        sur = "Surgical Innovation", "Surgical Innovation"
-        pat = "Patient Monitoring", "Patient Monitoring"
-        res = "Respiratory Interventions", "Respiratory Interventions"
-        ent = "ENT", "ENT"
-        neu = "Neurovascular", "Neurovascular"
-        end = "Endovenous", "Endovenous"
-        cor = "Coronary", "Coronary"
-        foc = "FOC", "FOC"
-        wm = "WM", "WM"
 
-    OU = models.CharField(max_length=255, choices=SELECTION.choices, default='....')
-    Ship_to_Location = models.CharField(max_length=255, blank=True, null=True)
-    Shipment_dash = models.CharField(max_length=255, blank=True, null=True)
-    PGI_Date = models.CharField(max_length=255, blank=True, null=True)
-    Q = models.CharField(max_length=255, blank=True, null=True)
-    ASN_Appointment = models.CharField(max_length=255, blank=True, null=True)
-    ASN = models.CharField(max_length=255, blank=True, null=True)
+class CustomerOutbound(models.Model):
+    time = models.DateField()
 
-    class ASNSTATUSSELECTION(models.TextChoices):
-        default = "...", "..."
-        rga = "RGA", "RGA"
-        deliv = "Delivered", "Delivered"
-        app = "Approved", "Approved"
-        new = "New", "New"
-        re = "Return", "Return"
-        re_as = "Re-ASN", "Re-ASN"
-        rej = "Rejected", "Rejected"
-        iss = "Issue", "Issue"
-        not_deliv = "Not Delivered", "Not Delivered"
-        under = "Under RGA", "Under RGA"
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
 
-    ASN_Status = models.CharField(max_length=255, choices=ASNSTATUSSELECTION.choices, default='....')
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
 
-    class PODSELECTION(models.TextChoices):
-        default = "...", "..."
-        cn = "CN", "CN"
-        pod = "POD", "POD"
-
-    POD = models.CharField(max_length=255, choices=PODSELECTION.choices, default='....')
-
-    class GRNASNSELECTION(models.TextChoices):
-        default = "...", "..."
-        gr = "GR Issued", "GR Issued"
-        nodeliv = "Not Delivered", "Not Delivered"
-        phy = "Physically Received", "Physically Received"
-        na = "N/A", "N/A"
-
-    GRN_ASN = models.CharField(max_length=255, choices=GRNASNSELECTION.choices, default='....')
-
-    OLD_ASN = models.CharField(max_length=255, blank=True, null=True)
-    Date_of_OLD_ASN = models.CharField(max_length=255, blank=True, null=True)
-    OLD_ASN_Status = models.CharField(max_length=255, blank=True, null=True)
-
-    class ISSUESELECTION(models.TextChoices):
-        default = "...", "..."
-        po = "PO Expiry Date", "PO Expiry Date"
-        appo = "Appointment canceled from NUPCO", "Appointment canceled from NUPCO"
-        asn = "ASN QTY Mismatch", "ASN QTY Mismatch"
-        size = "Size of item", "Size of item"
-        ship = "Ship to Location", "Ship to Location"
-        war = "Warehouse Transfer", "Warehouse Transfer"
-        tra = "Transportation issue", "Transportation issue"
-        wro = "Wrong/Missing Information", "Wrong/Missing Information"
-        sho = "Short Notice Approval from Nupco", "Short Notice Approval from Nupco"
-        dis = "Dispatch request before PO Due Date (early)", "Dispatch request before PO Due Date (early)"
-        ann = "Annual Cycle Count", "Annual Cycle Count"
-        qty = "QTY Issue", "QTY Issue"
-        shi = "Shipment closed/not visible on NUPCO portal", "Shipment closed/not visible on NUPCO portal"
-        inv = "Invoice Issue", "Invoice Issue"
-        poiss = "PO Issue", "PO Issue"
-        shel = "Short shelf life of item", "Short shelf life of item"
-        nup = "NUPCO Deleted some lines from the ASN", "NUPCO Deleted some lines from the ASN"
-        enin = "Eninvoicing Issue", "Eninvoicing Issue"
-
-    Issue = models.CharField(max_length=255, choices=ISSUESELECTION.choices, default='....')
-    Remark_1 = models.CharField(max_length=255, blank=True, null=True)
-    Remark_2 = models.CharField(max_length=255, blank=True, null=True)
+    order_received_from_npco = models.IntegerField(blank=True, null=True)
+    pending_orders = models.IntegerField(blank=True, null=True)
+    number_of_order_not_yet_picked = models.IntegerField(blank=True, null=True)
+    number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress = models.IntegerField(blank=True, null=True)
+    number_of_orders_waiting_for_mod_qc = models.IntegerField(blank=True, null=True)
+    number_of_orders_that_are_ready_for_dispatch = models.IntegerField(blank=True, null=True)
+    number_of_orders_that_are_delivered_today = models.IntegerField(blank=True, null=True)
+    justification_for_the_delay_order_by_order = models.IntegerField(blank=True, null=True)
+    total_skus_picked = models.IntegerField(blank=True, null=True)
+    total_dash_of_SKU_discripancy_in_Order = models.IntegerField(blank=True, null=True)
+    number_of_PODs_collected_on_time = models.IntegerField(blank=True, null=True)
+    number_of_PODs_collected_Late = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class Outbound(models.Model):
-    order_received_from_npco = models.CharField(max_length=255, blank=True, null=True)
-    pending_orders = models.CharField(max_length=255, blank=True, null=True)
-    number_of_order_not_yet_picked = models.CharField(max_length=255, blank=True, null=True)
-    number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress = models.CharField(max_length=255, blank=True,
-                                                                                         null=True)
-    number_of_orders_waiting_for_mod_qc = models.CharField(max_length=255, blank=True, null=True)
-    number_of_orders_that_are_ready_for_dispatch = models.CharField(max_length=255, blank=True, null=True)
-    number_of_orders_that_are_delivered_today = models.CharField(max_length=255, blank=True, null=True)
-    justification_for_the_delay_order_by_order = models.CharField(max_length=255, blank=True, null=True)
-    total_skus_picked = models.CharField(max_length=255, blank=True, null=True)
-    total_dash_of_SKU_discripancy_in_Order = models.CharField(max_length=255, blank=True, null=True)
-    number_of_PODs_collected_on_time = models.CharField(max_length=255, blank=True, null=True)
-    number_of_PODs_collected_Late = models.CharField(max_length=255, blank=True, null=True)
+class CustomerReturns(models.Model):
+    time = models.DateField()
+
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
+
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+
+    total_orders_items_returned = models.IntegerField(blank=True, null=True)
+    number_of_return_items_orders_updated_on_time = models.IntegerField(blank=True, null=True)
+    number_of_return_items_orders_updated_late = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class Returns(models.Model):
-    total_orders_items_returned = models.CharField(max_length=255, blank=True, null=True)
-    number_of_return_items_orders_updated_on_time = models.CharField(max_length=255, blank=True, null=True)
-    number_of_return_items_orders_updated_late = models.CharField(max_length=255, blank=True, null=True)
+class CustomerExpiry(models.Model):
+    time = models.DateField()
+
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
+
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+    total_SKUs_expired = models.IntegerField(blank=True, null=True)
+    total_expired_SKUS_disposed = models.IntegerField(blank=True, null=True)
+    nearly_expired_1_to_3_months = models.IntegerField(blank=True, null=True)
+    nearly_expired_3_to_6_months = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class Expiry(models.Model):
-    total_SKUs_expired = models.CharField(max_length=255, blank=True, null=True)
-    total_expired_SKUS_disposed = models.CharField(max_length=255, blank=True, null=True)
-    nearly_expired_1_to_3_months = models.CharField(max_length=255, blank=True, null=True)
-    nearly_expired_3_to_6_months = models.CharField(max_length=255, blank=True, null=True)
+class CustomerDamage(models.Model):
+    time = models.DateField()
+
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
+
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+    Total_QTYs_Damaged_by_WH = models.IntegerField(blank=True, null=True)
+    Number_of_Damaged_during_receiving = models.IntegerField(blank=True, null=True)
+    Total_Damaged_QTYs_Disposed = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class Damage(models.Model):
-    total_dash_SKUs_Audited_in_Inventory = models.CharField(max_length=255, blank=True, null=True)
-    dash_of_SKUs_with_discripancy = models.CharField(max_length=255, blank=True, null=True)
-    Total_QTYs_Damaged_by_WH = models.CharField(max_length=255, blank=True, null=True)
-    Number_of_Damaged_during_receiving = models.CharField(max_length=255, blank=True, null=True)
-    Total_Damaged_QTYs_Disposed = models.CharField(max_length=255, blank=True, null=True)
+class CustomerTravelDistance(models.Model):
+    time = models.DateField()
+
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
+
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+
+    Total_no_of_Customers_deliverd = models.IntegerField(blank=True, null=True)
+    Total_no_of_Pallet_deliverd = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class TravelDistance(models.Model):
-    Total_no_of_Customers_deliverd = models.CharField(max_length=255, blank=True, null=True)
-    Total_no_of_Pallet_deliverd = models.CharField(max_length=255, blank=True, null=True)
+class CustomerInventory(models.Model):
+    time = models.DateField()
+
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
+
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+    Total_Locations_Audited = models.IntegerField(blank=True, null=True)
+    Total_Locations_with_Incorrect_SKU_and_Qty = models.IntegerField(blank=True, null=True)
+    Total_SKUs_Reconciliation = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class Inventory(models.Model):
-    Total_Locations_Audited = models.CharField(max_length=255, blank=True, null=True)
-    Total_Locations_with_Incorrect_SKU_and_Qty = models.CharField(max_length=255, blank=True, null=True)
-    Total_SKUs_Reconciliation = models.CharField(max_length=255, blank=True, null=True)
+class CustomerPalletLocationAvailability(models.Model):
+    time = models.DateField()
+
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
+
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+    Total_Storage_Pallet = models.IntegerField(blank=True, null=True)
+    Total_Storage_Bin = models.IntegerField(blank=True, null=True)
+    Total_Storage_pallet_empty = models.IntegerField(blank=True, null=True)
+    Total_Storage_Bin_empty = models.IntegerField(blank=True, null=True)
+    Total_occupied_pallet_location = models.IntegerField(blank=True, null=True)
+    Total_occupied_Bin_location = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
 
 
-class PalletLocationAvailability(models.Model):
-    Total_Storage_Pallet = models.CharField(max_length=255, blank=True, null=True)
-    Total_Storage_Bin = models.CharField(max_length=255, blank=True, null=True)
-    Total_Storage_pallet_empty = models.CharField(max_length=255, blank=True, null=True)
-    Total_Storage_Bin_empty = models.CharField(max_length=255, blank=True, null=True)
-    Total_occupied_pallet_location = models.CharField(max_length=255, blank=True, null=True)
-    Total_occupied_pallet_locaiton2 = models.CharField(max_length=255, blank=True, null=True)
+class CustomerHSE(models.Model):
+    time = models.DateField()
 
-    def __str__(self):
-        return str(self.id)
+    class Weekday(models.TextChoices):
+        mon = "Monday", "Monday"
+        tue = "Tuesday", "Tuesday"
+        wed = "Wednesday", "Wednesday"
+        thu = "Thursday", "Thursday"
+        fri = "Friday", "Friday"
+        sund = "Sunday", "Sunday"
 
-
-class HSE(models.Model):
-    Total_Incidents_on_the_side = models.CharField(max_length=255, blank=True, null=True)
+    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
+    Total_Incidents_on_the_side = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)

@@ -1,0 +1,35 @@
+<!-- accounts/approve_users.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Users</title>
+</head>
+<body>
+<h1>Users Awaiting Approval</h1>
+<form method="post">
+    {% csrf_token %}
+    <table>
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Approve</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <button type="submit" name="user_id" value="{{ user.id }}">Approve</button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</form>
+</body>
+</html>
