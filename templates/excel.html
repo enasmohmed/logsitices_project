@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Data Entry</title>
 
+
     <style>
         *{box-sizing: border-box;}
              table th{background: #eee;padding: 3px 0px; text-align: center; font-size: 14px; min-width: 100px; width: 100px; border-right: 1px solid #ccc;}
@@ -26,15 +27,13 @@
     }
     .tab {
         cursor: pointer;
-        padding: 8px 16px;
+        padding: 8px 14px;
         background-color: #f1f1f1;
         border: 1px solid #ccc;
         display: inline-block;
         margin-right: 5px;
     }
-    .tab-content {
-        display: none;
-    }
+
       #table-container {
 
         overflow-y: scroll; /* تمكين التمرير العمودي */
@@ -67,14 +66,22 @@
     .table-bordered tr:hover {
         background-color: #f1f1f1;  /* لون الخلفية عند التمرير */
     }
-    </style>
+    .add-row-btn { margin-bottom: 10px; }
+         .table td, .table th {
+            vertical-align: middle;
+        }
 
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    </style>
 
 
 </head>
 <body>
-
-
 
 
 <div class="tabs">
@@ -82,16 +89,17 @@
     <div class="tab" onclick="showTab('inbounds-tab')">Inbound</div>
     <div class="tab" onclick="showTab('outbounds-tab')">Outbound</div>
     <div class="tab" onclick="showTab('returns-tab')">Return</div>
-    <div class="tab" onclick="showTab('expiries-tab')">ExpirY</div>
+    <div class="tab" onclick="showTab('expiries-tab')">Expiry</div>
     <div class="tab" onclick="showTab('damages-tab')">Damage</div>
     <div class="tab" onclick="showTab('travel_distances-tab')">Travel Distances</div>
     <div class="tab" onclick="showTab('inventories-tab')">Inventories</div>
-    <div class="tab" onclick="showTab('pallet_location_availabilities-tab')">Pallet location Availabilities</div>
-    <div class="tab" onclick="showTab('hses-tab-tab')">HSE</div>
+    <div class="tab" onclick="showTab('pallet_location_availabilities-tab')">Pallet Location Availabilities</div>
+    <div class="tab" onclick="showTab('hses-tab')">HSE</div>
 </div>
 
 
-<div id="companies-tab" class="content-tab">
+<div id="companies-tab" class="tab-content">
+    <button class="add-row-btn" onclick="addRow('Customer')">Add Row</button>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -101,24 +109,28 @@
             <th scope="col">Actions</th>
         </tr>
         </thead>
-       {% for company in companies %}
-        <tr>
+        <tbody>
+        {% for company in companies %}
+        <tr data-id="{{ company.id }}">
             <td>{{ company.id }}</td>
-            <td contenteditable="true" onblur="updateCompany({{ company.id }}, 'name_company', this.innerText)">{{ company.name_company }}</td>
-            <td contenteditable="true" onblur="updateCompany({{ company.id }}, 'user.username', this.innerText)">{{ request.user.username }}</td>
+            <td contenteditable="true"
+                onblur="updateData('Customer', {{ company.id }}, 'name_company', this.innerText)">
+                {{ company.name_company }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateData('Customer', {{ company.id }}, 'username', this.innerText)">
+                {{ company.user.username }}
+            </td>
             <td>
-                <button type="button" onclick="deleteCompany({{ company.id }})">Delete</button>
+                <button onclick="deleteData('Customer', {{ company.id }})">Delete</button>
             </td>
         </tr>
         {% endfor %}
-
-
         </tbody>
     </table>
 </div>
 
-
-<div id="inbounds-tab" class="content-tab">
+<div id="inbounds-tab" class="tab-content">
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -139,28 +151,73 @@
             <th scope="col">Total SKUS received</th>
             <th scope="col"># of SKUS Damaged During Receiving</th>
             <th scope="col">Total Received with Putaway</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
         {% for inbound in inbounds %}
         <tr>
             <td>{{ inbound.id }}</td>
-            <td>{{ inbound.time }}</td>
-            <td>{{ inbound.assigned_day }}</td>
-            <td>{{ inbound.total_shipments_in_asn }}</td>
-            <td>{{ inbound.arrived }}</td>
-            <td>{{ inbound.no_show }}</td>
-            <td>{{ inbound.received_completely }}</td>
-            <td>{{ inbound.rejected_completely }}</td>
-            <td>{{ inbound.received_partially }}</td>
-            <td>{{ inbound.under_tamer_inspection }}</td>
-            <td>{{ inbound.waiting_for_mod_inspection }}</td>
-            <td>{{ inbound.waiting_for_NUPCO_action }}</td>
-            <td>{{ inbound.total_dash_of_GR_reports_shared }}</td>
-            <td>{{ inbound.dash_of_GR_reports_with_discripancy }}</td>
-            <td>{{ inbound.total_SKUS_received }}</td>
-            <td>{{ inbound.dash_of_skus_damaged_during_receiving }}</td>
-            <td>{{ inbound.total_received_with_putaway }}</td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'time', this.innerText)">
+                {{ inbound.time }}
+            </td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'assigned_day', this.innerText)">
+                {{ inbound.assigned_day }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'total_shipments_in_asn', this.innerText)">
+                {{ inbound.total_shipments_in_asn }}
+            </td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'arrived', this.innerText)">
+                {{ inbound.arrived }}
+            </td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'no_show', this.innerText)">
+                {{ inbound.no_show }}
+            </td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'received_completely', this.innerText)">
+                {{ inbound.received_completely }}
+            </td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'rejected_completely', this.innerText)">
+                {{ inbound.rejected_completely }}
+            </td>
+            <td contenteditable="true" onblur="updateInbound({{ inbound.id }}, 'received_partially', this.innerText)">
+                {{ inbound.received_partially }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'under_tamer_inspection', this.innerText)">
+                {{ inbound.under_tamer_inspection }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'waiting_for_mod_inspection', this.innerText)">
+                {{ inbound.waiting_for_mod_inspection }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'waiting_for_NUPCO_action', this.innerText)">
+                {{ inbound.waiting_for_NUPCO_action }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'total_dash_of_GR_reports_shared', this.innerText)">
+                {{ inbound.total_dash_of_GR_reports_shared }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'dash_of_GR_reports_that_include_variance', this.innerText)">
+                {{ inbound.dash_of_GR_reports_that_include_variance }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'total_number_of_SKUS_received', this.innerText)">
+                {{ inbound.total_number_of_SKUS_received }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'number_of_SKUS_damaged_during_receiving', this.innerText)">
+                {{ inbound.number_of_SKUS_damaged_during_receiving }}
+            </td>
+            <td contenteditable="true"
+                onblur="updateInbound({{ inbound.id }}, 'total_received_with_storing', this.innerText)">
+                {{ inbound.total_received_with_storing }}
+            </td>
+            <td>
+                <button type="button" onclick="deleteInbound({{ inbound.id }})">Delete</button>
+            </td>
         </tr>
         {% endfor %}
         </tbody>
@@ -168,9 +225,132 @@
 </div>
 
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        showTab('companies-tab');
+    });
 
+    function showTab(tabId) {
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+    }
 
+    function updateData(model, id, field, value) {
+        fetch("{% url 'customer:data_entry' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({update: {model: model, id: id, field: field, value: value}})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert("Failed to update data: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error updating data:", error);
+        });
+    }
 
+    function addRow(model) {
+        const tableBody = document.querySelector(`#${model.toLowerCase()}-tab tbody`);
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true">{{ user.username }}</td>
+            <td><button onclick="deleteRow(this)">Delete</button></td>
+            <td><button onclick="saveNewRow('${model}', this)">Save</button></td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+
+    function saveNewRow(model, button) {
+        const row = button.closest('tr');
+        const fields = {};
+
+        row.querySelectorAll('td[contenteditable="true"]').forEach((td, index) => {
+            fields[`field${index + 1}`] = td.innerText;
+        });
+
+        fetch("{% url 'customer:data_entry' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({add: {model: model, fields: fields}})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert("Failed to add row: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error adding row:", error);
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrfToken = getCookie('csrftoken');
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true
+        });
+    });
+
+    function deleteRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+    }
+
+    function deleteData(model, id) {
+        fetch("{% url 'customer:data_entry' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({delete: {model: model, id: id}})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert("Failed to delete row: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting row:", error);
+        });
+    }
+</script>
 
 <script>
     edit = 0;
@@ -714,63 +894,9 @@
      selection = 1
  })
 </script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        showTab('companies-tab');
-    });
-
-    function showTab(tabName) {
-        var tabs = document.getElementsByClassName("content-tab");
-        for (var i = 0; i < tabs.length; i++) {
-            tabs[i].style.display = "none";
-        }
-        document.getElementById(tabName).style.display = "block";
-    }
-</script>
-
-<script>
-    function updateCompany(id, field, value) {
-        fetch("{% url 'customer:data_entry' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                'update': {
-                    'id': id,
-                    [field]: value
-                }
-            })
-        }).then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  console.log('Data updated successfully');
-              } else {
-                  console.error('Error updating data');
-              }
-          });
-    }
-
-    function deleteCompany(id) {
-        fetch("{% url 'customer:data_entry' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ 'delete': { 'id': id } })
-        }).then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  location.reload();
-              } else {
-                  console.error('Error deleting data');
-              }
-          });
-    }
-</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 
 </body>

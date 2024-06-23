@@ -1262,7 +1262,7 @@
           z-index: 9;
           height: auto;
           line-height: inherit;
-          background: $sidebar-background;
+          background: #E1F5FE;
           width: $sidebar-width;
           text-align: left;
           transition: 0.3s;
@@ -1535,7 +1535,7 @@
                   span {
                     letter-spacing: 0.7px;
                     text-transform: capitalize;
-                    color: $sidebar-fill-icon-color;
+                    color: #5C6BC0;
                     padding: 4px 8px;
                   }
                   &.link-nav {
@@ -1702,7 +1702,7 @@
                               overflow: hidden;
                               text-overflow: ellipsis;
                               &.active {
-                                color: $white;
+                                color: #135285;
                               }
                               &:after {
                                 left: 12px;

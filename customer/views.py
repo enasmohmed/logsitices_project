@@ -5,16 +5,16 @@ import xlwt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 from administration.models import AdminData
-from customer.models import CustomerInbound, CustomerOutbound, CustomerTravelDistance, CustomerExpiry, CustomerReturns, \
-    CustomerInventory, CustomerHSE, CustomerDamage, \
-    CustomerPalletLocationAvailability, Customer
+from .models import Customer, CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
+    CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
 
 
 @method_decorator(login_required, name='dispatch')
@@ -215,7 +215,8 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         days = range(1, 32)  # للحصول على أيام الشهر
 
         context['current_user'] = self.request.user
-        context['user_type'] = "Customer"
+        user_type = "Employee" if self.request.user.is_employee else "Admin" if self.request.user.is_admin else "Customer"
+        context['user_type'] = user_type
 
         context.update({
             'years': years,
@@ -240,21 +241,70 @@ def data_entry_view(request):
     hses = CustomerHSE.objects.all()
 
     if request.method == 'POST':
-        data = json.loads(request.body)
-        if 'add' in data:
-            # Handle addition logic
-            pass
-        elif 'update' in data:
-            company = get_object_or_404(Customer, id=data['update']['id'])
-            for key, value in data['update'].items():
-                setattr(company, key, value)
-            company.save()
-        elif 'delete' in data:
-            company = get_object_or_404(Customer, id=data['delete']['id'])
-            company.delete()
-        return JsonResponse({"success": True})
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON"})
 
-    return render(request, "excel.html", {
+        model_map = {
+            'Customer': Customer,
+            'CustomerInbound': CustomerInbound,
+            'CustomerOutbound': CustomerOutbound,
+            'CustomerReturns': CustomerReturns,
+            'CustomerExpiry': CustomerExpiry,
+            'CustomerDamage': CustomerDamage,
+            'CustomerTravelDistance': CustomerTravelDistance,
+            'CustomerInventory': CustomerInventory,
+            'CustomerPalletLocationAvailability': CustomerPalletLocationAvailability,
+            'CustomerHSE': CustomerHSE,
+        }
+
+        if 'update' in data:
+            model_name = data['update'].get('model')
+            model_id = data['update'].get('id')
+            field_name = data['update'].get('field')
+            new_value = data['update'].get('value')
+
+            if model_name in model_map:
+                model = model_map[model_name]
+                try:
+                    obj = model.objects.get(id=model_id)
+                except model.DoesNotExist:
+                    return JsonResponse({"success": False, "error": "Object not found"})
+
+                setattr(obj, field_name, new_value)
+                obj.save()
+                return JsonResponse({"success": True})
+            else:
+                return JsonResponse({"success": False, "error": "Invalid model"})
+        elif 'add' in data:
+            model_name = data['add'].get('model')
+            fields = data['add'].get('fields', {})
+
+            if model_name in model_map:
+                model = model_map[model_name]
+                obj = model(**fields)
+                obj.save()
+                return JsonResponse({"success": True, "id": obj.id})
+            else:
+                return JsonResponse({"success": False, "error": "Invalid model"})
+        elif 'delete' in data:
+            model_name = data['delete'].get('model')
+            model_id = data['delete'].get('id')
+
+            if model_name in model_map:
+                model = model_map[model_name]
+                try:
+                    obj = model.objects.get(id=model_id)
+                except model.DoesNotExist:
+                    return JsonResponse({"success": False, "error": "Object not found"})
+
+                obj.delete()
+                return JsonResponse({"success": True})
+            else:
+                return JsonResponse({"success": False, "error": "Invalid model"})
+
+    context = {
         "companies": companies,
         "inbounds": inbounds,
         "outbounds": outbounds,
@@ -266,7 +316,8 @@ def data_entry_view(request):
         "pallet_location_availabilities": pallet_location_availabilities,
         "hses": hses,
         "user": request.user,
-    })
+    }
+    return render(request, "excel.html", context)
 
 
 def export_to_excel(request):

@@ -48747,3 +48747,14 @@ html[dir=rtl] body.dark-only .page-wrapper .page-body-wrapper .page-body .card:n
      62. Responsive CSS Ends
 ==========================**/
 /*# sourceMappingURL=style.css.map */
+
+
+/** Add to code projects **/
+@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
+
+body {
+  font-size: 14px;
+  overflow-x: hidden;
+  font-family: "Caveat" !important;
+  color: #171829;
+}

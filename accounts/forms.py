@@ -3,9 +3,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
 from accounts.models import CustomUser
-from administration.models import AdminData, AdminInbound, AdminOutbound, AdminReturns, AdminCapacity, AdminInventory
-from customer.models import Customer, CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, \
-    CustomerDamage, CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
+from administration.models import AdminInventory, AdminCapacity, AdminReturns, AdminOutbound, AdminInbound, AdminData
+from customer.models import CustomerHSE, CustomerPalletLocationAvailability, CustomerInventory, CustomerTravelDistance, \
+    CustomerDamage, CustomerExpiry, CustomerReturns, CustomerOutbound, CustomerInbound, Customer
 
 
 class CustomUserCreationForm(UserCreationForm):

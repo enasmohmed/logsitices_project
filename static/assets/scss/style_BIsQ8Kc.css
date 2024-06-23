@@ -2349,7 +2349,7 @@ table tbody .border-bottom-warning td {
 body {
   font-size: 14px;
   overflow-x: hidden;
-  font-family: "Lexend", sans-serif;
+  font-family: $landing-cursive;
   color: #171829; }
 
 h1,

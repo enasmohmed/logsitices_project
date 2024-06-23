@@ -145,8 +145,34 @@
             </tbody>
         </table>
     </div>
+
+    <div id="outbound" class="tab-content">
+        {% load django_tables2 %}
+        <table>
+            <thead>
+            <tr>
+                <th class="numbering">#</th>
+                <th>Time</th>
+                <th>Assigned Day</th>
+                <!-- Add table headers for outbound data -->
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in table_outbound.data %}
+            <tr>
+                <!-- Add table cells for outbound data -->
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Repeat similar structure for other tabs -->
+
+
     <!-- Repeat similar structure for other tables -->
 </div>
+
+
 <div class="tabs">
     <div class="tab" onclick="showTabContent(event, 'inbound')">Inbound</div>
     <div class="tab" onclick="showTabContent(event, 'outbound')">Outbound</div>
