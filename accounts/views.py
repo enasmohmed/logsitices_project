@@ -9,10 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView
 
-from .forms import CustomUserCreationForm, ProfileForm, AdminDataForm, CustomerForm, CustomerInboundForm, \
-    CustomerOutboundForm, CustomerReturnsForm, CustomerExpiryForm, CustomerDamageForm, CustomerTravelDistanceForm, \
-    CustomerInventoryForm, CustomerPalletLocationAvailabilityForm, CustomerHSEForm, AdminInboundForm, AdminOutboundForm, \
-    AdminReturnsForm, AdminCapacityForm, AdminInventoryForm
+from .forms import CustomUserCreationForm, ProfileForm, AdminDataForm, CustomerForm
 from .models import CustomUser
 
 User = get_user_model()
@@ -181,59 +178,31 @@ def is_employee(user):
 class AddAdminDataView(View):
     def get(self, request):
         context = {
-            'customer_form': CustomerForm(),
-            'inbound_form': CustomerInboundForm(),
-            'outbound_form': CustomerOutboundForm(),
-            'returns_form': CustomerReturnsForm(),
-            'expiry_form': CustomerExpiryForm(),
-            'damage_form': CustomerDamageForm(),
-            'travel_distance_form': CustomerTravelDistanceForm(),
-            'inventory_form': CustomerInventoryForm(),
-            'pallet_location_availability_form': CustomerPalletLocationAvailabilityForm(),
-            'hse_form': CustomerHSEForm(),
             'admin_data_form': AdminDataForm(),
-            'admin_inbound_form': AdminInboundForm(),
-            'admin_outbound_form': AdminOutboundForm(),
-            'admin_returns_form': AdminReturnsForm(),
-            'admin_capacity_form': AdminCapacityForm(),
-            'admin_inventory_form': AdminInventoryForm(),
+            'customer_form': CustomerForm(),
         }
         return render(request, 'general/dashboard/default/components/add_admin_data.html', context)
 
     def post(self, request):
         data_type = request.POST.get('data_type')
-        forms = {
-            'admin': [
-                AdminDataForm(request.POST),
-                AdminInboundForm(request.POST),
-                AdminOutboundForm(request.POST),
-                AdminReturnsForm(request.POST),
-                AdminCapacityForm(request.POST),
-                AdminInventoryForm(request.POST)
-            ],
-            'customer': [
-                CustomerForm(request.POST),
-                CustomerInboundForm(request.POST),
-                CustomerOutboundForm(request.POST),
-                CustomerReturnsForm(request.POST),
-                CustomerExpiryForm(request.POST),
-                CustomerDamageForm(request.POST),
-                CustomerTravelDistanceForm(request.POST),
-                CustomerInventoryForm(request.POST),
-                CustomerPalletLocationAvailabilityForm(request.POST),
-                CustomerHSEForm(request.POST)
-            ]
-        }
-
-        if data_type in forms and all(form.is_valid() for form in forms[data_type]):
-            for form in forms[data_type]:
+        if data_type == 'admin':
+            form = AdminDataForm(request.POST)
+            if form.is_valid():
                 form.save()
-
-            if data_type == 'admin':
-                print("add data admin success")
+                messages.success(request, 'Admin data added successfully.')
                 return redirect('accounts:employee_dashboard')
             else:
-                print("add data customer success")
+                messages.error(request, 'Invalid admin data. Please check the form.')
+                return redirect('add_admin_data')  # Redirect back to the same page
+        elif data_type == 'customer':
+            form = CustomerForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Customer data added successfully.')
                 return redirect('accounts:customer_dashboard')
+            else:
+                messages.error(request, 'Invalid customer data. Please check the form.')
+                return redirect('add_admin_data')  # Redirect back to the same page
 
-        return render(request, 'general/dashboard/default/components/add_admin_data.html')
+        # If no data type is selected or other error occurred, redirect back to the same page
+        return redirect('add_admin_data')

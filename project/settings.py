@@ -28,7 +28,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # 'jazzmin',
+    # "semantic_admin",
+    # "semantic_forms",
+    # 'admin_volt.apps.AdminVoltConfig',
+    # 'jet.dashboard',
+    # 'jet',
+    'jazzmin',
+    # 'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +47,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'accounts',
     "bootstrap4",
+    'django_filters',
 
     'import_export',
     'django_tables2',
