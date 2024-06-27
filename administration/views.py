@@ -130,9 +130,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'selected_day': day,
         })
 
-        current_user = self.request.user
-        user_type = "Admin" if current_user.is_admin else "Company"
+        # current_user = self.request.user
+        # user_type = "Admin" if current_user.is_admin else "Company"
+        # context['current_user'] = self.request.user
+        # context['user_type'] = "Admin"
+
+        # قم بتحديد user_type واستخدمه لتوجيه المستخدمين إلى الصفحة المناسبة
+        user_type = "Admin" if self.request.user.is_superuser or self.request.user.groups.filter(
+            name='Admin').exists() else "Employee"
+
         context['current_user'] = self.request.user
-        context['user_type'] = "Admin"
+        context['user_type'] = user_type
 
         return context

@@ -115,6 +115,7 @@
         5.9 Box-layout CSS
 
  */
+@import url("https://fonts.googleapis.com/css2?family=Playwrite+DE+Grund:wght@100..400&display=swap");
 :root {
   --theme-default: #5C61F2;
   --theme-secondary: #FF9766;
@@ -2378,11 +2379,13 @@ table tbody .border-bottom-warning td {
     1.2 Typography CSS start
 ==========================**/
 body {
-    font-size: 14px;
-    overflow-x: hidden;
-    font-family:  "Lexend", sans-serif;
-    color: #171829;
-}
+  font-size: 14px;
+  overflow-x: hidden;
+  font-family: "Playwrite DE Grund", cursive !important;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal; }
+
 h1,
 h2,
 h3,
@@ -28340,7 +28343,7 @@ div.dt-button-collection {
   right: 20px;
   top: 22px;
   cursor: pointer;
-  background-color: rgb(123 130 152 / 97%);
+  background-color: rgba(123, 130, 152, 0.2);
   padding: 9px;
   display: flex;
   align-items: center;
@@ -29855,7 +29858,7 @@ footer {
     z-index: 9;
     height: auto;
     line-height: inherit;
-    background: #171829;
+    background: #ccc !important;
     width: 253px;
     text-align: left;
     transition: 0.3s;
@@ -30006,7 +30009,7 @@ footer {
         .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links li a span {
           letter-spacing: 0.7px;
           text-transform: capitalize;
-          color: #9FA8C1;
+          color: #5C6BC0;
           padding: 4px 8px; }
         .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links li a.link-nav .according-menu {
           display: none; }
@@ -30123,7 +30126,7 @@ footer {
             overflow: hidden;
             text-overflow: ellipsis; }
             .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-submenu li a.active {
-              color: #fff; }
+              color: #135285; }
             .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-submenu li a:after {
               left: 12px; }
             .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li .sidebar-submenu li a:hover {

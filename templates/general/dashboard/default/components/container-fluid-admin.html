@@ -157,6 +157,14 @@ hr {
     .title-card{
         color: #5C6BC0;
     }
+    .apexcharts-xaxis text {
+        text-transform: capitalize !important;
+        font-family: 'Playwrite DE Grund' !important;
+    }
+    .apexcharts-xaxis offsetY{
+        top: -10px;
+    }
+
 </style>
 
 <!-- Container-fluid starts-->
@@ -452,93 +460,6 @@ hr {
             </div>
         </div>
 
-        <div class="col-xl-4 col-lg-4 col-md-5">
-            <div class="card transaction-history">
-                <div class="card-header pb-0">
-                    <div class="header-top">
-                        <h4 class="title-card">HC Business</h4>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body" style="height: 100px; overflow-y: auto;">
-                    <div class="table-responsive custom-scrollbar">
-                        <table class="table display" style="width:100%">
-                            <tbody>
-                            {% for business in businesses %}
-                            <tr>
-                                <td>
-                                    <div class="d-flex">
-                                        <div class="flex-grow-1 ms-2" style="text-transform: capitalize;">
-                                            <span>{{ business }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-4 col-md-5">
-            <div class="card transaction-history">
-                <div class="card-header pb-0">
-                    <div class="header-top">
-                        <h4 class="title-card">Year</h4>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="stat-box" style="height: 70px; overflow-y: auto;">
-                        {% for year in years %}
-                        <option value="{{ year.year }}">{{ year.year }}</option>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-2 col-md-5">
-            <div class="card transaction-history">
-                <div class="card-header pb-0">
-                    <div class="header-top">
-                        <h4 class="title-card">Month</h4>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="stat-box" style="height: 70px; overflow-y: auto;">
-                        {% for month in months %}
-                        <option value="{{ month }}">{{ month }}
-                        </option>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-2 col-md-5">
-            <div class="card transaction-history">
-                <div class="card-header pb-0">
-                    <div class="header-top">
-                        <h4 class="title-card">Day</h4>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="stat-box" style="height: 70px; overflow-y: auto;">
-                        {% for day in days %}
-                        <option value="{{ day }}">{{ day }}</option>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="col-xl-12 col-xl-12 col-md-12 box-col-7e">
             <div class="card selling-product">
                 <div class="card-header pb-0">
@@ -607,105 +528,90 @@ hr {
     </div>
 </div>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var categories = ["bulk", "mix", "cold", "frozen", "ambient"];
-      var shipmentData = [
-        {{ shipment_data.bulk|default:0 }},
-        {{ shipment_data.mix|default:0 }},
-        {{ shipment_data.cold|default:0 }},
-        {{ shipment_data.frozen|default:0 }},
-        {{ shipment_data.ambient|default:0 }}
-      ];
+        var categories = ["bulk", "mix", "cold", "frozen", "ambient"];
+        var shipmentData = [
+            {{ shipment_data.bulk|default:0 }},
+            {{ shipment_data.mix|default:0 }},
+            {{ shipment_data.cold|default:0 }},
+            {{ shipment_data.frozen|default:0 }},
+            {{ shipment_data.ambient|default:0 }}
+        ];
 
-      var options = {
-        series: [{
-          name: 'Shipments',
-          type: 'column',
-          data: shipmentData
-        }],
-        chart: {
-          height: 230,
-          type: 'line',
-          stacked: false,
-          toolbar: {
-            show: false,
-          }
-        },
-        stroke: {
-          width: [0, 2, 5],
-          curve: 'stepline'
-        },
-        plotOptions: {
-          bar: {
-            columnWidth: '50%',
-          },
-        },
-        colors: ['#5DADE2'],
-        dropShadow: {
-          enabled: true,
-          top: 5,
-          left: 6,
-          bottom: 5,
-          blur: 2,
-          color: 'black',
-          opacity: 0.5,
-        },
-        grid: {
-          xaxis: {
-            lines: {
-              show: false,
-            }
-          },
-          yaxis: {
-            lines: {
-              show: false,
-            }
-          },
-        },
-        xaxis: {
-          categories: categories.map(function(category) {
-            return category.toUpperCase();
-          }),
-          labels: {
-            style: {
-              fontFamily: 'Lexend, sans-serif',
-              fontWeight: 600,
-              colors: 'black',
+        var options = {
+            series: [{
+                name: 'Shipments',
+                data: shipmentData
+            }],
+            chart: {
+                height: 250,
+                type: 'bar',
+                toolbar: {
+                    show: false,
+                }
             },
-            rotate: 0
-          },
-          axisBorder: {
-            show: false
-          },
-        },
-        dataLabels: {
-          enabled: true,
-          offsetY: -10,
-          style: {
-            fontSize: '12px',
-            colors: ["black"]
-          }
-        },
-        yaxis: {
-          labels: {
-            show: false,
-          },
-        },
-        legend: {
-          show: false,
-        },
-        tooltip: {
-          custom: function ({ series, seriesIndex, dataPointIndex }) {
-            return '<div class="apex-tooltip p-2">' + '<span>' + '<span class="bg-primary">' + '</span>' + 'Shipments' + '<h3>' + '$'+ series[seriesIndex][dataPointIndex] + '<h3/>'  + '</span>' + '</div>';
-          },
-        },
-      };
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%',
+                    distributed: true, // This allows each column to have a different color
+                    borderRadius: 4, // Add border radius if needed
+                }
+            },
+            colors: ['#64B5F6', '#9FA8DA', '#80CBC4', '#64B5F6', '#9FA8DA'], // Set colors for each column
+            grid: {
+                xaxis: {
+                    lines: {
+                        show: false,
+                    }
+                },
+                yaxis: {
+                    lines: {
+                        show: false,
+                    }
+                },
+            },
+            xaxis: {
+                categories: categories,
+                labels: {
+                    style: {
+                        fontWeight: 600,
+                        colors: 'black',
+                    },
+                    rotate: 0
+                },
+                axisBorder: {
+                    show: false
+                },
+            },
+            dataLabels: {
+                enabled: true,
+                offsetY: 90, // Move the data label above the bar
+                style: {
+                    fontSize: '15px',
+                    colors: ["black"],
+                    fontWeight: 600, // Apply the custom font weight
+                }
+            },
+            yaxis: {
+                labels: {
+                    show: false,
+                },
+            },
+            legend: {
+                show: false,
+            },
+            tooltip: {
+                custom: function ({ series, seriesIndex, dataPointIndex }) {
+                    return '<div class="apex-tooltip p-2">' + '<span>' + '<span class="bg-primary">' + '</span>' + 'Shipments' + '<h3>' + '$' + series[seriesIndex][dataPointIndex] + '<h3/>' + '</span>' + '</div>';
+                },
+            },
+        };
 
-      var chart = new ApexCharts(document.querySelector("#growth-chart"), options);
-      chart.render();
+        var chart = new ApexCharts(document.querySelector("#growth-chart"), options);
+        chart.render();
     });
-
 </script>
 
 <script>
@@ -734,6 +640,7 @@ hr {
             dataLabels: {
               name: {
                 fontSize: '16px',
+                fontFamily: 'Playwright DE Grund',
                 offsetY: -70,
                 color: '#888',
                 formatter: function(val) {
@@ -743,12 +650,13 @@ hr {
               value: {
                 offsetY: 0,
                 fontSize: '22px',
+                fontFamily: 'Playwright DE Grund',
                 color: undefined,
                 formatter: function (val) {
                   return val + "%";
                 }
               }
-            }
+            },
           }
         },
         fill: {
@@ -759,7 +667,10 @@ hr {
             inverseColors: false,
             opacityFrom: 1,
             opacityTo: 1,
-            stops: [0, 50, 65, 91]
+            stops: [0, 50, 65, 91],
+            colorStops: [
+              { offset: 0, color: "#64B5F6" }
+            ]
           },
         },
         stroke: {
@@ -782,6 +693,7 @@ hr {
             dataLabels: {
               name: {
                 fontSize: '16px',
+                fontFamily: 'Playwright DE Grund',
                 offsetY: -70,
                 color: '#888',
                 formatter: function(val) {
@@ -791,6 +703,7 @@ hr {
               value: {
                 offsetY: 0,
                 fontSize: '22px',
+                fontFamily: 'Playwright DE Grund',
                 color: undefined,
                 formatter: function (val) {
                   return val + "%";
@@ -807,7 +720,10 @@ hr {
             inverseColors: false,
             opacityFrom: 1,
             opacityTo: 1,
-            stops: [0, 50, 65, 91]
+            stops: [0, 50, 65, 91],
+            colorStops: [
+              { offset: 0, color: "#9FA8DA" },
+            ]
           },
         },
         stroke: {
@@ -830,6 +746,7 @@ hr {
             dataLabels: {
               name: {
                 fontSize: '16px',
+                fontFamily: 'Playwright DE Grund',
                 offsetY: -70,
                 color: '#888',
                 formatter: function(val) {
@@ -839,6 +756,7 @@ hr {
               value: {
                 offsetY: 0,
                 fontSize: '22px',
+                fontFamily: 'Playwright DE Grund',
                 color: undefined,
                 formatter: function (val) {
                   return val + "%";
@@ -855,7 +773,10 @@ hr {
             inverseColors: false,
             opacityFrom: 1,
             opacityTo: 1,
-            stops: [0, 50, 65, 91]
+            stops: [0, 50, 65, 91],
+            colorStops: [
+              { offset: 0, color: "#80CBC4" },
+            ]
           },
         },
         stroke: {
@@ -878,6 +799,7 @@ hr {
             dataLabels: {
               name: {
                 fontSize: '16px',
+                fontFamily: 'Playwright DE Grund',
                 offsetY: -70,
                 color: '#888',
                 formatter: function(val) {
@@ -887,6 +809,7 @@ hr {
               value: {
                 offsetY: 0,
                 fontSize: '22px',
+                fontFamily: 'Playwright DE Grund',
                 color: undefined,
                 formatter: function (val) {
                   return val + "%";
@@ -903,7 +826,11 @@ hr {
             inverseColors: false,
             opacityFrom: 1,
             opacityTo: 1,
-            stops: [0, 50, 65, 91]
+            stops: [0, 50, 65, 91],
+            colorStops: [
+              { offset: 0, color: "#64B5F6"},
+
+            ]
           },
         },
         stroke: {
@@ -922,6 +849,7 @@ hr {
     });
 </script>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var total_capacity = {{ total_capacity|safe }};
@@ -929,7 +857,7 @@ hr {
         var options = {
             series: [total_capacity],
             chart: {
-                height: 238, // قمت هنا بتقليل ارتفاع الرسم البياني لتصغير حجم الدائرة
+                height: 238,
                 type: 'radialBar',
                 toolbar: {
                     show: false,
@@ -941,7 +869,7 @@ hr {
                     endAngle: 225,
                     hollow: {
                         margin: 0,
-                        size: '60%', // قمت هنا بتقليل حجم الدائرة
+                        size: '60%',
                         background: '#fff',
                         image: undefined,
                         imageOffsetX: 0,
@@ -989,16 +917,18 @@ hr {
                     shade: 'dark',
                     type: 'horizontal',
                     shadeIntensity: 0.5,
-                    gradientToColors: ['#ABE5A1'],
+                    gradientToColors: ['#64B5F6', '#9FA8DA', '#80CBC4'], // هنا تضيف ألوان إضافية
                     inverseColors: true,
                     opacityFrom: 1,
                     opacityTo: 1,
-                    stops: [0, 100]
+                    stops: [0, 50, 100]
                 }
             },
             stroke: {
-                lineCap: 'round'
+                lineCap: 'round',
+                colors: ['#9FA8DA'] // تغيير لون حواف الرسم البياني
             },
+            colors: ['#64B5F6', '#9FA8DA', '#80CBC4'] // إضافة ألوان السلسلة
         };
 
         var chart = new ApexCharts(document.querySelector("#chart-capacity"), options);

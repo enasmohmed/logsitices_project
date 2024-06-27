@@ -20,10 +20,6 @@ from django.urls import path, include
 from accounts.views import RegisterView
 
 urlpatterns = [
-    # path('', include('admin_volt.urls')),
-    # path('jet/', include('jet.urls', 'jet')),
-    # path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
-    # path('grappelli/', include('grappelli.urls')),  # grappelli URLS
     path('admin/', admin.site.urls),
     path('administration/', include('administration.urls')),
     path('customer/', include('customer.urls')),

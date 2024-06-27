@@ -1,14 +1,21 @@
+import calendar
+
 from django.contrib import messages
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 
+from administration.models import AdminData
+from customer.models import CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
+    CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
 from .forms import CustomUserCreationForm, ProfileForm, AdminDataForm, CustomerForm
 from .models import CustomUser
 
@@ -23,28 +30,22 @@ class CustomLoginView(AuthLoginView):
 
     def form_valid(self, form):
         user = form.get_user()
-        password = form.cleaned_data.get('password')
 
-        # Check if the user is superuser
-        if user.is_superuser:
-            login(self.request, user)
-            return redirect('/accounts/admin_dashboard/')
-
-        # For non-superuser accounts
-        if not user.is_approved:
+        # Check if the user is superuser or in the Admin group
+        if user.is_superuser or user.groups.filter(name='Admin').exists():
+            return redirect(reverse('accounts:admin_dashboard'))
+        elif not user.is_approved:
             logout(self.request)
             messages.error(self.request, "Your account is pending approval.")
             return redirect('/accounts/login/')
-
-        login(self.request, user)
-        if user.is_admin:
-            return redirect('/accounts/admin_dashboard/')
-        elif user.is_customer:
-            return redirect('/accounts/customer_dashboard/')
-        elif user.is_employee:
-            return redirect('/accounts/employee_dashboard/')
         else:
-            return redirect('/')
+            login(self.request, user)
+            if user.is_customer:
+                return redirect('/accounts/customer_dashboard/')
+            elif user.is_employee:
+                return redirect('/accounts/employee_dashboard/')
+            else:
+                return redirect('/')
 
 
 class CustomRegisterView(CreateView):
@@ -106,9 +107,10 @@ def profile_view(request):
 
 
 # ---------------------------------user
+
+
 @login_required(login_url="/login")
 def user_profile(request):
-    # الحصول على بيانات فتات الخبز
     context = {
         "breadcrumb": {
             "title": "User Profile",
@@ -117,11 +119,16 @@ def user_profile(request):
         }
     }
 
-    # الحصول على المستخدم الحالي
     user = request.user
-
-    # إنشاء نموذج مملوء ببيانات المستخدم الحالي
     form = ProfileForm(instance=user)
+
+    # تحديد نوع المستخدم بناءً على الصلاحيات وعضوية المجموعة
+    if user.is_superuser or user.groups.filter(name='Admin').exists():
+        user_type = "Admin"
+    elif user.is_employee:
+        user_type = "Employee"
+    else:
+        user_type = "Customer"
 
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=user)
@@ -129,45 +136,273 @@ def user_profile(request):
             form.save()
             return redirect('profile')
 
-    # تمرير النموذج إلى القالب
     context['form'] = form
-
-    # تحديد ما إذا كان المستخدم مسجل كمسؤول أو كشركة
-    is_admin = user.is_admin
-    is_customer = user.is_customer
-    is_employee = user.is_employee
-
-    # إضافة المتغيرات إلى السياق
-    context['is_admin'] = is_admin
-    context['is_customer'] = is_customer
-    context['is_employee'] = is_employee
-
-    context['date_joined'] = user.date_joined
-    context['last_login'] = user.last_login
+    context['user_type'] = user_type
 
     return render(request, "user/user-profile/user-profile.html", context)
 
 
 @login_required(login_url="/login")
-def edit_profile(request):
-    context = {"breadcrumb": {"title": "Edit Profile", "parent": "Users", "child": "Edit Profile"}}
-    return render(request, "accounts/user/edit-profile/edit-profile.html", context)
+def redirect_to_dashboard(request):
+    user = request.user
+
+    # التحقق من إذا كان المستخدم مشرفًا فائق الصلاحيات أو عضوًا في مجموعة Admin
+    if user.is_superuser or user.groups.filter(name='Admin').exists():
+        return redirect('accounts:admin_dashboard')
+
+    # التحقق من إذا كان المستخدم عضوًا في مجموعة Employee
+    elif user.is_employee:
+        return redirect('accounts:employee_dashboard')
+
+    # إذا لم يكن المستخدم مشرفًا أو موظفًا، افتراض أن المستخدم عميل
+    else:
+        return redirect('accounts:customer_dashboard')
+
+    # يمكنك إضافة إعادة توجيه افتراضية هنا إذا كان نوع المستخدم غير معروف
+    return redirect('accounts:default_dashboard')
 
 
-@login_required(login_url="/login")
+@user_passes_test(lambda u: u.is_superuser)
 def user_cards(request):
-    context = {"breadcrumb": {"title": "User Cards", "parent": "Users", "child": "User Cards"}}
-    return render(request, "accounts/user/user-cards/user-cards.html", context)
+    # التحقق إذا كان المستخدم الحالي هو سوبر يوزر
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    # جلب جميع المستخدمين
+    users = User.objects.all()
+
+    # تعيين نوع المستخدم
+    if request.user.is_superuser:
+        user_type = "Admin"
+    elif request.user.is_employee:
+        user_type = "Employee"
+    else:
+        user_type = "Customer"
+
+    context = {
+        "breadcrumb": {
+            "title": "User Cards",
+            "parent": "Users",
+            "child": "User Cards"
+        },
+        "users": users,
+        "user_type": user_type  # إضافة user_type إلى السياق
+    }
+
+    return render(request, "user/user-cards/user-cards.html", context)
 
 
 def is_employee(user):
     return user.is_authenticated and user.is_employee
 
 
-@login_required
-@user_passes_test(is_employee)
-def employee_dashboard(request):
-    return render(request, 'general/dashboard/default/components/employee_dashboard.html')
+@method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
+class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumb'] = {
+            "title": "Employee Dashboard",
+            "parent": "Dashboard",
+            "child": "Employee"
+        }
+
+        year = self.request.GET.get('year')
+        month = self.request.GET.get('month')
+        day = self.request.GET.get('day')
+
+        # فلترة البيانات بناءً على القيم المدخلة
+        inbound_data = CustomerInbound.objects.all()
+        outbound_data = CustomerOutbound.objects.all()
+        returns_data = CustomerReturns.objects.all()
+        expiry_data = CustomerExpiry.objects.all()
+        damage_data = CustomerDamage.objects.all()
+        travel_distance_data = CustomerTravelDistance.objects.all()
+        inventory_data = CustomerInventory.objects.all()
+        pallet_location_availability_data = CustomerPalletLocationAvailability.objects.all()
+        hse_data = CustomerHSE.objects.all()
+
+        if year:
+            inbound_data = inbound_data.filter(time__year=year)
+            outbound_data = outbound_data.filter(time__year=year)
+            returns_data = returns_data.filter(time__year=year)
+            expiry_data = expiry_data.filter(time__year=year)
+            damage_data = damage_data.filter(time__year=year)
+            travel_distance_data = travel_distance_data.filter(time__year=year)
+            inventory_data = inventory_data.filter(time__year=year)
+            pallet_location_availability_data = pallet_location_availability_data.filter(time__year=year)
+            hse_data = hse_data.filter(time__year=year)
+
+        if month:
+            inbound_data = inbound_data.filter(time__month=month)
+            outbound_data = outbound_data.filter(time__month=month)
+            returns_data = returns_data.filter(time__month=month)
+            expiry_data = expiry_data.filter(time__month=month)
+            damage_data = damage_data.filter(time__month=month)
+            travel_distance_data = travel_distance_data.filter(time__month=month)
+            inventory_data = inventory_data.filter(time__month=month)
+            pallet_location_availability_data = pallet_location_availability_data.filter(time__month=month)
+            hse_data = hse_data.filter(time__month=month)
+
+        if day:
+            inbound_data = inbound_data.filter(time__day=day)
+            outbound_data = outbound_data.filter(time__day=day)
+            returns_data = returns_data.filter(time__day=day)
+            expiry_data = expiry_data.filter(time__day=day)
+            damage_data = damage_data.filter(time__day=day)
+            travel_distance_data = travel_distance_data.filter(time__day=day)
+            inventory_data = inventory_data.filter(time__day=day)
+            pallet_location_availability_data = pallet_location_availability_data.filter(time__day=day)
+            hse_data = hse_data.filter(time__day=day)
+
+        # إضافة البيانات المفلترة إلى السياق
+        context['inbound_data'] = inbound_data
+        context['outbound_data'] = outbound_data
+        context['returns_data'] = returns_data
+        context['expiry_data'] = expiry_data
+        context['damage_data'] = damage_data
+        context['travel_distance_data'] = travel_distance_data
+        context['inventory_data'] = inventory_data
+        context['pallet_location_availability_data'] = pallet_location_availability_data
+        context['hse_data'] = hse_data
+
+        # الحصول على جميع بيانات Inbound
+        context['inbound_data'] = inbound_data
+        context['total_shipments_in_asn'] = inbound_data.aggregate(Sum('total_shipments_in_asn'))[
+                                                'total_shipments_in_asn__sum'] or 0
+        context['total_arrived'] = inbound_data.aggregate(Sum('arrived'))['arrived__sum'] or 0
+        context['total_no_show'] = inbound_data.aggregate(Sum('no_show'))['no_show__sum'] or 0
+
+        context['total_waiting_for_mod_inspection'] = inbound_data.aggregate(Sum('waiting_for_mod_inspection'))[
+                                                          'waiting_for_mod_inspection__sum'] or 0
+        context['total_dash_of_GR_reports_shared'] = \
+            inbound_data.aggregate(Sum('total_dash_of_GR_reports_shared'))['total_dash_of_GR_reports_shared__sum'] or 0
+        context['total_dash_of_GR_reports_with_discripancy'] = \
+            inbound_data.aggregate(Sum('dash_of_GR_reports_with_discripancy'))[
+                'dash_of_GR_reports_with_discripancy__sum'] or 0
+
+        context['total_received_completely'] = inbound_data.aggregate(Sum('received_completely'))[
+                                                   'received_completely__sum'] or 0
+        context['total_received_partially'] = inbound_data.aggregate(Sum('received_partially'))[
+                                                  'received_partially__sum'] or 0
+        context['total_rejected_completely'] = inbound_data.aggregate(Sum('rejected_completely'))[
+                                                   'rejected_completely__sum'] or 0
+
+        # الحصول على جميع بيانات Outound
+        context['outbound_data'] = outbound_data
+        context['total_order_received_from_npco'] = outbound_data.aggregate(Sum('order_received_from_npco'))[
+                                                        'order_received_from_npco__sum'] or 0
+        context['total_pending_orders'] = outbound_data.aggregate(Sum('pending_orders'))['pending_orders__sum'] or 0
+        context['total_number_of_orders_that_are_delivered_today'] = \
+            outbound_data.aggregate(Sum('number_of_orders_that_are_delivered_today'))[
+                'number_of_orders_that_are_delivered_today__sum'] or 0
+
+        context['total_number_of_PODs_collected_on_time'] = \
+            outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))[
+                'number_of_PODs_collected_on_time__sum'] or 0
+        context['total_number_of_PODs_collected_Late'] = outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
+                                                             'number_of_PODs_collected_Late__sum'] or 0
+        context['total_total_skus_picked'] = outbound_data.aggregate(Sum('total_skus_picked'))[
+                                                 'total_skus_picked__sum'] or 0
+
+        # الحصول على جميع بيانات Returns
+        context['returns_data'] = returns_data
+        context['total_orders_items_returned'] = returns_data.aggregate(Sum('total_orders_items_returned'))[
+                                                     'total_orders_items_returned__sum'] or 0
+        context['total_number_of_return_items_orders_updated_on_time'] = \
+            returns_data.aggregate(Sum('number_of_return_items_orders_updated_on_time'))[
+                'number_of_return_items_orders_updated_on_time__sum'] or 0
+        context['total_number_of_return_items_orders_updated_late'] = \
+            returns_data.aggregate(Sum('number_of_return_items_orders_updated_late'))[
+                'number_of_return_items_orders_updated_late__sum'] or 0
+
+        # الحصول على جميع بيانات Expiry
+        context['expiry_data'] = expiry_data
+        context['total_SKUs_expired'] = expiry_data.aggregate(Sum('total_SKUs_expired'))['total_SKUs_expired__sum'] or 0
+        context['total_expired_SKUS_disposed'] = expiry_data.aggregate(Sum('total_expired_SKUS_disposed'))[
+                                                     'total_expired_SKUS_disposed__sum'] or 0
+        context['total_nearly_expired_1_to_3_months'] = expiry_data.aggregate(Sum('nearly_expired_1_to_3_months'))[
+                                                            'nearly_expired_1_to_3_months__sum'] or 0
+        context['total_nearly_expired_3_to_6_months'] = expiry_data.aggregate(Sum('nearly_expired_3_to_6_months'))[
+                                                            'nearly_expired_3_to_6_months__sum'] or 0
+
+        # Damage
+        context['damage_data'] = damage_data
+        context['Total_QTYs_Damaged_by_WH'] = damage_data.aggregate(Sum('Total_QTYs_Damaged_by_WH'))[
+                                                  'Total_QTYs_Damaged_by_WH__sum'] or 0
+        context['Total_Number_of_Damaged_during_receiving'] = \
+            damage_data.aggregate(Sum('Number_of_Damaged_during_receiving'))[
+                'Number_of_Damaged_during_receiving__sum'] or 0
+        context['Total_Damaged_QTYs_Disposed'] = damage_data.aggregate(Sum('Total_Damaged_QTYs_Disposed'))[
+                                                     'Total_Damaged_QTYs_Disposed__sum'] or 0
+
+        # الحصول على جميع بيانات TravelDistance
+        context['travel_distance_data'] = travel_distance_data
+        context['Total_no_of_Pallet_deliverd'] = travel_distance_data.aggregate(Sum('Total_no_of_Pallet_deliverd'))[
+                                                     'Total_no_of_Pallet_deliverd__sum'] or 0
+        context['Total_no_of_Customers_deliverd'] = \
+            travel_distance_data.aggregate(Sum('Total_no_of_Customers_deliverd'))[
+                'Total_no_of_Customers_deliverd__sum'] or 0
+
+        # Inventory
+        context['inventory_data'] = inventory_data
+        context['Total_Locations_Audited'] = inventory_data.aggregate(Sum('Total_Locations_Audited'))[
+                                                 'Total_Locations_Audited__sum'] or 0
+        context['Total_Locations_with_Incorrect_SKU_and_Qty'] = \
+            inventory_data.aggregate(Sum('Total_Locations_with_Incorrect_SKU_and_Qty'))[
+                'Total_Locations_with_Incorrect_SKU_and_Qty__sum'] or 0
+        context['Total_SKUs_Reconciliation'] = inventory_data.aggregate(Sum('Total_SKUs_Reconciliation'))[
+                                                   'Total_SKUs_Reconciliation__sum'] or 0
+
+        # PalletLocationAvailability
+        context['pallet_location_availability_data'] = pallet_location_availability_data
+        context['Total_Storage_Pallet'] = pallet_location_availability_data.aggregate(Sum('Total_Storage_Pallet'))[
+                                              'Total_Storage_Pallet__sum'] or 0
+        context['Total_Storage_Bin'] = pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin'))[
+                                           'Total_Storage_Bin__sum'] or 0
+        context['Total_Storage_pallet_empty'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_Storage_pallet_empty'))[
+                'Total_Storage_pallet_empty__sum'] or 0
+        context['Total_Storage_Bin_empty'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin_empty'))[
+                'Total_Storage_Bin_empty__sum'] or 0
+        context['Total_Storage_Bin_empty'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin_empty'))[
+                'Total_Storage_Bin_empty__sum'] or 0
+        context['Total_occupied_pallet_location'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_occupied_pallet_location'))[
+                'Total_occupied_pallet_location__sum'] or 0
+        context['Total_occupied_Bin_location'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_occupied_Bin_location'))[
+                'Total_occupied_Bin_location__sum'] or 0
+
+        # HSE
+        context['hse_data'] = hse_data
+        context['Total_Incidents_on_the_side'] = hse_data.aggregate(Sum('Total_Incidents_on_the_side'))[
+                                                     'Total_Incidents_on_the_side__sum'] or 0
+
+        # Admin
+        admin_data = AdminData.objects.all()
+        context['admin_data'] = admin_data.all()
+        context['total_no_of_employees'] = admin_data.aggregate(Sum('total_no_of_employees'))[
+                                               'total_no_of_employees__sum'] or 0
+
+        # الحصول على جميع السنين والشهور والأيام
+        years = CustomerInbound.objects.dates('time', 'year')
+        months = list(calendar.month_name)[1:]
+        days = range(1, 32)  # للحصول على أيام الشهر
+
+        context['current_user'] = self.request.user
+        user_type = "Employee" if self.request.user.is_employee else "Customer"
+        context['user_type'] = user_type
+
+        context.update({
+            'years': years,
+            'months': months,
+            'days': days,
+        })
+        return context
 
 
 def is_employee(user):

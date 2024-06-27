@@ -36,7 +36,6 @@ class ProfileForm(forms.ModelForm):
         fields = ['username', 'email', 'is_admin', 'is_customer', 'is_employee']
 
 
-# form add admin data
 class DateInput(forms.DateInput):
     input_type = 'date'
 

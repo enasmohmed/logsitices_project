@@ -28,13 +28,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # "semantic_admin",
-    # "semantic_forms",
-    # 'admin_volt.apps.AdminVoltConfig',
-    # 'jet.dashboard',
-    # 'jet',
     'jazzmin',
-    # 'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

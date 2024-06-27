@@ -426,77 +426,8 @@
 <!-- Container-fluid starts-->
 <div class="container-fluid default-dashboard general-widget">
     <div class="row">
-        <div class="col-xl-2 col-xl-2 col-md-2 box-col-4e">
-            <div class="card selling-product">
-                <div class="card-header pb-0">
-                    <div class="header-top">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                             style="margin-bottom: 10px;">
-                            <path fill="#3F51B5"
-                                  d="M19 4h-2V3a1 1 0 0 0-2 0v1H9V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3m1 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7h16Zm0-9H4V7a1 1 0 0 1 1-1h2v1a1 1 0 0 0 2 0V6h6v1a1 1 0 0 0 2 0V6h2a1 1 0 0 1 1 1Z"/>
-                        </svg>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card calendar">
-                        <div class="card-header pb-0">
-                            <div class="header-top">
-                                <h4 class="title-card">Years</h4>
-                                <hr class="line-button">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="stat-box">
-                                <select style="width: 100%;" size="4">
-                                    {% for year in years %}
-                                    <option value="{{ year.year }}">{{ year.year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="card calendar">
-                        <div class="card-header pb-0">
-                            <div class="header-top">
-                                <h4 class="title-card">Months</h4>
-                                <hr class="line-button">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="stat-box">
-                                <select style="width: 100%;" size="5">
-                                    {% for month in months %}
-                                    <option value="{{ month }}">{{ month }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card calendar">
-                        <div class="card-header pb-0">
-                            <div class="header-top">
-                                <h4 class="title-card">Day</h4>
-                                <hr class="line-button">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="stat-box">
-                                <select style="width: 100%;" size="4">
-                                    {% for day in days %}
-                                    <option value="{{ day }}">{{ day }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-12 col-lg-10 box-col-12e">
+        <div class="col-xl-12 col-lg-12 box-col-12e">
             <div class="card">
                 <div class="card-header pb-0">
                     <div class="header-top">
@@ -1309,12 +1240,8 @@
                     colors: ['#000'], // Text color
                 },
                 dropShadow: {
-                    enabled: true,
+                    enabled: false,
                 },
-            },
-            title: {
-                text: 'Inventory Data',
-                align: 'center',
             },
             xaxis: {
                 categories: [

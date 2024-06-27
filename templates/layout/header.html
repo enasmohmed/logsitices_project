@@ -1,12 +1,22 @@
 {% load static %}
 {% load sass_tags %}
 
+<style>
+    .gradient-text {
+        background: -webkit-linear-gradient(#64B5F6, #9FA8DA);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2em;
+        font-weight: bolder;
+        font-style: italic;
+    }
+</style>
 <!-- Page Header Start-->
 <div class="page-header mt-0">
     <div class="header-wrapper row m-0">
         <div class="header-logo-wrapper col-auto p-0">
             <div class="logo-wrapper">
-                <a href="/">
+                <a href="{% url 'accounts:redirect_to_dashboard' %}">
                     <img class="img-fluid for-light" src="{% static 'assets/images/logo/logo-1.png' %}" alt="">
                     <img class="img-fluid for-dark" src="{% static 'assets/images/logo/logo.png' %}" alt="">
                 </a>
@@ -22,7 +32,9 @@
             <div class="left-menu-header">
                 <ul class="header-left">
                     <li>
-                        <h2 class="text-uppercase">TAMER DATA ++</h2>
+                        <a href="{% url 'accounts:redirect_to_dashboard' %}">
+                            <h2 class="text-uppercase gradient-text">TAMER DATA ++</h2>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -34,7 +46,7 @@
                     <div class="d-flex align-items-center profile-media"><img class="b-r-10 img-40"
                                                                               src="{% static 'assets/images/dashboard/profile.png' %}"
                                                                               alt="">
-                        <div class="flex-grow-1"><span>{{ current_user.username }}</span>
+                        <div class="flex-grow-1"><span>{{ user.username }}</span>
                             <p class="mb-0">{{ user_type }}</p>
                         </div>
                     </div>
@@ -81,4 +93,6 @@
             </div></script>
     </div>
 </div>
+
+
 <!-- Page Header Ends -->

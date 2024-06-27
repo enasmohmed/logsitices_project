@@ -42,3 +42,12 @@
 - [ ] واجه مدير  ( داش بورد الادمن )
 - [ ] واجه موظف  ( يشوف الداش بورد تبع العميل ويظيف داتا )
 - [ ] واجه عميل ( يشوف الداش بورد تبع شركتوا وينزل الداتا ويظيف تعليقات )
+
+edit profile and user profile and links ---> Done
+edit add data
+edit links for sidebar ----> Done
+user cards for super admin ---> done
+edit color chart for dashboard admin ---> Done
+edit full screen website responseve
+اني اقدر اسجل في صفحه البروفيل انه يقدر يعدلي او يظهرلي كام مرة عدل وكام مرة ضاف داتا للادمن او الشركة
+add fonts website ----> Done

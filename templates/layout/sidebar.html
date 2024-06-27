@@ -5,7 +5,7 @@
 <div class="sidebar-wrapper" data-layout="fill-svg">
     <div>
         <div class="logo-wrapper">
-            <a href="/">
+            <a href="{% url 'accounts:redirect_to_dashboard' %}">
                 <img class="img-fluid" src="{% static 'assets/images/logo/logo.png' %}" alt="">
             </a>
             <div class="toggle-sidebar">
@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="logo-icon-wrapper">
-            <a href="/index">
+            <a href="{% url 'accounts:redirect_to_dashboard' %}">
                 <img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt="">
             </a>
         </div>
@@ -23,11 +23,13 @@
             <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
             <div id="sidebar-menu">
                 <ul class="sidebar-links" id="simple-bar">
-                    <li class="back-btn"><a href="/index"><img class="img-fluid"
-                                                               src="{% static 'assets/images/logo/logo-icon.png' %}"
-                                                               alt=""></a>
-                        <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2"
-                                                                              aria-hidden="true"></i></div>
+                    <li class="back-btn">
+                        <a href="{% url 'accounts:redirect_to_dashboard' %}">
+                            <img class="img-fluid" src="{% static 'assets/images/logo/logo-icon.png' %}" alt="">
+                        </a>
+                        <div class="mobile-back text-end">
+                            <span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i>
+                        </div>
                     </li>
                     <li class="pin-title sidebar-main-title">
                         <div>
@@ -39,18 +41,14 @@
                             <h6 class="lan-1">General</h6>
                         </div>
                     </li>
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title"
-                                                                                href="#">
-                        <svg class="stroke-icon">
-                            <use href="{% static 'assets/svg/icon-sprite.svg' %}#stroke-home"></use>
-                        </svg>
-                        <svg class="fill-icon">
-                            <use href="{% static 'assets/svg/icon-sprite.svg' %}#fill-home"></use>
-                        </svg>
-                        <span class="lan-3">Dashboard</span></a>
-                        <ul class="sidebar-submenu">
-                            <li><a class="lan-4" href="/">Default</a></li>
-                        </ul>
+                    <li class="sidebar-list">
+                        <i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title"
+                           href="{% url 'accounts:redirect_to_dashboard' %}">
+                            <svg class="fill-icon">
+                                <use href="{% static 'assets/svg/icon-sprite.svg' %}#fill-home"></use>
+                            </svg>
+                            <span class="lan-3">Dashboard</span></a>
                     </li>
                     <li class="sidebar-main-title">
                         <div>
@@ -58,19 +56,22 @@
                         </div>
                     </li>
 
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title"
-                                                                                href="#">
-                        <svg class="stroke-icon">
-                            <use href="{% static 'assets/svg/icon-sprite.svg' %}#stroke-user"></use>
-                        </svg>
-                        <svg class="fill-icon">
-                            <use href="{% static 'assets/svg/icon-sprite.svg' %}#fill-user"></use>
-                        </svg>
-                        <span>Users</span></a>
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title"
+                           href="#">
+
+                            <svg class="stroke-icon">
+                                <use href="{% static 'assets/svg/icon-sprite.svg' %}#stroke-user"></use>
+                            </svg>
+                            <svg class="fill-icon">
+                                <use href="{% static 'assets/svg/icon-sprite.svg' %}#fill-user"></use>
+                            </svg>
+                            <span>Users</span></a>
                         <ul class="sidebar-submenu">
-                            <li><a href="/user_profile">Users Profile</a></li>
-                            <li><a href="/edit_profile">Users Edit</a></li>
-                            <li><a href="/user_cards">Users Cards</a></li>
+                            <li><a href="{% url 'accounts:user_profile' %}">Users Profile</a></li>
+                            {% if request.user.is_superuser %}
+                            <li><a href="{% url 'accounts:user_cards' %}">Users Cards</a></li>
+                            {% endif %}
                         </ul>
                     </li>
 
@@ -81,4 +82,6 @@
         </nav>
     </div>
 </div>
+
+
 <!-- Page Sidebar Ends-->

@@ -20,10 +20,11 @@
 
 {% if user_type == "Admin" %}
 {% include 'general/dashboard/default/components/container-fluid-admin.html' %}
-{% elif user_type == "Customer" or user_type == "Employee" %}
+{% elif user_type == "Customer" %}
 {% include 'general/dashboard/default/components/container-fluid-customer.html' %}
+{% elif user_type == "Employee" %}
+{% include 'general/dashboard/default/components/container-fluid-employee.html' %}
 {% else %}
-
 <p>Unknown user type</p>
 {% endif %}
 

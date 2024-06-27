@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
@@ -215,7 +216,7 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         days = range(1, 32)  # للحصول على أيام الشهر
 
         context['current_user'] = self.request.user
-        user_type = "Employee" if self.request.user.is_employee else "Admin" if self.request.user.is_admin else "Customer"
+        user_type = "Employee" if self.request.user.is_employee else "Customer"
         context['user_type'] = user_type
 
         context.update({
@@ -226,38 +227,59 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@login_required
-@csrf_exempt
-def data_entry_view(request):
-    companies = Customer.objects.all()
-    inbounds = CustomerInbound.objects.all()
-    outbounds = CustomerOutbound.objects.all()
-    returns = CustomerReturns.objects.all()
-    expiries = CustomerExpiry.objects.all()
-    damages = CustomerDamage.objects.all()
-    travel_distances = CustomerTravelDistance.objects.all()
-    inventories = CustomerInventory.objects.all()
-    pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
-    hses = CustomerHSE.objects.all()
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class DataEntryView(View):
+    model_map = {
+        'Customer': Customer,
+        'CustomerInbound': CustomerInbound,
+        'CustomerOutbound': CustomerOutbound,
+        'CustomerReturns': CustomerReturns,
+        'CustomerExpiry': CustomerExpiry,
+        'CustomerDamage': CustomerDamage,
+        'CustomerTravelDistance': CustomerTravelDistance,
+        'CustomerInventory': CustomerInventory,
+        'CustomerPalletLocationAvailability': CustomerPalletLocationAvailability,
+        'CustomerHSE': CustomerHSE,
+    }
 
-    if request.method == 'POST':
+    def get(self, request):
+        companies = Customer.objects.all()
+        inbounds = CustomerInbound.objects.all()
+        outbounds = CustomerOutbound.objects.all()
+        returns = CustomerReturns.objects.all()
+        expiries = CustomerExpiry.objects.all()
+        damages = CustomerDamage.objects.all()
+        travel_distances = CustomerTravelDistance.objects.all()
+        inventories = CustomerInventory.objects.all()
+        pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
+        hses = CustomerHSE.objects.all()
+
+        context = {
+            "companies": companies,
+            "inbounds": inbounds,
+            "outbounds": outbounds,
+            "returns": returns,
+            "expiries": expiries,
+            "damages": damages,
+            "travel_distances": travel_distances,
+            "inventories": inventories,
+            "pallet_location_availabilities": pallet_location_availabilities,
+            "hses": hses,
+            "user": request.user,
+            "breadcrumb": {
+                "title": "Employee Dashboard",
+                "parent": "Edit Data",
+                "child": "Default"
+            }
+        }
+        return render(request, "excel.html", context)
+
+    def post(self, request):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "error": "Invalid JSON"})
-
-        model_map = {
-            'Customer': Customer,
-            'CustomerInbound': CustomerInbound,
-            'CustomerOutbound': CustomerOutbound,
-            'CustomerReturns': CustomerReturns,
-            'CustomerExpiry': CustomerExpiry,
-            'CustomerDamage': CustomerDamage,
-            'CustomerTravelDistance': CustomerTravelDistance,
-            'CustomerInventory': CustomerInventory,
-            'CustomerPalletLocationAvailability': CustomerPalletLocationAvailability,
-            'CustomerHSE': CustomerHSE,
-        }
 
         if 'update' in data:
             model_name = data['update'].get('model')
@@ -265,8 +287,8 @@ def data_entry_view(request):
             field_name = data['update'].get('field')
             new_value = data['update'].get('value')
 
-            if model_name in model_map:
-                model = model_map[model_name]
+            if model_name in self.model_map:
+                model = self.model_map[model_name]
                 try:
                     obj = model.objects.get(id=model_id)
                 except model.DoesNotExist:
@@ -281,8 +303,8 @@ def data_entry_view(request):
             model_name = data['add'].get('model')
             fields = data['add'].get('fields', {})
 
-            if model_name in model_map:
-                model = model_map[model_name]
+            if model_name in self.model_map:
+                model = self.model_map[model_name]
                 obj = model(**fields)
                 obj.save()
                 return JsonResponse({"success": True, "id": obj.id})
@@ -292,8 +314,8 @@ def data_entry_view(request):
             model_name = data['delete'].get('model')
             model_id = data['delete'].get('id')
 
-            if model_name in model_map:
-                model = model_map[model_name]
+            if model_name in self.model_map:
+                model = self.model_map[model_name]
                 try:
                     obj = model.objects.get(id=model_id)
                 except model.DoesNotExist:
@@ -304,20 +326,101 @@ def data_entry_view(request):
             else:
                 return JsonResponse({"success": False, "error": "Invalid model"})
 
-    context = {
-        "companies": companies,
-        "inbounds": inbounds,
-        "outbounds": outbounds,
-        "returns": returns,
-        "expiries": expiries,
-        "damages": damages,
-        "travel_distances": travel_distances,
-        "inventories": inventories,
-        "pallet_location_availabilities": pallet_location_availabilities,
-        "hses": hses,
-        "user": request.user,
-    }
-    return render(request, "excel.html", context)
+        return JsonResponse({"success": False, "error": "Invalid operation"})
+
+
+# @login_required
+# @csrf_exempt
+# def data_entry_view(request):
+#     companies = Customer.objects.all()
+#     inbounds = CustomerInbound.objects.all()
+#     outbounds = CustomerOutbound.objects.all()
+#     returns = CustomerReturns.objects.all()
+#     expiries = CustomerExpiry.objects.all()
+#     damages = CustomerDamage.objects.all()
+#     travel_distances = CustomerTravelDistance.objects.all()
+#     inventories = CustomerInventory.objects.all()
+#     pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
+#     hses = CustomerHSE.objects.all()
+#
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#         except json.JSONDecodeError:
+#             return JsonResponse({"success": False, "error": "Invalid JSON"})
+#
+#         model_map = {
+#             'Customer': Customer,
+#             'CustomerInbound': CustomerInbound,
+#             'CustomerOutbound': CustomerOutbound,
+#             'CustomerReturns': CustomerReturns,
+#             'CustomerExpiry': CustomerExpiry,
+#             'CustomerDamage': CustomerDamage,
+#             'CustomerTravelDistance': CustomerTravelDistance,
+#             'CustomerInventory': CustomerInventory,
+#             'CustomerPalletLocationAvailability': CustomerPalletLocationAvailability,
+#             'CustomerHSE': CustomerHSE,
+#         }
+#
+#         if 'update' in data:
+#             model_name = data['update'].get('model')
+#             model_id = data['update'].get('id')
+#             field_name = data['update'].get('field')
+#             new_value = data['update'].get('value')
+#
+#             if model_name in model_map:
+#                 model = model_map[model_name]
+#                 try:
+#                     obj = model.objects.get(id=model_id)
+#                 except model.DoesNotExist:
+#                     return JsonResponse({"success": False, "error": "Object not found"})
+#
+#                 setattr(obj, field_name, new_value)
+#                 obj.save()
+#                 return JsonResponse({"success": True})
+#             else:
+#                 return JsonResponse({"success": False, "error": "Invalid model"})
+#         elif 'add' in data:
+#             model_name = data['add'].get('model')
+#             fields = data['add'].get('fields', {})
+#
+#             if model_name in model_map:
+#                 model = model_map[model_name]
+#                 obj = model(**fields)
+#                 obj.save()
+#                 return JsonResponse({"success": True, "id": obj.id})
+#             else:
+#                 return JsonResponse({"success": False, "error": "Invalid model"})
+#         elif 'delete' in data:
+#             model_name = data['delete'].get('model')
+#             model_id = data['delete'].get('id')
+#
+#             if model_name in model_map:
+#                 model = model_map[model_name]
+#                 try:
+#                     obj = model.objects.get(id=model_id)
+#                 except model.DoesNotExist:
+#                     return JsonResponse({"success": False, "error": "Object not found"})
+#
+#                 obj.delete()
+#                 return JsonResponse({"success": True})
+#             else:
+#                 return JsonResponse({"success": False, "error": "Invalid model"})
+#
+#     context = {
+#         "companies": companies,
+#         "inbounds": inbounds,
+#         "outbounds": outbounds,
+#         "returns": returns,
+#         "expiries": expiries,
+#         "damages": damages,
+#         "travel_distances": travel_distances,
+#         "inventories": inventories,
+#         "pallet_location_availabilities": pallet_location_availabilities,
+#         "hses": hses,
+#         "user": request.user,
+#     }
+#     return render(request, "excel.html", context)
 
 
 def export_to_excel(request):
