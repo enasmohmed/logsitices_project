@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
 from accounts.models import CustomUser
@@ -9,22 +8,19 @@ from customer.models import CustomerHSE, CustomerPalletLocationAvailability, Cus
 
 
 class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    is_admin = forms.BooleanField(required=False, label='Are you an Admin?')
-    is_customer = forms.BooleanField(required=False, label='Are you a Customer?')
-    is_employee = forms.BooleanField(required=False, label='Are you an Employee?')
+    role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES)
 
     class Meta:
-        model = get_user_model()
-        fields = ('username', 'email', 'password1', 'password2', 'is_admin', 'is_customer', 'is_employee')
+        model = CustomUser
+        fields = ('username', 'email', 'password1', 'password2', 'role')
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.is_admin = self.cleaned_data['is_admin']
-        user.is_customer = self.cleaned_data['is_customer']
-        user.is_employee = self.cleaned_data['is_employee']
-        user.is_approved = not user.is_admin  # عدم الموافقة على المديرين تلقائيًا
+        user.is_approved = False  # الحساب غير مفعل افتراضياً
+        user.is_active = False  # الحساب غير نشط افتراضياً
+        if user.role in ['employee', 'admin', 'customer']:
+            user.is_staff = True
+            user.is_active = True
         if commit:
             user.save()
         return user
@@ -33,7 +29,7 @@ class CustomUserCreationForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'is_admin', 'is_customer', 'is_employee']
+        fields = ['username', 'email', 'role']
 
 
 class DateInput(forms.DateInput):

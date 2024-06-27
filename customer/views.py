@@ -215,9 +215,12 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         months = list(calendar.month_name)[1:]
         days = range(1, 32)  # للحصول على أيام الشهر
 
-        context['current_user'] = self.request.user
-        user_type = "Employee" if self.request.user.is_employee else "Customer"
-        context['user_type'] = user_type
+        if self.request.user.groups.filter(name='Customer'):
+            context['user_type'] = "Customer"
+        elif self.request.user.groups.filter(name='Employee').exists():
+            context['user_type'] = "Employee"
+        else:
+            context['user_type'] = "Unknown"
 
         context.update({
             'years': years,

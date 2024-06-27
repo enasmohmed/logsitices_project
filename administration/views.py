@@ -13,26 +13,25 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # بيانات فتات الخبز
         context['breadcrumb'] = {
             "title": "Healthcare Dachshund",
             "parent": "Dashboard",
             "child": "Default"
         }
 
-        # الحصول على معايير التصفية من الطلب
         hc_business = self.request.GET.get('hc_business')
         year = self.request.GET.get('year')
         month = self.request.GET.get('month')
         day = self.request.GET.get('day')
 
-        # تصفية البيانات بناءً على المعايير المحددة
+        # Retrieve all data without role-specific filters
         inbound_data = AdminInbound.objects.all()
         outbound_data = AdminOutbound.objects.all()
         returns_data = AdminReturns.objects.all()
         capacity_data = AdminCapacity.objects.all()
         inventory_data = AdminInventory.objects.all()
 
+        # Apply optional filters based on query parameters
         if hc_business:
             inbound_data = inbound_data.filter(admin_data__hc_business=hc_business)
             outbound_data = outbound_data.filter(admin_data__hc_business=hc_business)
@@ -61,7 +60,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             capacity_data = capacity_data.filter(time__day=day)
             inventory_data = inventory_data.filter(time__day=day)
 
-        # احتساب الإحصاءات الإجمالية للبيانات المصفاة
+        # Calculate total statistics for filtered data
         context['total_vehicles_daily'] = inbound_data.aggregate(Sum('number_of_vehicles_daily'))[
                                               'number_of_vehicles_daily__sum'] or 0
         context['total_pallets'] = inbound_data.aggregate(Sum('number_of_pallets'))['number_of_pallets__sum'] or 0
@@ -98,17 +97,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         context['total_last_movement'] = inventory_data.aggregate(Sum('last_movement'))['last_movement__sum'] or 0
 
-        # احتساب عدد السنين، الشهور، والأيام
+        # Calculate count of years, months, and days
         year_count = AdminInbound.objects.dates('time', 'year').count()
         month_count = AdminInbound.objects.dates('time', 'month').count()
         day_count = AdminInbound.objects.dates('time', 'day').count()
 
-        # الحصول على جميع السنين والشهور والأيام
+        # Get all years, months, and days
         years = AdminInbound.objects.dates('time', 'year')
         months = list(calendar.month_name)[1:]
-        days = range(1, 32)  # للحصول على أيام الشهر
+        days = range(1, 32)  # Get days of the month
 
-        # الحصول على جميع أسماء الشركات من AdminData
+        # Get all company names from AdminData
         businesses = AdminData.objects.values_list('hc_business', flat=True).distinct()
 
         context.update({
@@ -130,16 +129,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'selected_day': day,
         })
 
-        # current_user = self.request.user
-        # user_type = "Admin" if current_user.is_admin else "Company"
-        # context['current_user'] = self.request.user
-        # context['user_type'] = "Admin"
-
-        # قم بتحديد user_type واستخدمه لتوجيه المستخدمين إلى الصفحة المناسبة
-        user_type = "Admin" if self.request.user.is_superuser or self.request.user.groups.filter(
-            name='Admin').exists() else "Employee"
-
-        context['current_user'] = self.request.user
-        context['user_type'] = user_type
+        # Determine user_type based on user roles
+        if self.request.user.is_superuser:
+            context['user_type'] = "Super Admin"
+        elif self.request.user.groups.filter(name='Admin').exists():
+            context['user_type'] = "Admin"
+        elif self.request.user.groups.filter(name='Employee').exists():
+            context['user_type'] = "Employee"
+        else:
+            context['user_type'] = "Unknown"
 
         return context

@@ -1,9 +1,10 @@
 import calendar
 
 from django.contrib import messages
-from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth import login, get_user_model, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView as AuthLoginView, LogoutView
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -30,22 +31,27 @@ class CustomLoginView(AuthLoginView):
 
     def form_valid(self, form):
         user = form.get_user()
+        print(f"User: {user.username}, Approved: {user.is_approved}, Role: {user.role}")
 
-        # Check if the user is superuser or in the Admin group
-        if user.is_superuser or user.groups.filter(name='Admin').exists():
-            return redirect(reverse('accounts:admin_dashboard'))
-        elif not user.is_approved:
-            logout(self.request)
+        if not user.is_approved:
             messages.error(self.request, "Your account is pending approval.")
-            return redirect('/accounts/login/')
+            logout(self.request)
+            return redirect('accounts:login')
+
+        login(self.request, user)
+
+        if user.is_superuser or user.groups.filter(name='Admin').exists():
+            print("Redirecting to admin dashboard")
+            return redirect(reverse('accounts:admin_dashboard'))
+        elif user.role == 'customer' and user.groups.filter(name='Customer').exists():
+            print("Redirecting to customer dashboard")
+            return redirect('accounts:customer_dashboard')
+        elif user.role == 'employee' and user.groups.filter(name='Employee').exists():
+            print("Redirecting to employee dashboard")
+            return redirect('accounts:choose_dashboard')
         else:
-            login(self.request, user)
-            if user.is_customer:
-                return redirect('/accounts/customer_dashboard/')
-            elif user.is_employee:
-                return redirect('/accounts/employee_dashboard/')
-            else:
-                return redirect('/')
+            print("Redirecting to home page")
+            return redirect('/')
 
 
 class CustomRegisterView(CreateView):
@@ -58,7 +64,7 @@ class CustomRegisterView(CreateView):
         user = form.save()
         messages.success(self.request,
                          "Your account has been created successfully. Your account is now pending approval.")
-        return redirect('login')
+        return redirect(self.success_url)
 
 
 class RegisterView(View):
@@ -84,13 +90,26 @@ class CustomLogoutView(LogoutView):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def approve_users_view(request):
-    users_to_approve = User.objects.filter(is_approved=False)
+    users_to_approve = CustomUser.objects.filter(is_approved=False)
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
-        user = User.objects.get(id=user_id)
+        user = CustomUser.objects.get(id=user_id)
         user.is_approved = True
+        user.is_staff = True  # تعيين المستخدم كـstaff
         user.save()
-        return redirect('approve_users')
+
+        # إضافة المستخدم إلى الجروب المناسب بناءً على دوره
+        if user.role == 'admin':
+            group, created = Group.objects.get_or_create(name='Admin')
+        elif user.role == 'customer':
+            group, created = Group.objects.get_or_create(name='Customer')
+        elif user.role == 'employee':
+            group, created = Group.objects.get_or_create(name='Employee')
+
+        user.groups.add(group)
+        user.save()
+
+        return redirect('accounts:approve_users')
 
     return render(request, 'accounts/approve_users.html', {'users': users_to_approve})
 
@@ -146,16 +165,16 @@ def user_profile(request):
 def redirect_to_dashboard(request):
     user = request.user
 
-    # التحقق من إذا كان المستخدم مشرفًا فائق الصلاحيات أو عضوًا في مجموعة Admin
-    if user.is_superuser or user.groups.filter(name='Admin').exists():
+    # التحقق من إذا كان المستخدم مشرفًا فائق الصلاحيات أو له دور 'admin'
+    if user.is_superuser or user.role == 'admin':
         return redirect('accounts:admin_dashboard')
 
-    # التحقق من إذا كان المستخدم عضوًا في مجموعة Employee
-    elif user.is_employee:
+    # التحقق من إذا كان للمستخدم دور 'employee'
+    elif user.role == 'employee':
         return redirect('accounts:employee_dashboard')
 
-    # إذا لم يكن المستخدم مشرفًا أو موظفًا، افتراض أن المستخدم عميل
-    else:
+    # إذا لم يكن المستخدم مشرفًا أو موظفًا، افتراض أن المستخدم له دور 'customer'
+    elif user.role == 'customer':
         return redirect('accounts:customer_dashboard')
 
     # يمكنك إضافة إعادة توجيه افتراضية هنا إذا كان نوع المستخدم غير معروف
@@ -193,7 +212,7 @@ def user_cards(request):
 
 
 def is_employee(user):
-    return user.is_authenticated and user.is_employee
+    return user.is_authenticated and user.role == 'employee'
 
 
 @method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
@@ -394,7 +413,7 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
         days = range(1, 32)  # للحصول على أيام الشهر
 
         context['current_user'] = self.request.user
-        user_type = "Employee" if self.request.user.is_employee else "Customer"
+        user_type = "Employee" if self.request.user.role == "employee" else "Customer"
         context['user_type'] = user_type
 
         context.update({
@@ -405,16 +424,73 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
+@method_decorator(login_required, name='dispatch')
+class ChooseDashboardView(View):
+    template_name = 'general/dashboard/default/components/choose_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            "breadcrumb": {
+                "title": "Employee Dashboard",
+                "parent": "Edit Data",
+                "child": "Default"
+            }
+        }
+
+        # تحقق من نوع المستخدم وإضافته إلى السياق
+        if self.request.user.groups.filter(name='Customer').exists():
+            context['user_type'] = "Customer"
+        elif self.request.user.groups.filter(name='Employee').exists():
+            context['user_type'] = "Employee"
+        else:
+            context['user_type'] = "Unknown"
+
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context.update({
+            'admin_data_form': AdminDataForm(initial={'user': request.user}),
+            'customer_form': CustomerForm(initial={'user': request.user}),
+            'current_user': request.user.username  # إضافة اسم المستخدم الحالي إلى السياق
+        })
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        choice = request.POST.get('choice')
+        if choice == 'admin_dashboard':
+            return redirect('accounts:admin_dashboard')
+        elif choice == 'customer_dashboard':
+            return redirect('accounts:customer_dashboard')
+        current_user = request.user
+        user_role = EmployeeProfile.objects.get(user=current_user).role  # الحصول على الدور الخاص بالمستخدم
+        context = self.get_context_data(**kwargs)
+        context.update({
+            'admin_data_form': AdminDataForm(initial={'user': request.user}),
+            'customer_form': CustomerForm(initial={'user': request.user}),
+            'current_user': current_user.username,  # إضافة اسم المستخدم الحالي إلى السياق
+            'user_role': user_role  # إضافة الدور الخاص بالمستخدم إلى السياق
+        })
+        return render(request, self.template_name, context)
+
+
 def is_employee(user):
-    return user.is_employee
+    return user.groups.filter(name='Employees').exists()
 
 
 @method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
 class AddAdminDataView(View):
     def get(self, request):
+        current_user = request.user.username  # Get current user's username
         context = {
-            'admin_data_form': AdminDataForm(),
-            'customer_form': CustomerForm(),
+            'admin_data_form': AdminDataForm(initial={'user': request.user}),
+            'customer_form': CustomerForm(initial={'user': request.user}),
+            'current_user': current_user,  # Add current user's username to context
+            'breadcrumb': {
+                'title': 'Employee Dashboard',
+                'parent': 'Edit Data',
+                'child': 'Default'
+            }
         }
         return render(request, 'general/dashboard/default/components/add_admin_data.html', context)
 
@@ -423,21 +499,25 @@ class AddAdminDataView(View):
         if data_type == 'admin':
             form = AdminDataForm(request.POST)
             if form.is_valid():
-                form.save()
+                admin_data = form.save(commit=False)
+                admin_data.user = request.user  # Assign the current user
+                admin_data.save()
                 messages.success(request, 'Admin data added successfully.')
                 return redirect('accounts:employee_dashboard')
             else:
                 messages.error(request, 'Invalid admin data. Please check the form.')
-                return redirect('add_admin_data')  # Redirect back to the same page
+                return redirect('add_admin_data')
         elif data_type == 'customer':
             form = CustomerForm(request.POST)
             if form.is_valid():
-                form.save()
+                customer_data = form.save(commit=False)
+                customer_data.user = request.user  # Assign the current user
+                customer_data.save()
                 messages.success(request, 'Customer data added successfully.')
                 return redirect('accounts:customer_dashboard')
             else:
                 messages.error(request, 'Invalid customer data. Please check the form.')
-                return redirect('add_admin_data')  # Redirect back to the same page
+                return redirect('add_admin_data')
 
-        # If no data type is selected or other error occurred, redirect back to the same page
+        # If data type is not specified or some other error occurred, redirect user to the same page
         return redirect('add_admin_data')

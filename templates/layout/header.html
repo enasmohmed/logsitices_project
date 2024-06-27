@@ -53,9 +53,17 @@
                     <ul class="profile-dropdown onhover-show-div">
                         <li><a href="{% url 'accounts:user_profile' %}"><i data-feather="user"></i><span>Account </span></a>
                         </li>
-                        {% if user.is_employee %}
+                        {% if user.role == 'employee' %}
                         <li><a href="{% url 'accounts:add_admin_data' %}">
                             <i data-feather="file-text"></i><span>Add Data</span></a>
+                        </li>
+                        <li><a href="{% url 'customer:data_entry' %}">
+                            <i data-feather="file-text"></i><span>Edit Data</span></a>
+                        </li>
+                        {% endif %}
+                        {% if user.role == 'customer' %}
+                        <li><a href="{% url 'customer:data_entry' %}">
+                            <i data-feather="file-text"></i><span>Edit Data</span></a>
                         </li>
                         {% endif %}
                         <!--                        <li><a href="/edit_profile"><i data-feather="settings"></i><span>Settings</span></a></li>-->

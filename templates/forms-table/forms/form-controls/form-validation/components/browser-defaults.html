@@ -1,78 +1,71 @@
 {% load static %}
 {% load sass_tags %}
 
+
 <div class="col-xl-6">
     <div class="card height-equal">
-      <div class="card-header pb-0">
-        <h3>Browser defaults</h3>
-        <p class="f-m-light mt-1">
-           Not interested in custom validation feedback messages or writing JavaScript to change form behaviors? Depending on your browser and OS,While these feedback styles cannot be styled with CSS, you can still customize the feedback text through JavaScript.</p>
-      </div>
-      <div class="card-body custom-input">
-        <form class="row g-3">
-          <div class="col-12"> 
-            <label class="form-label" for="first-name">First name</label>
-            <input class="form-control" id="first-name" type="text" placeholder="First name" aria-label="First name" required>
-          </div>
-          <div class="col-12">
-            <label class="form-label" for="exampleFormControlInput1">Email address</label>
-            <input class="form-control" id="exampleFormControlInput1" type="email" placeholder="pesamof475@saeoil.com" required>
-          </div>
-          <div class="col-12"> 
-            <label class="col-sm-12 col-form-label" for="inputPassword2">Password</label>
-            <input class="form-control" id="inputPassword2" type="password" required>
-          </div>
-          <div class="col-12"> 
-            <label class="form-label" for="validationDefault04">State</label>
-            <select class="form-select" id="validationDefault04" required="">
-              <option selected="" disabled="" value="">Choose...</option>
-              <option>U.K </option>
-              <option>Thailand</option>
-              <option>India </option>
-              <option>U.S</option>
-            </select>
-          </div>
-          <div class="col-12"> 
-            <label class="form-label" for="formFile">Choose file</label>
-            <input class="form-control" id="formFile" type="file" required>
-          </div>
-          <div class="col-12"> 
-            <div class="card-wrapper border rounded-3 checkbox-checked">
-              <h6 class="sub-title">Select your payment method</h6>
-              <div class="radio-form">
-                <div class="form-check">
-                  <input class="form-check-input" id="flexRadioDefault1" type="radio" name="flexRadioDefault" required="">
-                  <label class="form-check-label" for="flexRadioDefault1">Visa</label>
+        <div class="card-header pb-0">
+            <h3>Add Data</h3>
+        </div>
+        <div class="card-body custom-input">
+            <!-- Display messages -->
+            {% if messages %}
+            <div class="alert alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="form-check">
-                  <input class="form-check-input" id="flexRadioDefault2" type="radio" name="flexRadioDefault" checked="" required="">
-                  <label class="form-check-label" for="flexRadioDefault2">MasterCard</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" id="flexRadioDefault3" type="radio" name="flexRadioDefault" checked="" required="">
-                  <label class="form-check-label" for="flexRadioDefault3">Paypal</label>
-                </div>
-              </div>
+                {% endfor %}
             </div>
-          </div>
-          <div class="col-12"> 
-            <label class="form-label" for="exampleFormControlTextarea1">Description</label>
-            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-          </div>
-          <div class="col-12 checkbox-checked">
-            <input class="form-check-input" id="flexCheckDefault" type="checkbox" value="">
-            <label class="form-check-label" for="flexCheckDefault">I agree to the policies</label>
-          </div>
-          <div class="col-12"> 
-            <div class="form-check form-switch">
-              <input class="form-check-input" id="flexSwitchCheckDefault" type="checkbox" role="switch" required>
-              <label class="form-check-label" for="flexSwitchCheckDefault">Are you sure above information are true</label>
-            </div>
-          </div>
-          <div class="col-12">
-            <button class="btn btn-primary" type="submit">Submit</button>
-          </div>
-        </form>
-      </div>
+            {% endif %}
+            <form class="row g-3" method="post">
+                {% csrf_token %}
+                <div class="col-12">
+                    <label class="form-label" for="data_type">Data Type</label>
+                    <select class="form-select" id="data_type" name="data_type" required onchange="toggleForm()">
+                        <option selected disabled value="">Choose...</option>
+                        <option value="admin">Admin</option>
+                        <option value="customer">Customer</option>
+                    </select>
+                </div>
+                <div id="admin-form" class="col-12" style="display:none;">
+                    {{ admin_data_form.as_p }}
+                </div>
+                <div id="customer-form" class="col-12" style="display:none;">
+                    {{ customer_form.as_p }}
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+
+<script>
+    function toggleForm() {
+        var dataType = document.getElementById('data_type').value;
+        var adminForm = document.getElementById('admin-form');
+        var customerForm = document.getElementById('customer-form');
+        if (dataType === 'admin') {
+            adminForm.style.display = 'block';
+            customerForm.style.display = 'none';
+        } else if (dataType === 'customer') {
+            adminForm.style.display = 'none';
+            customerForm.style.display = 'block';
+        } else {
+            adminForm.style.display = 'none';
+            customerForm.style.display = 'none';
+        }
+    }
+
+    // Show alert if messages are present
+    document.addEventListener('DOMContentLoaded', function() {
+        var messages = {% if messages %}[{% for message in messages %}'{{ message }}'{% if not forloop.last %}, {% endif %}{% endfor %}]{% else %}[]{% endif %};
+        if (messages.length > 0) {
+            alert(messages.join('\n'));
+        }
+    });
+</script>

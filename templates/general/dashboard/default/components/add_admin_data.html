@@ -1,64 +1,27 @@
+{% extends 'base.html' %}
 {% load static %}
 {% load sass_tags %}
-{% load bootstrap4 %}
-{% load crispy_forms_tags %}
 
+
+{% block css %}
+
+{% endblock css %}
 
 {% block content %}
 
-<div class="container">
+<!-- Container-fluid starts-->
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Add Data</h5>
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-success" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="id_data_type">Select Data Type:</label>
-                            <select class="form-control" id="id_data_type" name="data_type">
-                                <option value="admin" {% if request.POST.data_type == 'admin' %}selected{% endif %}>Admin Data</option>
-                                <option value="customer" {% if request.POST.data_type == 'customer' %}selected{% endif %}>Customer Data</option>
-                            </select>
-                        </div>
-                        <div id="admin-form" style="display: {% if request.POST.data_type == 'admin' %}block{% else %}none{% endif %};">
-                            {{ admin_data_form.as_p }}
-                        </div>
-                        <div id="customer-form" style="display: {% if request.POST.data_type == 'customer' %}block{% else %}none{% endif %};">
-                            {{ customer_form.as_p }}
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Data</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        {% include 'forms-table/forms/form-controls/form-validation/components/browser-defaults.html' %}
     </div>
 </div>
+<!-- Container-fluid Ends-->
 
+{% endblock %}
 
+{% block scriptcontent %}
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var adminForm = document.getElementById('admin-form');
-        var customerForm = document.getElementById('customer-form');
+<script src="{% static 'assets/js/form-validation-custom.js' %}"></script>
+<script src="{% static 'assets/js/height-equal.js' %}"></script>
 
-        document.getElementById('id_data_type').addEventListener('change', function() {
-            if (this.value === 'admin') {
-                adminForm.style.display = 'block';
-                customerForm.style.display = 'none';
-            } else if (this.value === 'customer') {
-                adminForm.style.display = 'none';
-                customerForm.style.display = 'block';
-            }
-        });
-    });
-</script>
-
-{% endblock content %}
+{% endblock %}

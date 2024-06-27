@@ -18,12 +18,18 @@
 {% block content %}
 
 
-{% if user_type == "Admin" %}
+{% if user.is_authenticated and user.role == "employee" %}
+{% if user.role == 'admin' %}
 {% include 'general/dashboard/default/components/container-fluid-admin.html' %}
-{% elif user_type == "Customer" %}
+{% elif user.role == 'customer' %}
 {% include 'general/dashboard/default/components/container-fluid-customer.html' %}
-{% elif user_type == "Employee" %}
-{% include 'general/dashboard/default/components/container-fluid-employee.html' %}
+{% else %}
+{% include 'general/dashboard/default/components/choose_dashboard.html' %}
+{% endif %}
+{% elif user.role == 'admin' %}
+{% include 'general/dashboard/default/components/container-fluid-admin.html' %}
+{% elif user.role == 'customer' %}
+{% include 'general/dashboard/default/components/container-fluid-customer.html' %}
 {% else %}
 <p>Unknown user type</p>
 {% endif %}

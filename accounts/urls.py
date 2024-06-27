@@ -5,7 +5,7 @@ from administration.views import DashboardView
 from customer.views import CustomerDashboardView
 from . import views
 from .views import RegisterView, approve_users_view, CustomLogoutView, CustomLoginView, AddAdminDataView, \
-    EmployeeDashboardView, redirect_to_dashboard
+    EmployeeDashboardView, redirect_to_dashboard, ChooseDashboardView
 
 app_name = 'accounts'
 
@@ -19,6 +19,7 @@ urlpatterns = [
     path('admin_dashboard/', staff_member_required(DashboardView.as_view()), name='admin_dashboard'),
     path('customer_dashboard/', CustomerDashboardView.as_view(), name='customer_dashboard'),
     path('home/', redirect_to_dashboard, name='redirect_to_dashboard'),
+    path('choose_dashboard/', ChooseDashboardView.as_view(), name='choose_dashboard'),
 
     path('employee_dashboard/', EmployeeDashboardView.as_view(), name='employee_dashboard'),
     path('add_admin_data/', AddAdminDataView.as_view(), name='add_admin_data'),

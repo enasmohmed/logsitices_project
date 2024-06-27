@@ -18,11 +18,11 @@
                     <div class="login-main">
                         <!-- رسائل التنبيه -->
                         {% if messages %}
-                          <ul class="messages">
+                        <ul class="messages">
                             {% for message in messages %}
-                              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
                             {% endfor %}
-                          </ul>
+                        </ul>
                         {% endif %}
                         <!-- نهاية رسائل التنبيه -->
                         <form class="theme-form" method="post">

@@ -4,21 +4,13 @@
 <h1>Approve Users</h1>
 <form method="post">
     {% csrf_token %}
-    <table>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Approve</th>
-        </tr>
+    <ul>
         {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-                <button type="submit" name="user_id" value="{{ user.id }}">Approve</button>
-            </td>
-        </tr>
+        <li>
+            {{ user.username }} ({{ user.email }})
+            <button type="submit" name="user_id" value="{{ user.id }}">Approve</button>
+        </li>
         {% endfor %}
-    </table>
+    </ul>
 </form>
 {% endblock %}
