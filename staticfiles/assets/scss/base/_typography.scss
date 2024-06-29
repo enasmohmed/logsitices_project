@@ -1,11 +1,17 @@
 /**=====================
     1.2 Typography CSS start
 ==========================**/
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+DE+Grund:wght@100..400&display=swap');
+
 //Custom css Start
 body {
     font-size: 14px;
     overflow-x: hidden;
-    font-family: $font-lexend;
+//     font-family: $font-lexend;
+    font-family: "Playwrite DE Grund", cursive !important;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
 }
 h1,
 h2,

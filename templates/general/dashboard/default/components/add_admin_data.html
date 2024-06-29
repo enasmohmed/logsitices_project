@@ -3,21 +3,23 @@
 {% load sass_tags %}
 
 
-{% block css %}
-
-{% endblock css %}
-
 {% block content %}
 
 <!-- Container-fluid starts-->
 <div class="container-fluid">
     <div class="row">
-        {% include 'forms-table/forms/form-controls/form-validation/components/browser-defaults.html' %}
+        {% if user.role == 'employee' %}
+        {% if request.session.dashboard_choice == 'admin_dashboard' %}
+        {% include 'forms-table/forms/form-controls/form-validation/components/add_data_form_admin.html' %}
+        {% elif request.session.dashboard_choice == 'customer_dashboard' %}
+        {% include 'forms-table/forms/form-controls/form-validation/components/add_data_form_customer.html' %}
+        {% endif %}
+        {% endif %}
     </div>
 </div>
 <!-- Container-fluid Ends-->
 
-{% endblock %}
+{% endblock content %}
 
 {% block scriptcontent %}
 

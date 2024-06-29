@@ -4,8 +4,8 @@ from django.urls import path
 from administration.views import DashboardView
 from customer.views import CustomerDashboardView
 from . import views
-from .views import RegisterView, approve_users_view, CustomLogoutView, CustomLoginView, AddAdminDataView, \
-    EmployeeDashboardView, redirect_to_dashboard, ChooseDashboardView
+from .views import RegisterView, approve_users_view, CustomLogoutView, CustomLoginView, EmployeeDashboardView, \
+    redirect_to_dashboard, ChooseDashboardView
 
 app_name = 'accounts'
 
@@ -22,7 +22,7 @@ urlpatterns = [
     path('choose_dashboard/', ChooseDashboardView.as_view(), name='choose_dashboard'),
 
     path('employee_dashboard/', EmployeeDashboardView.as_view(), name='employee_dashboard'),
-    path('add_admin_data/', AddAdminDataView.as_view(), name='add_admin_data'),
+    # path('add_admin_data/', AddAdminDataView.as_view(), name='add_admin_data'),
     # path('add_admin_data', views.data_entry_view, name="add_admin_data"),
 
     path('user_profile', views.user_profile, name="user_profile"),

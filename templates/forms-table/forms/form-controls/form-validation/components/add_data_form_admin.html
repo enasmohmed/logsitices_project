@@ -1,0 +1,58 @@
+{% load static %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+
+
+<div class="col-xl-6">
+    <div class="card height-equal">
+        <div class="card-header pb-0">
+            <h3>Add Admin Data</h3>
+        </div>
+        <div class="card-body custom-input">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Admin Data Form -->
+                <fieldset class="scheduler-border">
+                    <legend class="scheduler-border">Admin Data</legend>
+                    {{ admin_data_form|crispy }}
+                </fieldset>
+
+                <!-- Admin Inbound Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Admin Inbound</legend>
+                    {{ admin_inbound_form|crispy }}
+                </fieldset>
+
+                <!-- Admin Outbound Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Admin Outbound</legend>
+                    {{ admin_outbound_form|crispy }}
+                </fieldset>
+
+                <!-- Admin Returns Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Admin Returns</legend>
+                    {{ admin_returns_form|crispy }}
+                </fieldset>
+
+                <!-- Admin Capacity Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Admin Capacity</legend>
+                    {{ admin_capacity_form|crispy }}
+                </fieldset>
+
+                <!-- Admin Inventory Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Admin Inventory</legend>
+                    {{ admin_inventory_form|crispy }}
+                </fieldset>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <a href="{% url 'accounts:employee_dashboard' %}" class="btn btn-secondary ml-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

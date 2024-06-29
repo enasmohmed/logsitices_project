@@ -17,21 +17,24 @@
 
 {% block content %}
 
-
-{% if user.is_authenticated and user.role == "employee" %}
-{% if user.role == 'admin' %}
+{% if user.is_authenticated %}
+{% if is_admin or request.session.dashboard_choice == 'admin_dashboard' %}
 {% include 'general/dashboard/default/components/container-fluid-admin.html' %}
-{% elif user.role == 'customer' %}
+{% elif is_employee %}
+{% if request.session.dashboard_choice == 'admin_dashboard' %}
+{% include 'general/dashboard/default/components/container-fluid-admin.html' %}
+{% elif request.session.dashboard_choice == 'customer_dashboard' %}
 {% include 'general/dashboard/default/components/container-fluid-customer.html' %}
 {% else %}
 {% include 'general/dashboard/default/components/choose_dashboard.html' %}
 {% endif %}
-{% elif user.role == 'admin' %}
-{% include 'general/dashboard/default/components/container-fluid-admin.html' %}
-{% elif user.role == 'customer' %}
+{% elif is_customer or request.session.dashboard_choice == 'customer_dashboard' %}
 {% include 'general/dashboard/default/components/container-fluid-customer.html' %}
 {% else %}
 <p>Unknown user type</p>
+{% endif %}
+{% else %}
+<p>User is not authenticated</p>
 {% endif %}
 
 

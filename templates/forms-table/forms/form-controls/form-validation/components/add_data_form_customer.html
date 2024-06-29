@@ -1,0 +1,94 @@
+{% load static %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+
+
+<div class="col-xl-6">
+    <div class="card height-equal">
+        <div class="card-header pb-0">
+            <h3>Add Customer Data</h3>
+        </div>
+        <div class="card-body custom-input">
+            <!-- Display messages -->
+            {% if messages %}
+            <div class="alert alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Customer Form -->
+                <fieldset class="scheduler-border">
+                    <legend class="scheduler-border">Customer Data</legend>
+                    {{ customer_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Inbound Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Inbound</legend>
+                    {{ customer_inbound_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Outbound Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Outbound</legend>
+                    {{ customer_outbound_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Returns Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Returns</legend>
+                    {{ customer_returns_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Expiry Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Expiry</legend>
+                    {{ customer_expiry_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Damage Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Damage</legend>
+                    {{ customer_damage_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Travel Distance Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Travel Distance</legend>
+                    {{ customer_travel_distance_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Inventory Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Inventory</legend>
+                    {{ customer_inventory_form|crispy }}
+                </fieldset>
+
+                <!-- Customer Pallet Location Availability Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer Pallet Location Availability</legend>
+                    {{ customer_pallet_location_availability_form|crispy }}
+                </fieldset>
+
+                <!-- Customer HSE Form -->
+                <fieldset class="scheduler-border mt-4">
+                    <legend class="scheduler-border">Customer HSE</legend>
+                    {{ customer_hse_form|crispy }}
+                </fieldset>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <a href="{% url 'accounts:customer_dashboard' %}" class="btn btn-secondary ml-2">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

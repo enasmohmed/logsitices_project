@@ -2,28 +2,49 @@ import calendar
 import json
 
 import xlwt
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.db.models import Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
+from accounts.forms import CustomerForm, CustomerInboundForm, CustomerOutboundForm, CustomerReturnsForm, \
+    CustomerExpiryForm, CustomerDamageForm, CustomerTravelDistanceForm, CustomerInventoryForm, \
+    CustomerPalletLocationAvailabilityForm, CustomerHSEForm
 from administration.models import AdminData
 from .models import Customer, CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
     CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
 
 
+### View Customer Dashboard
 @method_decorator(login_required, name='dispatch')
 class CustomerDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Check user's group membership
+        user = self.request.user
+        if user.is_authenticated:
+            if user.groups.filter(name='Super Admin').exists() or user.groups.filter(name='Admin').exists():
+                context['is_admin'] = True
+            elif user.groups.filter(name='Employee').exists():
+                context['is_employee'] = True
+            elif user.groups.filter(name='Customer').exists():
+                context['is_customer'] = True
+            else:
+                context['user_type'] = 'Unknown'
+        else:
+            context['user_type'] = 'Anonymous'
+
         context['breadcrumb'] = {
             "title": "Operation Dashboard",
             "parent": "Dashboard",
@@ -230,9 +251,8 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-@method_decorator(csrf_exempt, name='dispatch')
-class DataEntryView(View):
+### Edit Data Form Customer
+class CustomerEditDataView(View):
     model_map = {
         'Customer': Customer,
         'CustomerInbound': CustomerInbound,
@@ -246,17 +266,44 @@ class DataEntryView(View):
         'CustomerHSE': CustomerHSE,
     }
 
+    def is_employee_user(self, user):
+        return user.groups.filter(name='Employee').exists()
+
+    def is_customer_user(self, user):
+        return user.groups.filter(name='Customer').exists()
+
+    @method_decorator(login_required, name='dispatch')
+    @method_decorator(csrf_exempt, name='dispatch')
     def get(self, request):
-        companies = Customer.objects.all()
-        inbounds = CustomerInbound.objects.all()
-        outbounds = CustomerOutbound.objects.all()
-        returns = CustomerReturns.objects.all()
-        expiries = CustomerExpiry.objects.all()
-        damages = CustomerDamage.objects.all()
-        travel_distances = CustomerTravelDistance.objects.all()
-        inventories = CustomerInventory.objects.all()
-        pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
-        hses = CustomerHSE.objects.all()
+        user = request.user
+        is_admin = user.is_staff
+        is_employee = self.is_employee_user(user)
+        is_customer = self.is_customer_user(user)
+
+        dashboard_choice = request.session.get('dashboard_choice', 'customer')
+
+        if dashboard_choice not in ['admin', 'customer']:
+            dashboard_choice = 'customer'
+
+        if dashboard_choice == 'admin' and not is_admin:
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        if dashboard_choice == 'customer' and not (is_customer or is_employee):
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        companies = Customer.objects.all() if dashboard_choice == 'customer' else None
+        inbounds = CustomerInbound.objects.all() if dashboard_choice == 'customer' else None
+        outbounds = CustomerOutbound.objects.all() if dashboard_choice == 'customer' else None
+        returns = CustomerReturns.objects.all() if dashboard_choice == 'customer' else None
+        expiries = CustomerExpiry.objects.all() if dashboard_choice == 'customer' else None
+        damages = CustomerDamage.objects.all() if dashboard_choice == 'customer' else None
+        travel_distances = CustomerTravelDistance.objects.all() if dashboard_choice == 'customer' else None
+        inventories = CustomerInventory.objects.all() if dashboard_choice == 'customer' else None
+        pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all() if dashboard_choice == 'customer' else None
+        hses = CustomerHSE.objects.all() if dashboard_choice == 'customer' else None
+
+        # تحديد دور المستخدم
+        user_type = 'employee' if is_employee else 'customer'
 
         context = {
             "companies": companies,
@@ -269,16 +316,44 @@ class DataEntryView(View):
             "inventories": inventories,
             "pallet_location_availabilities": pallet_location_availabilities,
             "hses": hses,
-            "user": request.user,
+            "user": user,
+            "is_admin": is_admin,
+            "is_employee": is_employee,
+            "is_customer": is_customer,
+            "dashboard_choice": dashboard_choice,
+            "user_type": user_type,  # إضافة دور المستخدم إلى السياق
             "breadcrumb": {
-                "title": "Employee Dashboard",
+                "title": "Admin Dashboard" if dashboard_choice == 'admin' else "Customer Dashboard",
                 "parent": "Edit Data",
                 "child": "Default"
             }
         }
+
+        if is_admin and dashboard_choice == 'admin':
+            admin_data = AdminData.objects.all()
+            context["admin_data"] = admin_data
+
         return render(request, "excel.html", context)
 
+    @method_decorator(login_required, name='dispatch')
+    @method_decorator(csrf_exempt, name='dispatch')
     def post(self, request):
+        user = request.user
+        is_admin = user.is_staff
+        is_employee = self.is_employee_user(user)
+        is_customer = self.is_customer_user(user)
+
+        dashboard_choice = request.session.get('dashboard_choice', 'customer')
+
+        if dashboard_choice not in ['admin', 'customer']:
+            dashboard_choice = 'customer'
+
+        if dashboard_choice == 'admin' and not is_admin:
+            return JsonResponse({"success": False, "error": "Permission denied."})
+
+        if dashboard_choice == 'customer' and not (is_customer or is_employee):
+            return JsonResponse({"success": False, "error": "Permission denied."})
+
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -332,98 +407,115 @@ class DataEntryView(View):
         return JsonResponse({"success": False, "error": "Invalid operation"})
 
 
-# @login_required
-# @csrf_exempt
-# def data_entry_view(request):
-#     companies = Customer.objects.all()
-#     inbounds = CustomerInbound.objects.all()
-#     outbounds = CustomerOutbound.objects.all()
-#     returns = CustomerReturns.objects.all()
-#     expiries = CustomerExpiry.objects.all()
-#     damages = CustomerDamage.objects.all()
-#     travel_distances = CustomerTravelDistance.objects.all()
-#     inventories = CustomerInventory.objects.all()
-#     pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
-#     hses = CustomerHSE.objects.all()
-#
-#     if request.method == 'POST':
-#         try:
-#             data = json.loads(request.body)
-#         except json.JSONDecodeError:
-#             return JsonResponse({"success": False, "error": "Invalid JSON"})
-#
-#         model_map = {
-#             'Customer': Customer,
-#             'CustomerInbound': CustomerInbound,
-#             'CustomerOutbound': CustomerOutbound,
-#             'CustomerReturns': CustomerReturns,
-#             'CustomerExpiry': CustomerExpiry,
-#             'CustomerDamage': CustomerDamage,
-#             'CustomerTravelDistance': CustomerTravelDistance,
-#             'CustomerInventory': CustomerInventory,
-#             'CustomerPalletLocationAvailability': CustomerPalletLocationAvailability,
-#             'CustomerHSE': CustomerHSE,
-#         }
-#
-#         if 'update' in data:
-#             model_name = data['update'].get('model')
-#             model_id = data['update'].get('id')
-#             field_name = data['update'].get('field')
-#             new_value = data['update'].get('value')
-#
-#             if model_name in model_map:
-#                 model = model_map[model_name]
-#                 try:
-#                     obj = model.objects.get(id=model_id)
-#                 except model.DoesNotExist:
-#                     return JsonResponse({"success": False, "error": "Object not found"})
-#
-#                 setattr(obj, field_name, new_value)
-#                 obj.save()
-#                 return JsonResponse({"success": True})
-#             else:
-#                 return JsonResponse({"success": False, "error": "Invalid model"})
-#         elif 'add' in data:
-#             model_name = data['add'].get('model')
-#             fields = data['add'].get('fields', {})
-#
-#             if model_name in model_map:
-#                 model = model_map[model_name]
-#                 obj = model(**fields)
-#                 obj.save()
-#                 return JsonResponse({"success": True, "id": obj.id})
-#             else:
-#                 return JsonResponse({"success": False, "error": "Invalid model"})
-#         elif 'delete' in data:
-#             model_name = data['delete'].get('model')
-#             model_id = data['delete'].get('id')
-#
-#             if model_name in model_map:
-#                 model = model_map[model_name]
-#                 try:
-#                     obj = model.objects.get(id=model_id)
-#                 except model.DoesNotExist:
-#                     return JsonResponse({"success": False, "error": "Object not found"})
-#
-#                 obj.delete()
-#                 return JsonResponse({"success": True})
-#             else:
-#                 return JsonResponse({"success": False, "error": "Invalid model"})
-#
-#     context = {
-#         "companies": companies,
-#         "inbounds": inbounds,
-#         "outbounds": outbounds,
-#         "returns": returns,
-#         "expiries": expiries,
-#         "damages": damages,
-#         "travel_distances": travel_distances,
-#         "inventories": inventories,
-#         "pallet_location_availabilities": pallet_location_availabilities,
-#         "hses": hses,
-#         "user": request.user,
-#     }
-#     return render(request, "excel.html", context)
+### Add Data Form Customer
+def is_employee(user):
+    return user.groups.filter(name='Employee').exists()
+
+
+@method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
+class AddCustomerDataView(View):
+    def get(self, request):
+        current_user = request.user.username  # Get current user's username
+        user_type = ''
+
+        if request.user.groups.filter(name='Super Admin').exists():
+            user_type = 'Super Admin'
+        elif request.user.groups.filter(name='Admin').exists():
+            user_type = 'Admin'
+        elif request.user.groups.filter(name='Employee').exists():
+            user_type = 'Employee'
+        elif request.user.groups.filter(name='Customer').exists():
+            user_type = 'Customer'
+        else:
+            user_type = 'Unknown'
+
+        context = {
+            'customer_form': CustomerForm(initial={'user': request.user}),
+            'customer_inbound_form': CustomerInboundForm(),
+            'customer_outbound_form': CustomerOutboundForm(),
+            'customer_returns_form': CustomerReturnsForm(),
+            'customer_expiry_form': CustomerExpiryForm(),
+            'customer_damage_form': CustomerDamageForm(),
+            'customer_travel_distance_form': CustomerTravelDistanceForm(),
+            'customer_inventory_form': CustomerInventoryForm(),
+            'customer_pallet_location_availability_form': CustomerPalletLocationAvailabilityForm(),
+            'customer_hse_form': CustomerHSEForm(),
+            'current_user': current_user,  # Add current user's username to context
+            'user_type': user_type,  # Add user type to context
+            'breadcrumb': {
+                'title': 'Employee Dashboard',
+                'parent': 'Edit Data',
+                'child': 'Default'
+            }
+        }
+        return render(request, 'general/dashboard/default/components/add_admin_data.html', context)
+
+    def post(self, request):
+        customer_form = CustomerForm(request.POST)
+        customer_inbound_form = CustomerInboundForm(request.POST)
+        customer_outbound_form = CustomerOutboundForm(request.POST)
+        customer_returns_form = CustomerReturnsForm(request.POST)
+        customer_expiry_form = CustomerExpiryForm(request.POST)
+        customer_damage_form = CustomerDamageForm(request.POST)
+        customer_travel_distance_form = CustomerTravelDistanceForm(request.POST)
+        customer_inventory_form = CustomerInventoryForm(request.POST)
+        customer_pallet_location_availability_form = CustomerPalletLocationAvailabilityForm(request.POST)
+        customer_hse_form = CustomerHSEForm(request.POST)
+
+        forms = [
+            customer_form,
+            customer_inbound_form,
+            customer_outbound_form,
+            customer_returns_form,
+            customer_expiry_form,
+            customer_damage_form,
+            customer_travel_distance_form,
+            customer_inventory_form,
+            customer_pallet_location_availability_form,
+            customer_hse_form
+        ]
+
+        if all(form.is_valid() for form in forms):
+            try:
+                with transaction.atomic():
+                    customer_data = customer_form.save(commit=False)
+                    customer_data.user = request.user  # Assign the current user
+                    customer_data.save()
+
+                    customer_inbound_form.instance.customer = customer_data
+                    customer_outbound_form.instance.customer = customer_data
+                    customer_returns_form.instance.customer = customer_data
+                    customer_expiry_form.instance.customer = customer_data
+                    customer_damage_form.instance.customer = customer_data
+                    customer_travel_distance_form.instance.customer = customer_data
+                    customer_inventory_form.instance.customer = customer_data
+                    customer_pallet_location_availability_form.instance.customer = customer_data
+                    customer_hse_form.instance.customer = customer_data
+
+                    customer_inbound_form.save()
+                    customer_outbound_form.save()
+                    customer_returns_form.save()
+                    customer_expiry_form.save()
+                    customer_damage_form.save()
+                    customer_travel_distance_form.save()
+                    customer_inventory_form.save()
+                    customer_pallet_location_availability_form.save()
+                    customer_hse_form.save()
+
+                messages.success(request, 'Customer data added successfully.')
+                return redirect('accounts:customer_dashboard')
+
+            except Exception as e:
+                messages.error(request, f'Failed to save customer data. Error: {str(e)}')
+                return redirect('accounts:add_customer_data')
+
+        else:
+            for form in forms:
+                for field in form:
+                    for error in field.errors:
+                        messages.error(request, error)
+
+            return redirect('accounts:add_customer_data')
 
 
 def export_to_excel(request):

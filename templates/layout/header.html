@@ -51,16 +51,37 @@
                         </div>
                     </div>
                     <ul class="profile-dropdown onhover-show-div">
-                        <li><a href="{% url 'accounts:user_profile' %}"><i data-feather="user"></i><span>Account </span></a>
+                        <li><a href="{% url 'accounts:user_profile' %}">
+                            <i data-feather="user"></i><span>Account </span></a>
                         </li>
                         {% if user.role == 'employee' %}
-                        <li><a href="{% url 'accounts:add_admin_data' %}">
+                        {% if request.session.dashboard_choice == 'admin_dashboard' %}
+                        <li><a href="{% url 'administration:data_entry' %}">
+                            <i data-feather="file-text"></i><span>Edit Admin Data</span></a>
+                        </li>
+                        <li><a href="{% url 'administration:add_admin_data' %}">
                             <i data-feather="file-text"></i><span>Add Data</span></a>
                         </li>
+                        {% elif request.session.dashboard_choice == 'customer_dashboard' %}
                         <li><a href="{% url 'customer:data_entry' %}">
-                            <i data-feather="file-text"></i><span>Edit Data</span></a>
+                            <i data-feather="file-text"></i><span>Edit Customer Data</span></a>
+                        </li>
+                        <li><a href="{% url 'customer:add_customer_data' %}">
+                            <i data-feather="file-text"></i><span>Add Data</span></a>
                         </li>
                         {% endif %}
+                        {% endif %}
+
+
+                        {% if user.is_superuser %}
+                        <li>
+                            <a href="{% url 'accounts:approve_users' %}">
+                                <span>Approve Users</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+
                         {% if user.role == 'customer' %}
                         <li><a href="{% url 'customer:data_entry' %}">
                             <i data-feather="file-text"></i><span>Edit Data</span></a>

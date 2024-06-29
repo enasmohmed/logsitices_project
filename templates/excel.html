@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load sass_tags %}
+{% load custom_tags %}
 
 
 {% block css %}
@@ -9,7 +10,15 @@
 
 {% block content %}
 
-{% include 'components/ui-kits/tab-bootstrap/components/tab-bootstrap.html' %}
+
+{% if user.role == 'employee' %}
+{% if request.session.dashboard_choice == 'admin_dashboard' %}
+{% include 'components/ui-kits/tab-bootstrap/components/tab-bootstrap-admin.html' %}
+{% else %}
+{% include 'components/ui-kits/tab-bootstrap/components/tab-bootstrap-customer.html' %}
+{% endif %}
+{% endif %}
+
 
 {% endblock %}
 

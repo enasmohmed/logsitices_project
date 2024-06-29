@@ -6,7 +6,7 @@ from django.db import models
 
 
 class Customer(models.Model):
-    name_company = models.CharField(max_length=255)
+    name_company = models.CharField(max_length=255, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):

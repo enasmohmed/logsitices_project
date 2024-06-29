@@ -55,14 +55,14 @@
         <div class="col-sm-12 col-xl-6">
             <div class="card">
                 <div class="card-body">
+
                     <ul class="nav nav-tabs border-tab border-0 mb-0 nav-danger" id="topline-tab" role="tablist">
                         <!--  Company Tab  -->
                         <li class="nav-item">
                             <a class="nav-link active nav-border pt-0 txt-danger nav-danger"
-                               id="topline-top-companies-tab"
-                               data-bs-toggle="tab" href="#topline-top-companies"
-                               role="tab" aria-controls="topline-top-companies" aria-selected="true">Company
-                            </a>
+                               id="topline-top-companies-tab" data-bs-toggle="tab" href="#topline-top-companies"
+                               role="tab" aria-controls="topline-top-companies" aria-selected="true">Customer</a>
+
                         </li>
                         <!--  Inbound Tab  -->
                         <li class="nav-item">
@@ -101,7 +101,7 @@
                             <a class="nav-link nav-border txt-danger nav-danger"
                                id="topline-top-damages-tab"
                                data-bs-toggle="tab" href="#topline-top-damages"
-                               role="tab" aria-controls="topline-top-damages" aria-selected="false">Expiry
+                               role="tab" aria-controls="topline-top-damages" aria-selected="false">Damage
                             </a>
                         </li>
                         <!--  Travel Distances Tab -->
@@ -138,11 +138,13 @@
                                role="tab" aria-controls="topline-top-hses" aria-selected="false">HSE
                             </a>
                         </li>
+
                     </ul>
 
                     <div class="tab-content" id="topline-tabContent">
                         <!-- Table Company  -->
-                        <div class="tab-pane fade show active" id="topline-top-companies" role="tabpanel"
+                        <div class="tab-pane fade show active"
+                             id="topline-top-companies" role="tabpanel"
                              aria-labelledby="topline-top-companies-tab">
                             <div class="card-body px-0 pb-0">
                                 <div class="user-header pb-2">
@@ -430,28 +432,28 @@
                                             <tr>
                                                 <td>{{ return.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerReturn',{{ return.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerReturns',{{ return.id }}, 'time', this.innerText)">
                                                     {{ return.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerReturn',{{ return.id }}, 'assigned_day', this.innerText)">
+                                                    onblur="updateData('CustomerReturns',{{ return.id }}, 'assigned_day', this.innerText)">
                                                     {{ return.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerReturn',{{ return.id }}, 'total_orders_items_returned', this.innerText)">
+                                                    onblur="updateData('CustomerReturns',{{ return.id }}, 'total_orders_items_returned', this.innerText)">
                                                     {{ return.total_orders_items_returned }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerReturn',{{ return.id }}, 'number_of_return_items_orders_updated_on_time', this.innerText)">
+                                                    onblur="updateData('CustomerReturns',{{ return.id }}, 'number_of_return_items_orders_updated_on_time', this.innerText)">
                                                     {{ return.number_of_return_items_orders_updated_on_time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerReturn',{{ return.id }}, 'number_of_return_items_orders_updated_late', this.innerText)">
+                                                    onblur="updateData('CustomerReturns',{{ return.id }}, 'number_of_return_items_orders_updated_late', this.innerText)">
                                                     {{ return.number_of_return_items_orders_updated_late }}
                                                 </td>
                                                 <td>
                                                     <button type="button"
-                                                            onclick="deleteData('CustomerReturn', {{ return.id }})">
+                                                            onclick="deleteData('CustomerReturns', {{ return.id }})">
 
                                                         Delete
                                                     </button>
@@ -492,31 +494,32 @@
                                             <tr>
                                                 <td>{{ expiry.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updateExpiry({{ expiry.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerExpiry', {{ expiry.id }}, 'time', this.innerText)">
                                                     {{ expiry.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateExpiry({{ expiry.id }}, 'assigned_day', this.innerText)">
+                                                    onblur="updateData('CustomerExpiry', {{ expiry.id }}, 'assigned_day', this.innerText)">
                                                     {{ expiry.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateExpiry({{ expiry.id }}, 'total_SKUs_expired', this.innerText)">
+                                                    onblur="updateData('CustomerExpiry', {{ expiry.id }}, 'total_SKUs_expired', this.innerText)">
                                                     {{ expiry.total_SKUs_expired }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateExpiry({{ expiry.id }}, 'total_expired_SKUS_disposed', this.innerText)">
+                                                    onblur="updateData('CustomerExpiry', {{ expiry.id }}, 'total_expired_SKUS_disposed', this.innerText)">
                                                     {{ expiry.total_expired_SKUS_disposed }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateExpiry({{ expiry.id }}, 'nearly_expired_1_to_3_months', this.innerText)">
+                                                    onblur="updateData('CustomerExpiry', {{ expiry.id }}, 'nearly_expired_1_to_3_months', this.innerText)">
                                                     {{ expiry.nearly_expired_1_to_3_months }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateExpiry({{ expiry.id }}, 'nearly_expired_3_to_6_months', this.innerText)">
+                                                    onblur="updateData('CustomerExpiry', {{ expiry.id }}, 'nearly_expired_3_to_6_months', this.innerText)">
                                                     {{ expiry.nearly_expired_3_to_6_months }}
                                                 </td>
                                                 <td>
-                                                    <button type="button" onclick="deleteExpiry({{ expiry.id }})">
+                                                    <button type="button"
+                                                            onclick="deleteData('CustomerExpiry', {{ expiry.id }})">
                                                         Delete
                                                     </button>
                                                 </td>
@@ -555,27 +558,28 @@
                                             <tr>
                                                 <td>{{ damage.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updateDamage({{ damage.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerDamage', {{ damage.id }}, 'time', this.innerText)">
                                                     {{ damage.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateDamage({{ damage.id }}, 'assigned_day', this.innerText)">
+                                                    onblur="updateData('CustomerDamage', {{ damage.id }}, 'assigned_day', this.innerText)">
                                                     {{ damage.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateDamage({{ damage.id }}, 'Total_QTYs_Damaged_by_WH', this.innerText)">
+                                                    onblur="updateData('CustomerDamage', {{ damage.id }}, 'Total_QTYs_Damaged_by_WH', this.innerText)">
                                                     {{ damage.Total_QTYs_Damaged_by_WH }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateDamage({{ damage.id }}, 'Number_of_Damaged_during_receiving', this.innerText)">
+                                                    onblur="updateData('CustomerDamage', {{ damage.id }}, 'Number_of_Damaged_during_receiving', this.innerText)">
                                                     {{ damage.Number_of_Damaged_during_receiving }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateDamage({{ damage.id }}, 'Number_of_Damaged_during_receiving', this.innerText)">
+                                                    onblur="updateData('CustomerDamage', {{ damage.id }}, 'Number_of_Damaged_during_receiving', this.innerText)">
                                                     {{ damage.Total_Damaged_QTYs_Disposed }}
                                                 </td>
                                                 <td>
-                                                    <button type="button" onclick="deleteDamage({{ damage.id }})">
+                                                    <button type="button"
+                                                            onclick="deleteData('CustomerDamage', {{ damage.id }})">
                                                         Delete
                                                     </button>
                                                 </td>
@@ -613,24 +617,24 @@
                                             <tr>
                                                 <td>{{ travel_distance.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updateTravelDistance({{ travel_distance.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'time', this.innerText)">
                                                     {{ travel_distance.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateTravelDistance({{ travel_distance.id }}, 'assigned_day', this.innerText)">
+                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'assigned_day', this.innerText)">
                                                     {{ travel_distance.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateTravelDistance({{ travel_distance.id }}, 'Total_no_of_Customers_deliverd', this.innerText)">
+                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'Total_no_of_Customers_deliverd', this.innerText)">
                                                     {{ travel_distance.Total_no_of_Customers_deliverd }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateTravelDistance({{ travel_distance.id }}, 'Total_no_of_Pallet_deliverd', this.innerText)">
+                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'Total_no_of_Pallet_deliverd', this.innerText)">
                                                     {{ travel_distance.Total_no_of_Pallet_deliverd }}
                                                 </td>
                                                 <td>
                                                     <button type="button"
-                                                            onclick="deleteTravelDistance({{ travel_distance.id }})">
+                                                            onclick="deleteData('CustomerTravelDistance', {{ travel_distance.id }})">
                                                         Delete
                                                     </button>
                                                 </td>
@@ -669,27 +673,28 @@
                                             <tr>
                                                 <td>{{ inventory.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updateInventory({{ inventory.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'time', this.innerText)">
                                                     {{ inventory.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateInventory({{ inventory.id }}, 'assigned_day', this.innerText)">
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'assigned_day', this.innerText)">
                                                     {{ inventory.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateInventory({{ inventory.id }}, 'Total_Locations_Audited', this.innerText)">
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_Locations_Audited', this.innerText)">
                                                     {{ inventory.Total_Locations_Audited }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateInventory({{ inventory.id }}, 'Total_Locations_with_Incorrect_SKU_and_Qty', this.innerText)">
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_Locations_with_Incorrect_SKU_and_Qty', this.innerText)">
                                                     {{ inventory.Total_Locations_with_Incorrect_SKU_and_Qty }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateInventory({{ inventory.id }}, 'Total_SKUs_Reconciliation', this.innerText)">
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_SKUs_Reconciliation', this.innerText)">
                                                     {{ inventory.Total_SKUs_Reconciliation }}
                                                 </td>
                                                 <td>
-                                                    <button type="button" onclick="deleteInventory({{ inventory.id }})">
+                                                    <button type="button"
+                                                            onclick="deleteData('CustomerInventory', {{ inventory.id }})">
                                                         Delete
                                                     </button>
                                                 </td>
@@ -730,40 +735,40 @@
                                             <tr>
                                                 <td>{{ pallet_location_availability.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'time', this.innerText)">
                                                     {{ pallet_location_availability.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'assigned_day', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'assigned_day', this.innerText)">
                                                     {{ pallet_location_availability.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'Total_Storage_Pallet', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'Total_Storage_Pallet', this.innerText)">
                                                     {{ pallet_location_availability.Total_Storage_Pallet }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'Total_Storage_Bin', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'Total_Storage_Bin', this.innerText)">
                                                     {{ pallet_location_availability.Total_Storage_Bin }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'Total_Storage_pallet_empty', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'Total_Storage_pallet_empty', this.innerText)">
                                                     {{ pallet_location_availability.Total_Storage_pallet_empty }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'Total_Storage_Bin_empty', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'Total_Storage_Bin_empty', this.innerText)">
                                                     {{ pallet_location_availability.Total_Storage_Bin_empty }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'Total_occupied_pallet_location', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'Total_occupied_pallet_location', this.innerText)">
                                                     {{ pallet_location_availability.Total_occupied_pallet_location }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updatePalletLocationAvailability({{ pallet_location_availability.id }}, 'Total_occupied_Bin_location', this.innerText)">
+                                                    onblur="updateData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }}, 'Total_occupied_Bin_location', this.innerText)">
                                                     {{ pallet_location_availability.Total_occupied_Bin_location }}
                                                 </td>
                                                 <td>
                                                     <button type="button"
-                                                            onclick="deletePalletLocationAvailability({{ pallet_location_availability.id }})">
+                                                            onclick="deleteData('CustomerPalletLocationAvailability', {{ pallet_location_availability.id }})">
                                                         Delete
                                                     </button>
                                                 </td>
@@ -800,19 +805,20 @@
                                             <tr>
                                                 <td>{{ hse.id }}</td>
                                                 <td contenteditable="true"
-                                                    onblur="updateHse({{ hse.id }}, 'time', this.innerText)">
+                                                    onblur="updateData('CustomerHSE', {{ hse.id }}, 'time', this.innerText)">
                                                     {{ hse.time }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateHse({{ hse.id }}, 'assigned_day', this.innerText)">{{
-                                                    hse.assigned_day }}
+                                                    onblur="updateData('CustomerHSE', {{ hse.id }}, 'assigned_day', this.innerText)">
+                                                    {{ hse.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateHse({{ hse.id }}, 'Total_Incidents_on_the_side', this.innerText)">
+                                                    onblur="updateData('CustomerHSE', {{ hse.id }}, 'Total_Incidents_on_the_side', this.innerText)">
                                                     {{ hse.Total_Incidents_on_the_side }}
                                                 </td>
                                                 <td>
-                                                    <button type="button" onclick="deleteHse({{ hse.id }})">Delete
+                                                    <button type="button"
+                                                            onclick="deleteData('CustomerHSE', {{ hse.id }})">Delete
                                                     </button>
                                                 </td>
                                             </tr>
@@ -833,7 +839,25 @@
 
 
 <script>
-    function updateData(model, id, field, value) {
+    // دالة للتحقق من نوع المستخدم وإظهار التبويبات المناسبة
+    function toggleTabs(isCustomer) {
+        if (isCustomer) {
+            // إظهار تبويب العميل وإخفاء تبويب الإدارة
+            document.getElementById('customer-data-tab').classList.add('active');
+            document.getElementById('topline-customer-data').classList.add('show', 'active');
+        } else {
+            // إخفاء تبويب العميل
+            document.getElementById('customer-data-tab').style.display = 'none';
+        }
+    }
+
+    // استدعاء الدالة بناءً على نوع المستخدم
+    document.addEventListener('DOMContentLoaded', function() {
+        const isCustomer = {{ is_customer|lower }}; // تحويل قيمة is_customer إلى lowercase لتصبح قيمة Boolean في جافاسكريبت
+        toggleTabs(isCustomer);
+    });
+
+      function updateData(model, id, field, value) {
         fetch("{% url 'customer:data_entry' %}", {
             method: 'POST',
             headers: {
@@ -877,6 +901,4 @@
         });
     }
 </script>
-
-
 <!-- Container-fluid Ends-->

@@ -17,7 +17,7 @@ from django.views.generic import CreateView, TemplateView
 from administration.models import AdminData
 from customer.models import CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
     CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
-from .forms import CustomUserCreationForm, ProfileForm, AdminDataForm, CustomerForm
+from .forms import CustomUserCreationForm, ProfileForm, CustomerForm, AdminDataForm
 from .models import CustomUser
 
 User = get_user_model()
@@ -31,7 +31,16 @@ class CustomLoginView(AuthLoginView):
 
     def form_valid(self, form):
         user = form.get_user()
-        print(f"User: {user.username}, Approved: {user.is_approved}, Role: {user.role}")
+        print(f"User: {user.username}, Approved: {user.is_approved}")
+
+        # Print detailed role information
+        if hasattr(user, 'role'):
+            print(f"Role attribute exists. Role: {user.role}")
+        else:
+            print("Role attribute does not exist.")
+
+        # Print group memberships
+        print(f"Groups: {[group.name for group in user.groups.all()]}")
 
         if not user.is_approved:
             messages.error(self.request, "Your account is pending approval.")
@@ -437,9 +446,11 @@ class ChooseDashboardView(View):
             }
         }
 
-        # تحقق من نوع المستخدم وإضافته إلى السياق
-        if self.request.user.groups.filter(name='Customer').exists():
-            context['user_type'] = "Customer"
+        # Determine user type and add it to the context
+        if self.request.user.is_superuser:
+            context['user_type'] = "Super Admin"
+        elif self.request.user.groups.filter(name='Admin').exists():
+            context['user_type'] = "Admin"
         elif self.request.user.groups.filter(name='Employee').exists():
             context['user_type'] = "Employee"
         else:
@@ -452,72 +463,31 @@ class ChooseDashboardView(View):
         context.update({
             'admin_data_form': AdminDataForm(initial={'user': request.user}),
             'customer_form': CustomerForm(initial={'user': request.user}),
-            'current_user': request.user.username  # إضافة اسم المستخدم الحالي إلى السياق
+            'current_user': request.user.username  # Add current user's username to context
         })
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         choice = request.POST.get('choice')
         if choice == 'admin_dashboard':
-            return redirect('accounts:admin_dashboard')
+            if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
+                return redirect('accounts:admin_dashboard')  # Replace with correct admin dashboard URL name
+            elif request.user.groups.filter(name='Employee').exists():
+                request.session['dashboard_choice'] = 'admin_dashboard'
+                return redirect('accounts:admin_dashboard')  # Replace with correct admin dashboard URL name
         elif choice == 'customer_dashboard':
-            return redirect('accounts:customer_dashboard')
+            request.session['dashboard_choice'] = 'customer_dashboard'
+            return redirect('accounts:customer_dashboard')  # Replace with correct customer dashboard URL name
+
+        # Get current user and their role
         current_user = request.user
-        user_role = EmployeeProfile.objects.get(user=current_user).role  # الحصول على الدور الخاص بالمستخدم
+        user_role = current_user.role  # Replace with correct way to fetch user role
+
         context = self.get_context_data(**kwargs)
         context.update({
             'admin_data_form': AdminDataForm(initial={'user': request.user}),
             'customer_form': CustomerForm(initial={'user': request.user}),
-            'current_user': current_user.username,  # إضافة اسم المستخدم الحالي إلى السياق
-            'user_role': user_role  # إضافة الدور الخاص بالمستخدم إلى السياق
+            'current_user': current_user.username,  # Add current user's username to context
+            'user_role': user_role  # Add user role to context
         })
         return render(request, self.template_name, context)
-
-
-def is_employee(user):
-    return user.groups.filter(name='Employees').exists()
-
-
-@method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
-class AddAdminDataView(View):
-    def get(self, request):
-        current_user = request.user.username  # Get current user's username
-        context = {
-            'admin_data_form': AdminDataForm(initial={'user': request.user}),
-            'customer_form': CustomerForm(initial={'user': request.user}),
-            'current_user': current_user,  # Add current user's username to context
-            'breadcrumb': {
-                'title': 'Employee Dashboard',
-                'parent': 'Edit Data',
-                'child': 'Default'
-            }
-        }
-        return render(request, 'general/dashboard/default/components/add_admin_data.html', context)
-
-    def post(self, request):
-        data_type = request.POST.get('data_type')
-        if data_type == 'admin':
-            form = AdminDataForm(request.POST)
-            if form.is_valid():
-                admin_data = form.save(commit=False)
-                admin_data.user = request.user  # Assign the current user
-                admin_data.save()
-                messages.success(request, 'Admin data added successfully.')
-                return redirect('accounts:employee_dashboard')
-            else:
-                messages.error(request, 'Invalid admin data. Please check the form.')
-                return redirect('add_admin_data')
-        elif data_type == 'customer':
-            form = CustomerForm(request.POST)
-            if form.is_valid():
-                customer_data = form.save(commit=False)
-                customer_data.user = request.user  # Assign the current user
-                customer_data.save()
-                messages.success(request, 'Customer data added successfully.')
-                return redirect('accounts:customer_dashboard')
-            else:
-                messages.error(request, 'Invalid customer data. Please check the form.')
-                return redirect('add_admin_data')
-
-        # If data type is not specified or some other error occurred, redirect user to the same page
-        return redirect('add_admin_data')
