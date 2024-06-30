@@ -252,6 +252,9 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
 
 
 ### Edit Data Form Customer
+
+
+### Edit Data Form Customer
 class CustomerEditDataView(View):
     model_map = {
         'Customer': Customer,
