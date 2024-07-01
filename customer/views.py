@@ -283,42 +283,21 @@ class CustomerEditDataView(View):
         is_employee = self.is_employee_user(user)
         is_customer = self.is_customer_user(user)
 
-        dashboard_choice = request.session.get('dashboard_choice', 'customer')
+        dashboard_choice = request.session.get('dashboard_choice', 'customer_dashboard')
 
-        if dashboard_choice not in ['admin', 'customer']:
-            dashboard_choice = 'customer'
+        if dashboard_choice not in ['admin_dashboard', 'customer_dashboard']:
+            dashboard_choice = 'customer_dashboard'
 
-        if dashboard_choice == 'admin' and not is_admin:
+        if dashboard_choice == 'admin_dashboard' and not is_admin:
             return HttpResponseForbidden("You do not have permission to access this page.")
 
-        if dashboard_choice == 'customer' and not (is_customer or is_employee):
+        if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
             return HttpResponseForbidden("You do not have permission to access this page.")
-
-        companies = Customer.objects.all() if dashboard_choice == 'customer' else None
-        inbounds = CustomerInbound.objects.all() if dashboard_choice == 'customer' else None
-        outbounds = CustomerOutbound.objects.all() if dashboard_choice == 'customer' else None
-        returns = CustomerReturns.objects.all() if dashboard_choice == 'customer' else None
-        expiries = CustomerExpiry.objects.all() if dashboard_choice == 'customer' else None
-        damages = CustomerDamage.objects.all() if dashboard_choice == 'customer' else None
-        travel_distances = CustomerTravelDistance.objects.all() if dashboard_choice == 'customer' else None
-        inventories = CustomerInventory.objects.all() if dashboard_choice == 'customer' else None
-        pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all() if dashboard_choice == 'customer' else None
-        hses = CustomerHSE.objects.all() if dashboard_choice == 'customer' else None
 
         # تحديد دور المستخدم
         user_type = 'employee' if is_employee else 'customer'
 
         context = {
-            "companies": companies,
-            "inbounds": inbounds,
-            "outbounds": outbounds,
-            "returns": returns,
-            "expiries": expiries,
-            "damages": damages,
-            "travel_distances": travel_distances,
-            "inventories": inventories,
-            "pallet_location_availabilities": pallet_location_availabilities,
-            "hses": hses,
             "user": user,
             "is_admin": is_admin,
             "is_employee": is_employee,
@@ -326,15 +305,39 @@ class CustomerEditDataView(View):
             "dashboard_choice": dashboard_choice,
             "user_type": user_type,  # إضافة دور المستخدم إلى السياق
             "breadcrumb": {
-                "title": "Admin Dashboard" if dashboard_choice == 'admin' else "Customer Dashboard",
+                "title": "Admin Dashboard" if dashboard_choice == 'admin_dashboard' else "Customer Dashboard",
                 "parent": "Edit Data",
                 "child": "Default"
             }
         }
 
-        if is_admin and dashboard_choice == 'admin':
+        if dashboard_choice == 'admin_dashboard' and is_admin:
             admin_data = AdminData.objects.all()
             context["admin_data"] = admin_data
+        elif dashboard_choice == 'customer_dashboard' or user.groups.filter(name='Customer').exists():
+            companies = Customer.objects.all()
+            inbounds = CustomerInbound.objects.all()
+            outbounds = CustomerOutbound.objects.all()
+            returns = CustomerReturns.objects.all()
+            expiries = CustomerExpiry.objects.all()
+            damages = CustomerDamage.objects.all()
+            travel_distances = CustomerTravelDistance.objects.all()
+            inventories = CustomerInventory.objects.all()
+            pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
+            hses = CustomerHSE.objects.all()
+
+            context.update({
+                "companies": companies,
+                "inbounds": inbounds,
+                "outbounds": outbounds,
+                "returns": returns,
+                "expiries": expiries,
+                "damages": damages,
+                "travel_distances": travel_distances,
+                "inventories": inventories,
+                "pallet_location_availabilities": pallet_location_availabilities,
+                "hses": hses,
+            })
 
         return render(request, "excel.html", context)
 
@@ -346,15 +349,15 @@ class CustomerEditDataView(View):
         is_employee = self.is_employee_user(user)
         is_customer = self.is_customer_user(user)
 
-        dashboard_choice = request.session.get('dashboard_choice', 'customer')
+        dashboard_choice = request.session.get('dashboard_choice', 'customer_dashboard')
 
-        if dashboard_choice not in ['admin', 'customer']:
-            dashboard_choice = 'customer'
+        if dashboard_choice not in ['admin_dashboard', 'customer_dashboard']:
+            dashboard_choice = 'customer_dashboard'
 
-        if dashboard_choice == 'admin' and not is_admin:
+        if dashboard_choice == 'admin_dashboard' and not is_admin:
             return JsonResponse({"success": False, "error": "Permission denied."})
 
-        if dashboard_choice == 'customer' and not (is_customer or is_employee):
+        if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
             return JsonResponse({"success": False, "error": "Permission denied."})
 
         try:

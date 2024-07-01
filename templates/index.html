@@ -18,7 +18,7 @@
 {% block content %}
 
 {% if user.is_authenticated %}
-{% if user.role == 'admin' or request.session.dashboard_choice == 'admin_dashboard' %}
+{% if user.role == 'admin' or request.user.is_superuser  or request.session.dashboard_choice == 'admin_dashboard' %}
 {% include 'general/dashboard/default/components/container-fluid-admin.html' %}
 {% elif is_employee %}
 {% if request.session.dashboard_choice == 'admin_dashboard' %}
