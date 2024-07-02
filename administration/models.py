@@ -1,17 +1,40 @@
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
+User = get_user_model()
+
+
 class AdminData(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     total_quantities = models.IntegerField(blank=True, null=True)
     total_no_of_employees = models.IntegerField(blank=True, null=True)
     hc_business = models.CharField(max_length=255, blank=True, null=True)
+    employees = models.ManyToManyField(User, related_name='admin_data_accessible_companies', blank=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.hc_business}'
+
+
+class EmployeeProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_employee_profile')
+    company = models.ForeignKey(AdminData, on_delete=models.CASCADE, related_name='admin_employees')
+    role = models.CharField(max_length=20, choices=User.ROLE_CHOICES)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.company.hc_business}"
+
+
+# Signal to create EmployeeProfile for new users
+@receiver(post_save, sender=User)
+def create_employee_profile(sender, instance, created, **kwargs):
+    if created and not hasattr(instance, 'admin_employee_profile'):
+        default_company = AdminData.objects.exclude(admin_employees__isnull=True).first()
+        if default_company:
+            EmployeeProfile.objects.create(user=instance, company=default_company, role='Employee')
 
 
 class AdminInbound(models.Model):

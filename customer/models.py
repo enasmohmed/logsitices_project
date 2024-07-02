@@ -1,5 +1,7 @@
-from django.conf import settings
 from django.db import models
+
+from accounts.models import CustomUser
+from project import settings
 
 
 # Create your models here.
@@ -7,13 +9,22 @@ from django.db import models
 
 class Customer(models.Model):
     name_company = models.CharField(max_length=255, blank=True, null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name_company
 
 
+class EmployeeProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='employee_profile')
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='employees')
+    role = models.CharField(max_length=20, choices=CustomUser.ROLE_CHOICES)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.company.name_company}"
+
+
 class CustomerInbound(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='inbounds')
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -46,6 +57,8 @@ class CustomerInbound(models.Model):
 
 
 class CustomerOutbound(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='outbounds')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -76,6 +89,8 @@ class CustomerOutbound(models.Model):
 
 
 class CustomerReturns(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='returns')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -97,6 +112,8 @@ class CustomerReturns(models.Model):
 
 
 class CustomerExpiry(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='expiries')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -118,6 +135,8 @@ class CustomerExpiry(models.Model):
 
 
 class CustomerDamage(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='damages')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -138,6 +157,8 @@ class CustomerDamage(models.Model):
 
 
 class CustomerTravelDistance(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='travel_distances')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -158,6 +179,8 @@ class CustomerTravelDistance(models.Model):
 
 
 class CustomerInventory(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='inventories')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -178,6 +201,8 @@ class CustomerInventory(models.Model):
 
 
 class CustomerPalletLocationAvailability(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='pallet_location_availabilities')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):
@@ -201,6 +226,8 @@ class CustomerPalletLocationAvailability(models.Model):
 
 
 class CustomerHSE(models.Model):
+    company = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='hses')
+
     time = models.DateField()
 
     class Weekday(models.TextChoices):

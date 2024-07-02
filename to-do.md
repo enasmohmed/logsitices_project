@@ -51,4 +51,4 @@ edit color chart for dashboard admin ---> Done
 edit full screen website responseve
 add fonts website ----> Done
 
-انا عايزه كل شركة يكون ليها موظفين معينين يقدر يشوفو الداتا ويعدلو عليها سواء شركة او ادمن 
+انا عايزه كل شركة يكون ليها موظفين معينين يقدر يشوفو الداتا ويعدلو عليها سواء شركة او ادمن ---> Done 

@@ -153,10 +153,13 @@ def user_profile(request):
     # تحديد نوع المستخدم بناءً على الصلاحيات وعضوية المجموعة
     if user.is_superuser or user.groups.filter(name='Admin').exists():
         user_type = "Admin"
-    elif user.is_employee:
+    elif user.groups.filter(name='Employee').exists():
         user_type = "Employee"
     else:
         user_type = "Customer"
+
+    # الحصول على أسماء المجموعات التي ينتمي إليها المستخدم
+    user_groups = user.groups.values_list('name', flat=True)
 
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=user)
@@ -166,6 +169,7 @@ def user_profile(request):
 
     context['form'] = form
     context['user_type'] = user_type
+    context['user_groups'] = user_groups
 
     return render(request, "user/user-profile/user-profile.html", context)
 

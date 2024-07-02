@@ -101,6 +101,7 @@
 
                     <!-- Admin Data Content -->
                     <div class="tab-content" id="topline-tabContent">
+
                         <!-- Admin Data Table -->
                         <div class="tab-pane fade show active" id="topline-admin-data" role="tabpanel"
                              aria-labelledby="topline-admin-data-tab">
@@ -118,6 +119,7 @@
                                                 <th scope="col">Total Quantities</th>
                                                 <th scope="col">Total no of Employees</th>
                                                 <th scope="col">HC Business</th>
+                                                <th scope="col">Employees</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
                                             </thead>
@@ -127,7 +129,7 @@
                                                 <th scope="row">{{ admin.id }}</th>
                                                 <td contenteditable="true"
                                                     onblur="updateData('AdminData', {{ admin.id }}, 'user', this.innerText)">
-                                                    {{ admin.user }}
+                                                    {{ admin.user.username }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('AdminData', {{ admin.id }}, 'total_quantities', this.innerText)">
@@ -142,9 +144,23 @@
                                                     {{ admin.hc_business }}
                                                 </td>
                                                 <td>
+                                                    <ul>
+                                                        {% for employee in admin.employees.all %}
+                                                        <li contenteditable="true"
+                                                            onblur="updateEmployees('AdminData', {{ admin.id }}, 'user.username', this.innerText)">
+                                                            {{ employee.username}}
+                                                        </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </td>
+                                                <td>
+                                                    {% if user.is_staff or user in admin.employees.all %}
                                                     <button type="button"
                                                             onclick="deleteData('AdminData', {{ admin.id }})">Delete
                                                     </button>
+                                                    {% else %}
+                                                    <button type="button" disabled>Delete</button>
+                                                    {% endif %}
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -513,48 +529,84 @@
         toggleTabs(isAdmin);
     });
 
-    function updateData(model, id, field, value) {
-        fetch("{% url 'administration:data_entry' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({update: {model: model, id: id, field: field, value: value}})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                alert("Failed to update data: " + data.error);
-            } else {
-                // Optional: Handle success if needed
+ function addData(model, fields) {
+    fetch("", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            add: {
+                model: model,
+                fields: fields
             }
         })
-        .catch(error => {
-            console.error("Error updating data:", error);
-        });
-    }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.error);
+        } else {
+            // Handle success as needed (e.g., reload page or update UI)
+            location.reload(); // Example: Reload page after successful addition
+        }
+    });
+}
 
-    function deleteData(model, id) {
-        fetch("{% url 'administration:data_entry' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({delete: {model: model, id: id}})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload(); // Reload the page on successful delete
-            } else {
-                alert("Failed to delete row: " + data.error);
-            }
-        })
-        .catch(error => {
-            console.error("Error deleting row:", error);
-        });
-    }
+  function updateData(model, id, field, value) {
+    fetch("{% url 'administration:data_entry' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ update: { model: model, id: id, field: field, value: value } })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            alert("Failed to update data: " + data.error);
+        } else {
+            // Optional: Handle success if needed
+        }
+    })
+    .catch(error => {
+        console.error("Error updating data:", error);
+    });
+}
+
+function deleteData(model, id) {
+    fetch("{% url 'administration:data_entry' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ delete: { model: model, id: id } })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Reload the page on successful delete
+        } else {
+            alert("Failed to delete row: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error deleting row:", error);
+    });
+}
+
 </script>
 <!-- Container-fluid Ends-->

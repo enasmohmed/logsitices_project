@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from accounts.models import CustomUser
 from administration.models import AdminInventory, AdminCapacity, AdminReturns, AdminOutbound, AdminInbound, AdminData
 from customer.models import CustomerHSE, CustomerPalletLocationAvailability, CustomerInventory, CustomerTravelDistance, \
-    CustomerDamage, CustomerExpiry, CustomerReturns, CustomerOutbound, CustomerInbound, Customer
+    CustomerDamage, CustomerExpiry, CustomerReturns, CustomerOutbound, CustomerInbound, Customer, EmployeeProfile
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -39,7 +39,25 @@ class DateInput(forms.DateInput):
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name_company', 'user']
+        fields = ['name_company']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Retrieve user from kwargs
+        super().__init__(*args, **kwargs)
+
+        if user:
+            if user.groups.filter(name='Employee').exists():
+                # Get company name for Employee users
+                company = EmployeeProfile.objects.filter(user=user).first().company
+            elif user.groups.filter(name='Customer').exists():
+                # Get company name for Customer users
+                company = Customer.objects.filter(employees__user=user).first()
+
+            if company:
+                self.fields['name_company'].initial = company.name_company
+                self.fields['name_company'].disabled = True  # Make the field disabled
+
+    # Optional: If `name_company` is not a model field, handle it separately as needed.
 
 
 class CustomerInboundForm(forms.ModelForm):
@@ -140,6 +158,9 @@ class AdminDataForm(forms.ModelForm):
     class Meta:
         model = AdminData
         fields = ['user', 'total_quantities', 'total_no_of_employees', 'hc_business']
+        # widgets = {
+        #     'employees': forms.CheckboxSelectMultiple,
+        # }
 
 
 class AdminInboundForm(forms.ModelForm):

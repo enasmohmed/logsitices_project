@@ -16,22 +16,26 @@
                 </div>
             </div>
             <div class="social-details">
-                <h5 class="mb-1"><a href="#">{{ user.username }}</a></h5><span
-                    class="f-light">{{ user.email }}</span>
+                <h5 class="mb-1"><a href="#">{{ user.username }}</a></h5>
+                <span class="f-light">{{ user.email }}</span>
                 <ul class="social-follow">
                     <li>
-                        <h5 class="mb-0">{{ date_joined }}</h5><span class="f-light">Date Joined</span>
+                        <h5 class="mb-0">{{ user.date_joined }}</h5><span class="f-light">Date Joined</span>
                     </li>
                     <li>
                         <h5 class="mb-0">{{ user_type }}</h5><span class="f-light">User Type</span>
                     </li>
-
-
                     <li>
-                        <h5 class="mb-0">897</h5><span class="f-light">Following</span>
+                        <h5 class="mb-0">
+                            {% for group in user_groups %}
+                            {{ group }}{% if not forloop.last %}<br>{% endif %}
+                            {% endfor %}
+                        </h5>
+                        <span class="f-light">User Groups</span>
                     </li>
                 </ul>
             </div>
+
         </div>
     </div>
 </div>

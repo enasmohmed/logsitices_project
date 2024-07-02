@@ -20,7 +20,7 @@ from accounts.forms import CustomerForm, CustomerInboundForm, CustomerOutboundFo
     CustomerPalletLocationAvailabilityForm, CustomerHSEForm
 from administration.models import AdminData
 from .models import Customer, CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
-    CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
+    CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile
 
 
 ### View Customer Dashboard
@@ -294,16 +294,20 @@ class CustomerEditDataView(View):
         if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
             return HttpResponseForbidden("You do not have permission to access this page.")
 
-        # تحديد دور المستخدم
-        user_type = 'employee' if is_employee else 'customer'
+        company = None
+        if is_employee:
+            company = EmployeeProfile.objects.filter(user=user).first().company
+        elif is_customer:
+            company = Customer.objects.filter(employees__user=user).first()
 
         context = {
             "user": user,
+            "user_type": "Employee" if is_employee else "Customer",  # تحديد نوع المستخدم هنا
             "is_admin": is_admin,
             "is_employee": is_employee,
             "is_customer": is_customer,
             "dashboard_choice": dashboard_choice,
-            "user_type": user_type,  # إضافة دور المستخدم إلى السياق
+            "company": company,  # إضافة الشركة إلى السياق
             "breadcrumb": {
                 "title": "Admin Dashboard" if dashboard_choice == 'admin_dashboard' else "Customer Dashboard",
                 "parent": "Edit Data",
@@ -314,17 +318,17 @@ class CustomerEditDataView(View):
         if dashboard_choice == 'admin_dashboard' and is_admin:
             admin_data = AdminData.objects.all()
             context["admin_data"] = admin_data
-        elif dashboard_choice == 'customer_dashboard' or user.groups.filter(name='Customer').exists():
-            companies = Customer.objects.all()
-            inbounds = CustomerInbound.objects.all()
-            outbounds = CustomerOutbound.objects.all()
-            returns = CustomerReturns.objects.all()
-            expiries = CustomerExpiry.objects.all()
-            damages = CustomerDamage.objects.all()
-            travel_distances = CustomerTravelDistance.objects.all()
-            inventories = CustomerInventory.objects.all()
-            pallet_location_availabilities = CustomerPalletLocationAvailability.objects.all()
-            hses = CustomerHSE.objects.all()
+        elif dashboard_choice == 'customer_dashboard' and company:
+            companies = Customer.objects.filter(employees__user=user)
+            inbounds = CustomerInbound.objects.filter(company=company)
+            outbounds = CustomerOutbound.objects.filter(company=company)
+            returns = CustomerReturns.objects.filter(company=company)
+            expiries = CustomerExpiry.objects.filter(company=company)
+            damages = CustomerDamage.objects.filter(company=company)
+            travel_distances = CustomerTravelDistance.objects.filter(company=company)
+            inventories = CustomerInventory.objects.filter(company=company)
+            pallet_location_availabilities = CustomerPalletLocationAvailability.objects.filter(company=company)
+            hses = CustomerHSE.objects.filter(company=company)
 
             context.update({
                 "companies": companies,
@@ -436,7 +440,7 @@ class AddCustomerDataView(View):
             user_type = 'Unknown'
 
         context = {
-            'customer_form': CustomerForm(initial={'user': request.user}),
+            'customer_form': CustomerForm(user=request.user),  # Pass current user to form
             'customer_inbound_form': CustomerInboundForm(),
             'customer_outbound_form': CustomerOutboundForm(),
             'customer_returns_form': CustomerReturnsForm(),
@@ -487,6 +491,13 @@ class AddCustomerDataView(View):
                     customer_data = customer_form.save(commit=False)
                     customer_data.user = request.user  # Assign the current user
                     customer_data.save()
+
+                    # Fetch the company associated with the current user
+                    company = None
+                    if request.user.groups.filter(name='Employee').exists():
+                        company = EmployeeProfile.objects.filter(user=request.user).first().company
+                    elif request.user.groups.filter(name='Customer').exists():
+                        company = Customer.objects.filter(employees__user=request.user).first()
 
                     customer_inbound_form.instance.customer = customer_data
                     customer_outbound_form.instance.customer = customer_data

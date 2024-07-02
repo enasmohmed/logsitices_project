@@ -12,9 +12,15 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <!-- Admin Data Form -->
+
                 <fieldset class="scheduler-border">
                     <legend class="scheduler-border">Admin Data</legend>
                     {{ admin_data_form|crispy }}
+                    <!-- Display Company Name -->
+                    <div class="form-group mt-4">
+                        <label for="company_name">Company Name or Hc Business</label>
+                        <input type="text" id="company_name" class="form-control" value="{{ company_name }}" readonly>
+                    </div>
                 </fieldset>
 
                 <!-- Admin Inbound Form -->
@@ -52,6 +58,7 @@
                     <a href="{% url 'accounts:employee_dashboard' %}" class="btn btn-secondary ml-2">Cancel</a>
                 </div>
             </form>
+
         </div>
     </div>
 </div>

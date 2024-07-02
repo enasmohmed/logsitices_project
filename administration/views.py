@@ -15,7 +15,7 @@ from django.views.generic import TemplateView
 
 from accounts.forms import AdminDataForm, AdminInboundForm, AdminOutboundForm, AdminReturnsForm, AdminCapacityForm, \
     AdminInventoryForm
-from .models import AdminInbound, AdminOutbound, AdminReturns, AdminCapacity, AdminInventory, AdminData
+from .models import AdminInbound, AdminOutbound, AdminReturns, AdminCapacity, AdminInventory, AdminData, EmployeeProfile
 
 
 #### View Dashborad Admin
@@ -166,12 +166,15 @@ class AdminEditDataView(View):
     }
 
     def is_employee_user(self, user):
-        # Check if the user belongs to the 'Employee' group
         return user.groups.filter(name='Employee').exists()
 
     def is_customer_user(self, user):
-        # Check if the user belongs to the 'Customer' group
         return user.groups.filter(name='Customer').exists()
+
+    def has_permission(self, user, model_instance):
+        if self.is_employee_user(user) or user.is_staff:
+            return True
+        return user == model_instance.user
 
     @method_decorator(login_required, name='dispatch')
     @method_decorator(csrf_exempt, name='dispatch')
@@ -189,8 +192,7 @@ class AdminEditDataView(View):
         if dashboard_choice == 'customer' and not (is_customer or is_employee):
             return HttpResponseForbidden("You do not have permission to access this page.")
 
-        # تحديد دور المستخدم
-        user_type = 'employee' if is_employee else 'customer'  # تعديل هنا لتعيين 'employee' إذا كان المستخدم موظفاً
+        user_type = 'employee' if is_employee else 'customer'
 
         context = {
             "user": user,
@@ -198,7 +200,7 @@ class AdminEditDataView(View):
             "is_employee": is_employee,
             "is_customer": is_customer,
             "dashboard_choice": dashboard_choice,
-            "user_type": user_type,  # إضافة دور المستخدم إلى السياق
+            "user_type": user_type,
             "breadcrumb": {
                 "title": "Admin Dashboard" if dashboard_choice == 'admin' else "Customer Dashboard",
                 "parent": "Edit Data",
@@ -206,19 +208,23 @@ class AdminEditDataView(View):
             }
         }
 
-        if is_admin and dashboard_choice == 'admin':
-            admin_data = AdminData.objects.all()
-            admin_inbound_data = AdminInbound.objects.all()
-            admin_outbound_data = AdminOutbound.objects.all()
-            admin_returns_data = AdminReturns.objects.all()
-            admin_capacity_data = AdminCapacity.objects.all()
-            admin_inventory_data = AdminInventory.objects.all()
-            context["admin_data"] = admin_data
-            context["admin_inbound_data"] = admin_inbound_data
-            context["admin_outbound_data"] = admin_outbound_data
-            context["admin_returns_data"] = admin_returns_data
-            context["admin_capacity_data"] = admin_capacity_data
-            context["admin_inventory_data"] = admin_inventory_data
+        if is_admin or (is_employee and dashboard_choice == 'admin'):
+            admin_data = AdminData.objects.filter(employees=user) if is_employee else AdminData.objects.filter(
+                user=user)
+            admin_inbound_data = AdminInbound.objects.filter(admin_data__in=admin_data)
+            admin_outbound_data = AdminOutbound.objects.filter(admin_data__in=admin_data)
+            admin_returns_data = AdminReturns.objects.filter(admin_data__in=admin_data)
+            admin_capacity_data = AdminCapacity.objects.filter(admin_data__in=admin_data)
+            admin_inventory_data = AdminInventory.objects.filter(admin_data__in=admin_data)
+
+            context.update({
+                "admin_data": admin_data,
+                "admin_inbound_data": admin_inbound_data,
+                "admin_outbound_data": admin_outbound_data,
+                "admin_returns_data": admin_returns_data,
+                "admin_capacity_data": admin_capacity_data,
+                "admin_inventory_data": admin_inventory_data
+            })
 
         return render(request, "excel.html", context)
 
@@ -256,6 +262,9 @@ class AdminEditDataView(View):
                 except model.DoesNotExist:
                     return JsonResponse({"success": False, "error": "Object not found"})
 
+                if not self.has_permission(user, obj):
+                    return JsonResponse({"success": False, "error": "Permission denied."})
+
                 setattr(obj, field_name, new_value)
                 obj.save()
                 return JsonResponse({"success": True})
@@ -283,6 +292,9 @@ class AdminEditDataView(View):
                 except model.DoesNotExist:
                     return JsonResponse({"success": False, "error": "Object not found"})
 
+                if not self.has_permission(user, obj):
+                    return JsonResponse({"success": False, "error": "Permission denied."})
+
                 obj.delete()
                 return JsonResponse({"success": True})
             else:
@@ -296,11 +308,23 @@ def is_employee(user):
 
 
 ### Add Data Form Admin
+
+
+def is_employee(user):
+    return user.groups.filter(name='Employee').exists()
+
+
 @method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
 class AddAdminDataView(View):
     def get(self, request):
-        current_user = request.user.username  # Get current user's username
+        current_user = request.user.username
         user_type = ''
+
+        try:
+            employee_profile = EmployeeProfile.objects.get(user=request.user)
+            company_name = employee_profile.company.hc_business
+        except EmployeeProfile.DoesNotExist:
+            company_name = None
 
         if request.user.groups.filter(name='Super Admin').exists():
             user_type = 'Super Admin'
@@ -320,8 +344,9 @@ class AddAdminDataView(View):
             'admin_returns_form': AdminReturnsForm(),
             'admin_capacity_form': AdminCapacityForm(),
             'admin_inventory_form': AdminInventoryForm(),
-            'current_user': current_user,  # Add current user's username to context
-            'user_type': user_type,  # Add user type to context
+            'current_user': current_user,
+            'user_type': user_type,
+            'company_name': company_name,
             'breadcrumb': {
                 'title': 'Employee Dashboard',
                 'parent': 'Edit Data',
@@ -351,7 +376,8 @@ class AddAdminDataView(View):
             try:
                 with transaction.atomic():
                     admin_data = admin_data_form.save(commit=False)
-                    admin_data.user = request.user  # Assign the current user
+                    admin_data.user = request.user
+                    admin_data.company = EmployeeProfile.objects.get(user=request.user).company
                     admin_data.save()
 
                     admin_inbound_form.instance.admin_data = admin_data

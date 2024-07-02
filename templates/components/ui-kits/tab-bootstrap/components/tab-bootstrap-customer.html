@@ -142,9 +142,9 @@
                     </ul>
 
                     <div class="tab-content" id="topline-tabContent">
+                        {% if is_customer or is_employee %}
                         <!-- Table Company  -->
-                        <div class="tab-pane fade show active"
-                             id="topline-top-companies" role="tabpanel"
+                        <div class="tab-pane fade show active" id="topline-top-companies" role="tabpanel"
                              aria-labelledby="topline-top-companies-tab">
                             <div class="card-body px-0 pb-0">
                                 <div class="user-header pb-2">
@@ -169,13 +169,29 @@
                                                     onblur="updateData('Customer', {{ company.id }}, 'name_company', this.innerText)">
                                                     {{ company.name_company }}
                                                 </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('Customer', {{ company.id }}, 'username', this.innerText)">
-                                                    {{ company.user.username }}
-                                                </td>
                                                 <td>
-                                                    <button onclick="deleteData('Customer', {{ company.id }})">Delete
-                                                    </button>
+                                                    <ul>
+                                                        {% for employee in company.employees.all %}
+                                                        <li contenteditable="true"
+                                                            onblur="updateData('EmployeeProfile', {{ employee.id }}, 'user.username', this.innerText)">
+                                                            {{ employee.user.username }}
+                                                        </li>
+                                                        <hr>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </td>
+
+                                                <td>
+                                                    <ul>
+                                                        {% for employee in company.employees.all %}
+                                                        <li>
+                                                            <button onclick="deleteData('EmployeeProfile', {{ employee.id }})">
+                                                                Delete
+                                                            </button>
+                                                        </li>
+                                                        <hr>
+                                                        {% endfor %}
+                                                    </ul>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -272,19 +288,19 @@
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'dash_of_GR_reports_that_include_variance', this.innerText)">
-                                                    {{ inbound.dash_of_GR_reports_that_include_variance }}
+                                                    {{ inbound.dash_of_GR_reports_with_discripancy }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_number_of_SKUS_received', this.innerText)">
-                                                    {{ inbound.total_number_of_SKUS_received }}
+                                                    {{ inbound.total_SKUS_received }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'number_of_SKUS_damaged_during_receiving', this.innerText)">
-                                                    {{ inbound.number_of_SKUS_damaged_during_receiving }}
+                                                    {{ inbound.dash_of_skus_damaged_during_receiving }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_received_with_storing', this.innerText)">
-                                                    {{ inbound.total_received_with_storing }}
+                                                    {{ inbound.total_received_with_putaway }}
                                                 </td>
                                                 <td>
                                                     <button type="button"
@@ -352,12 +368,12 @@
                                                     {{ outbound.pending_orders }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_not_yet_picked', this.innerText)">
-                                                    {{ outbound.number_of_orders_not_yet_picked }}
+                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_order_not_yet_picked', this.innerText)">
+                                                    {{ outbound.number_of_order_not_yet_picked }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_picked_but_not_yet_ready_for_dispatch', this.innerText)">
-                                                    {{ outbound.number_of_orders_picked_but_not_yet_ready_for_dispatch}}
+                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress', this.innerText)">
+                                                    {{outbound.number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress}}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_waiting_for_mod_qc', this.innerText)">
@@ -829,7 +845,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -856,49 +872,78 @@
         const isCustomer = {{ is_customer|lower }}; // تحويل قيمة is_customer إلى lowercase لتصبح قيمة Boolean في جافاسكريبت
         toggleTabs(isCustomer);
     });
+    function addData(model, fields) {
+    fetch("", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            add: {
+                model: model,
+                fields: fields
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.error);
+        } else {
+            // Handle success as needed (e.g., reload page or update UI)
+            location.reload(); // Example: Reload page after successful addition
+        }
+    });
+}
 
-      function updateData(model, id, field, value) {
-        fetch("{% url 'customer:data_entry' %}", {
-            method: 'POST',
+   function updateData(model, id, field, value) {
+        fetch("", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
             },
-            body: JSON.stringify({update: {model: model, id: id, field: field, value: value}})
+            body: JSON.stringify({
+                update: {
+                    model: model,
+                    id: id,
+                    field: field,
+                    value: value
+                }
+            })
         })
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                alert("Failed to update data: " + data.error);
-            } else {
-                // Optional: Handle success if needed
+                alert(data.error);
             }
-        })
-        .catch(error => {
-            console.error("Error updating data:", error);
         });
     }
 
     function deleteData(model, id) {
-        fetch("{% url 'customer:data_entry' %}", {
-            method: 'POST',
+        fetch("", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
             },
-            body: JSON.stringify({delete: {model: model, id: id}})
+            body: JSON.stringify({
+                delete: {
+                    model: model,
+                    id: id
+                }
+            })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload(); // Reload the page on successful delete
+                location.reload();
             } else {
-                alert("Failed to delete row: " + data.error);
+                alert(data.error);
             }
-        })
-        .catch(error => {
-            console.error("Error deleting row:", error);
         });
     }
 </script>
+
 <!-- Container-fluid Ends-->

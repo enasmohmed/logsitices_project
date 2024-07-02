@@ -2,12 +2,13 @@ from django.contrib import admin
 
 from customer.models import CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
     CustomerTravelDistance, \
-    CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, Customer
+    CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, Customer, EmployeeProfile
 
 # Register your models here.
 
 
 admin.site.register(Customer)
+admin.site.register(EmployeeProfile)
 admin.site.register(CustomerInbound)
 admin.site.register(CustomerOutbound)
 admin.site.register(CustomerReturns)
