@@ -16,27 +16,29 @@
                 </div>
             </div>
             <div class="social-details">
-                <h5 class="mb-1">{{ user.username }}</h5><span
-                    class="f-light">{{ user.email }}</span>
+                <h5 class="mb-1">{{ user.username }}</h5>
+                <span class="f-light">{{ user.email }}</span>
                 <ul class="social-follow">
                     <li>
-                        <h5 class="mb-0">User Type:</h5>
-                        {% with user|has_group:"Admin" as is_admin %}
-                        {% if user.is_superuser or is_admin %}
-                        <span class="f-light">Admin</span>
-                        {% elif user.is_customer %}
-                        <span class="f-light">Customer</span>
-                        {% elif user.is_employee %}
-                        <span class="f-light">Employee</span>
-                        {% else %}
-                        <span class="f-light">Unknown</span>
-                        {% endif %}
-                        {% endwith %}
-
+                        <h5 class="mb-0">User Type</h5>
+                        <span class="f-light"> {{ user.role }}</span>
                     </li>
-
+                    <li>
+                        <h5 class="mb-0">Date Joined</h5>
+                        <span class="f-light"> {{ user.date_joined|date:"d F Y" }}</span>
+                    </li>
+                    <li>
+                        <h5 class="mb-0">User Group</h5>
+                        <span class="f-light">
+                            {% for group in user.groups.all %}
+                                {{ group.name }}
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </span>
+                    </li>
                 </ul>
             </div>
+
         </div>
     </div>
 </div>

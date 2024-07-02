@@ -201,15 +201,25 @@ def user_cards(request):
         return redirect('/')
 
     # جلب جميع المستخدمين
-    users = User.objects.all()
+    users = CustomUser.objects.all()
 
-    # تعيين نوع المستخدم
+    # تحديد نوع المستخدم بناءً على الصلاحيات وعضوية المجموعة
     if request.user.is_superuser:
         user_type = "Admin"
-    elif request.user.is_employee:
+    elif request.user.groups.filter(name='Employee').exists():
         user_type = "Employee"
     else:
         user_type = "Customer"
+
+    # تحديد مجموعة المستخدم
+    user_group = "Unknown"  # افتراض قيمة افتراضية
+
+    if request.user.is_superuser:
+        user_group = "Admin"
+    elif request.user.groups.filter(name='Employee').exists():
+        user_group = "Employee"
+    elif request.user.groups.filter(name='Customer').exists():
+        user_group = "Customer"
 
     context = {
         "breadcrumb": {
@@ -218,7 +228,8 @@ def user_cards(request):
             "child": "User Cards"
         },
         "users": users,
-        "user_type": user_type  # إضافة user_type إلى السياق
+        "user_type": user_type,  # إضافة user_type إلى السياق
+        "user_group": user_group,  # إضافة user_group إلى السياق
     }
 
     return render(request, "user/user-cards/user-cards.html", context)
