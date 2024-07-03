@@ -44,8 +44,8 @@ class CustomerInbound(models.Model):
     rejected_completely = models.IntegerField(blank=True, null=True)
     received_partially = models.IntegerField(blank=True, null=True)
     under_tamer_inspection = models.IntegerField(blank=True, null=True)
-    waiting_for_mod_inspection = models.IntegerField(blank=True, null=True)
-    waiting_for_NUPCO_action = models.IntegerField(blank=True, null=True)
+    waiting_for_inspection = models.IntegerField(blank=True, null=True)
+    waiting_for_action = models.IntegerField(blank=True, null=True)
     total_dash_of_GR_reports_shared = models.IntegerField(blank=True, null=True)
     dash_of_GR_reports_with_discripancy = models.IntegerField(blank=True, null=True)
     total_SKUS_received = models.IntegerField(blank=True, null=True)
@@ -75,7 +75,7 @@ class CustomerOutbound(models.Model):
     pending_orders = models.IntegerField(blank=True, null=True)
     number_of_order_not_yet_picked = models.IntegerField(blank=True, null=True)
     number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress = models.IntegerField(blank=True, null=True)
-    number_of_orders_waiting_for_mod_qc = models.IntegerField(blank=True, null=True)
+    number_of_orders_waiting_for_qc = models.IntegerField(blank=True, null=True)
     number_of_orders_that_are_ready_for_dispatch = models.IntegerField(blank=True, null=True)
     number_of_orders_that_are_delivered_today = models.IntegerField(blank=True, null=True)
     justification_for_the_delay_order_by_order = models.IntegerField(blank=True, null=True)
@@ -129,6 +129,14 @@ class CustomerExpiry(models.Model):
     total_expired_SKUS_disposed = models.IntegerField(blank=True, null=True)
     nearly_expired_1_to_3_months = models.IntegerField(blank=True, null=True)
     nearly_expired_3_to_6_months = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.total_SKUs_expired = (
+                (self.nearly_expired_1_to_3_months or 0) +
+                (self.nearly_expired_3_to_6_months or 0) +
+                (self.total_expired_SKUS_disposed or 0)
+        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return str(self.id)

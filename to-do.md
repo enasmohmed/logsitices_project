@@ -51,4 +51,7 @@ edit color chart for dashboard admin ---> Done
 edit full screen website responseve
 add fonts website ----> Done
 
-انا عايزه كل شركة يكون ليها موظفين معينين يقدر يشوفو الداتا ويعدلو عليها سواء شركة او ادمن ---> Done 
+انا عايزه كل شركة يكون ليها موظفين معينين يقدر يشوفو الداتا ويعدلو عليها سواء شركة او ادمن ---> Done
+
+CustomerExpiry عايزه ال total_SKUs بيسوي مجموع ال total_expired_SKUS_disposed وال nearly_expired_1_to_3_months وال
+nearly_expired_3_to_6_months 

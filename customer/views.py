@@ -1,19 +1,24 @@
 import calendar
 import json
+from io import BytesIO
 
-import xlwt
+import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Sum
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 
 from accounts.forms import CustomerForm, CustomerInboundForm, CustomerOutboundForm, CustomerReturnsForm, \
     CustomerExpiryForm, CustomerDamageForm, CustomerTravelDistanceForm, CustomerInventoryForm, \
@@ -117,8 +122,8 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         context['total_arrived'] = inbound_data.aggregate(Sum('arrived'))['arrived__sum'] or 0
         context['total_no_show'] = inbound_data.aggregate(Sum('no_show'))['no_show__sum'] or 0
 
-        context['total_waiting_for_mod_inspection'] = inbound_data.aggregate(Sum('waiting_for_mod_inspection'))[
-                                                          'waiting_for_mod_inspection__sum'] or 0
+        context['total_waiting_for_inspection'] = inbound_data.aggregate(Sum('waiting_for_inspection'))[
+                                                      'waiting_for_inspection__sum'] or 0
         context['total_dash_of_GR_reports_shared'] = \
             inbound_data.aggregate(Sum('total_dash_of_GR_reports_shared'))['total_dash_of_GR_reports_shared__sum'] or 0
         context['total_dash_of_GR_reports_with_discripancy'] = \
@@ -162,13 +167,25 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
 
         # الحصول على جميع بيانات Expiry
         context['expiry_data'] = expiry_data
+        total_expired_SKUS_disposed = expiry_data.aggregate(Sum('total_expired_SKUS_disposed'))[
+                                          'total_expired_SKUS_disposed__sum'] or 0
+        total_nearly_expired_1_to_3_months = expiry_data.aggregate(Sum('nearly_expired_1_to_3_months'))[
+                                                 'nearly_expired_1_to_3_months__sum'] or 0
+        total_nearly_expired_3_to_6_months = expiry_data.aggregate(Sum('nearly_expired_3_to_6_months'))[
+                                                 'nearly_expired_3_to_6_months__sum'] or 0
+
+        total_SKUs_expired_calculated = (
+                total_expired_SKUS_disposed +
+                total_nearly_expired_1_to_3_months +
+                total_nearly_expired_3_to_6_months
+        )
+
+        context['expiry_data'] = expiry_data
         context['total_SKUs_expired'] = expiry_data.aggregate(Sum('total_SKUs_expired'))['total_SKUs_expired__sum'] or 0
-        context['total_expired_SKUS_disposed'] = expiry_data.aggregate(Sum('total_expired_SKUS_disposed'))[
-                                                     'total_expired_SKUS_disposed__sum'] or 0
-        context['total_nearly_expired_1_to_3_months'] = expiry_data.aggregate(Sum('nearly_expired_1_to_3_months'))[
-                                                            'nearly_expired_1_to_3_months__sum'] or 0
-        context['total_nearly_expired_3_to_6_months'] = expiry_data.aggregate(Sum('nearly_expired_3_to_6_months'))[
-                                                            'nearly_expired_3_to_6_months__sum'] or 0
+        context['total_expired_SKUS_disposed'] = total_expired_SKUS_disposed
+        context['total_nearly_expired_1_to_3_months'] = total_nearly_expired_1_to_3_months
+        context['total_nearly_expired_3_to_6_months'] = total_nearly_expired_3_to_6_months
+        context['total_SKUs_expired_calculated'] = total_SKUs_expired_calculated
 
         # Damage
         context['damage_data'] = damage_data
@@ -252,9 +269,6 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
 
 
 ### Edit Data Form Customer
-
-
-### Edit Data Form Customer
 class CustomerEditDataView(View):
     model_map = {
         'Customer': Customer,
@@ -299,6 +313,12 @@ class CustomerEditDataView(View):
             company = EmployeeProfile.objects.filter(user=user).first().company
         elif is_customer:
             company = Customer.objects.filter(employees__user=user).first()
+
+        if 'download' in request.GET:
+            if request.GET.get('format') == 'pdf':
+                return self.download_pdf(request)
+            else:
+                return self.download_excel(request, company)
 
         context = {
             "user": user,
@@ -415,6 +435,149 @@ class CustomerEditDataView(View):
                 return JsonResponse({"success": False, "error": "Invalid model"})
 
         return JsonResponse({"success": False, "error": "Invalid operation"})
+
+    def download_excel(self, request, company):
+        user = request.user
+        is_admin = user.is_staff
+        is_employee = self.is_employee_user(user)
+        is_customer = self.is_customer_user(user)
+
+        dashboard_choice = request.session.get('dashboard_choice', 'customer_dashboard')
+
+        if dashboard_choice not in ['admin_dashboard', 'customer_dashboard']:
+            dashboard_choice = 'customer_dashboard'
+
+        if dashboard_choice == 'admin_dashboard' and not is_admin:
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        company = None
+        if is_employee:
+            company = EmployeeProfile.objects.filter(user=user).first().company
+        elif is_customer:
+            company = Customer.objects.filter(employees__user=user).first()
+
+        # إعداد البيانات للتصدير إلى Excel
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            if dashboard_choice == 'admin_dashboard' and is_admin:
+                admin_data = AdminData.objects.all().values()
+                pd.DataFrame(list(admin_data)).to_excel(writer, sheet_name='AdminData')
+            elif dashboard_choice == 'customer_dashboard' and company:
+                companies = Customer.objects.filter(employees__user=user).values()
+                inbounds = CustomerInbound.objects.filter(company=company).values()
+                outbounds = CustomerOutbound.objects.filter(company=company).values()
+                returns = CustomerReturns.objects.filter(company=company).values()
+                expiries = CustomerExpiry.objects.filter(company=company).values()
+                damages = CustomerDamage.objects.filter(company=company).values()
+                travel_distances = CustomerTravelDistance.objects.filter(company=company).values()
+                inventories = CustomerInventory.objects.filter(company=company).values()
+                pallet_location_availabilities = CustomerPalletLocationAvailability.objects.filter(
+                    company=company).values()
+                hses = CustomerHSE.objects.filter(company=company).values()
+
+                pd.DataFrame(list(companies)).to_excel(writer, sheet_name='Companies')
+                pd.DataFrame(list(inbounds)).to_excel(writer, sheet_name='Inbounds')
+                pd.DataFrame(list(outbounds)).to_excel(writer, sheet_name='Outbounds')
+                pd.DataFrame(list(returns)).to_excel(writer, sheet_name='Returns')
+                pd.DataFrame(list(expiries)).to_excel(writer, sheet_name='Expiries')
+                pd.DataFrame(list(damages)).to_excel(writer, sheet_name='Damages')
+                pd.DataFrame(list(travel_distances)).to_excel(writer, sheet_name='TravelDistances')
+                pd.DataFrame(list(inventories)).to_excel(writer, sheet_name='Inventories')
+                pd.DataFrame(list(pallet_location_availabilities)).to_excel(writer,
+                                                                            sheet_name='PalletLocationAvailabilities')
+                pd.DataFrame(list(hses)).to_excel(writer, sheet_name='HSEs')
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=data.xlsx'
+        response.write(output.getvalue())
+        return response
+
+    def download_pdf(self, request):
+        user = request.user
+        is_admin = user.is_staff
+        is_employee = self.is_employee_user(user)
+        is_customer = self.is_customer_user(user)
+
+        dashboard_choice = request.session.get('dashboard_choice', 'customer_dashboard')
+
+        if dashboard_choice not in ['admin_dashboard', 'customer_dashboard']:
+            dashboard_choice = 'customer_dashboard'
+
+        if dashboard_choice == 'admin_dashboard' and not is_admin:
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        company = None
+        if is_employee:
+            company = EmployeeProfile.objects.filter(user=user).first().company
+        elif is_customer:
+            company = Customer.objects.filter(employees__user=user).first()
+
+        if not company:
+            return HttpResponseBadRequest("Company not found for current user.")
+
+        # Example: Fetching data related to the company for PDF generation
+        companies = Customer.objects.filter(employees__company=company)
+        inbounds = CustomerInbound.objects.filter(company=company)
+        outbounds = CustomerOutbound.objects.filter(company=company)
+        returns = CustomerReturns.objects.filter(company=company)
+        expiries = CustomerExpiry.objects.filter(company=company)
+        damages = CustomerDamage.objects.filter(company=company)
+        travel_distances = CustomerTravelDistance.objects.filter(company=company)
+        inventories = CustomerInventory.objects.filter(company=company)
+        pallet_location_availabilities = CustomerPalletLocationAvailability.objects.filter(company=company)
+        hses = CustomerHSE.objects.filter(company=company)
+
+        # Generating PDF using reportlab
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=data.pdf'
+
+        doc = SimpleDocTemplate(response, pagesize=letter)
+        elements = []
+
+        data_sets = [
+            ('Companies', companies),
+            ('Inbounds', inbounds),
+            ('Outbounds', outbounds),
+            ('Returns', returns),
+            ('Expiries', expiries),
+            ('Damages', damages),
+            ('Travel Distances', travel_distances),
+            ('Inventories', inventories),
+            ('Pallet Location Availabilities', pallet_location_availabilities),
+            ('HSEs', hses)
+        ]
+
+        styles = getSampleStyleSheet()
+        heading_style = styles['Heading1']
+        normal_style = styles['Normal']
+
+        for title, data in data_sets:
+            # Add caption before each table
+            caption_text = f"<b>{title}</b>"
+            caption = Paragraph(caption_text, heading_style)
+            elements.append(caption)
+
+            # Prepare table data
+            data_list = [[key, value] for item in data.values() for key, value in item.items()]
+            table = Table(data_list, colWidths=[200, 200])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ]))
+            elements.append(table)
+            elements.append(Spacer(0, 20))  # Add space after each table
+
+        doc.build(elements)
+        return response
 
 
 ### Add Data Form Customer
@@ -533,36 +696,3 @@ class AddCustomerDataView(View):
                         messages.error(request, error)
 
             return redirect('accounts:add_customer_data')
-
-
-def export_to_excel(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="data.xls"'
-
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Data')
-
-    row_num = 0
-    columns = ['ID', 'Name', 'User']
-
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num])
-
-    rows = Customer.objects.all().values_list('id', 'name_company', 'user__username')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num])
-
-    wb.save(response)
-    return response
-
-
-def export_to_pdf(request):
-    # احصل على بيانات الجداول من طلب الويب
-    data = request.POST.get('data')
-
-    # تحويل البيانات إلى ملف PDF وحفظها
-
-    # إرجاع رابط لتحميل الملف
-    return JsonResponse({'download_url': ' excel.html'})

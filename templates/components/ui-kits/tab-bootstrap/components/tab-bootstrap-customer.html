@@ -22,6 +22,10 @@
         background-color: #f2f2f2;
         text-align: left;
     }
+    .table{
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
 
     .custom-scrollbar {
         max-height: 300px; /* يمكنك ضبط الارتفاع المطلوب هنا */
@@ -47,22 +51,32 @@
         font-weight: bold; /* تمييز التبويب النشط بالخط العريض */
         background-color: #f8f9fa; /* لون خلفية التبويب النشط */
     }
+    .download-buttons{
+        float: right;
+        margin-top: 20px;
+    }
+    .download-buttons .btn-secondary{
+        background-color: #dddddd !important;
+        border-color: #dddddd !important;
+    }
+    .download-buttons a{
+        font-weight: bold;
+    }
+
 </style>
 
 <!-- Container-fluid starts  -->
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-12 col-xl-6">
+        <div class="col-lg-12 col-xl-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-
                     <ul class="nav nav-tabs border-tab border-0 mb-0 nav-danger" id="topline-tab" role="tablist">
                         <!--  Company Tab  -->
                         <li class="nav-item">
                             <a class="nav-link active nav-border pt-0 txt-danger nav-danger"
                                id="topline-top-companies-tab" data-bs-toggle="tab" href="#topline-top-companies"
                                role="tab" aria-controls="topline-top-companies" aria-selected="true">Customer</a>
-
                         </li>
                         <!--  Inbound Tab  -->
                         <li class="nav-item">
@@ -847,6 +861,15 @@
                         </div>
                         {% endif %}
                     </div>
+
+                    <div class="download-buttons">
+                        <button type="button" class="btn btn-secondary">
+                            <a href="?download=true">Download Excel</a>
+                        </button>
+                        <button type="button" class="btn btn-secondary">
+                            <a href="?download=true&format=pdf">Download PDF</a>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -872,7 +895,7 @@
         const isCustomer = {{ is_customer|lower }}; // تحويل قيمة is_customer إلى lowercase لتصبح قيمة Boolean في جافاسكريبت
         toggleTabs(isCustomer);
     });
-    function addData(model, fields) {
+  function addData(model, fields) {
     fetch("", {
         method: "POST",
         headers: {
@@ -896,6 +919,7 @@
         }
     });
 }
+
 
    function updateData(model, id, field, value) {
         fetch("", {

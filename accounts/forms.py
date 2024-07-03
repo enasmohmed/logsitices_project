@@ -64,8 +64,8 @@ class CustomerInboundForm(forms.ModelForm):
     class Meta:
         model = CustomerInbound
         fields = ['time', 'assigned_day', 'total_shipments_in_asn', 'arrived', 'no_show', 'received_completely',
-                  'rejected_completely', 'received_partially', 'under_tamer_inspection', 'waiting_for_mod_inspection',
-                  'waiting_for_NUPCO_action', 'total_dash_of_GR_reports_shared', 'dash_of_GR_reports_with_discripancy',
+                  'rejected_completely', 'received_partially', 'under_tamer_inspection', 'waiting_for_inspection',
+                  'waiting_for_action', 'total_dash_of_GR_reports_shared', 'dash_of_GR_reports_with_discripancy',
                   'total_SKUS_received', 'dash_of_skus_damaged_during_receiving', 'total_received_with_putaway']
         widgets = {
             'time': DateInput(),
@@ -77,7 +77,7 @@ class CustomerOutboundForm(forms.ModelForm):
         model = CustomerOutbound
         fields = ['time', 'assigned_day', 'order_received_from_npco', 'pending_orders',
                   'number_of_order_not_yet_picked', 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress',
-                  'number_of_orders_waiting_for_mod_qc', 'number_of_orders_that_are_ready_for_dispatch',
+                  'number_of_orders_waiting_for_qc', 'number_of_orders_that_are_ready_for_dispatch',
                   'number_of_orders_that_are_delivered_today', 'justification_for_the_delay_order_by_order',
                   'total_skus_picked', 'total_dash_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
                   'number_of_PODs_collected_Late']

@@ -275,6 +275,7 @@
        .employee{
            margin-top: -10px !important;
        }
+
        .employee .card {
            border: 1px solid #ddd;
            border-radius: 5px;
@@ -421,6 +422,56 @@
            margin-top: 10px;
        }
 
+     @media (min-width: 1440px){
+            .employee {
+                padding: 7% !important;
+            }
+            .damage{
+                padding: 28px !important;
+            }
+            .inbound{
+                left: 4%;
+            }
+            .outbound-h4{
+                left: 7%;
+            }
+            .returns{
+                left: 10%;
+            }
+            .line-button{
+                bottom: -20px;
+            }
+      }
+
+      @media (min-width: 2880px){
+            .employee {
+                padding: 4% !important;
+            }
+            .damage{
+                padding: 4% !important;
+            }
+            .inbound{
+                left: 2%;
+            }
+            .outbound-h4{
+                left: 4%;
+            }
+            .returns{
+                left: 4%;
+            }
+            .damage-h4{
+                left: 4%;
+            }
+            .inventory-h4 , .hse-h4 {
+                left: 5%;
+            }
+            .location-h4{
+                left: 3%;
+            }
+            .line-button{
+                bottom: -20px;
+            }
+      }
 </style>
 
 <!-- Container-fluid starts-->
@@ -725,7 +776,7 @@
                     <!-- الصف الأول -->
                     <div class="row expiry">
                         <div class="text">Total SKUS</div>
-                        <div class="number-box color1">{{ total_SKUs_expired }}</div>
+                        <div class="number-box color1">{{ total_SKUs_expired_calculated }}</div>
                     </div>
                     <div class="row expiry">
                         <div class="text">Total Expired SKUS Disposed</div>

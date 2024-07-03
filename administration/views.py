@@ -1,17 +1,23 @@
 import calendar
 import json
+from io import BytesIO
 
+import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Sum
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
 
 from accounts.forms import AdminDataForm, AdminInboundForm, AdminOutboundForm, AdminReturnsForm, AdminCapacityForm, \
     AdminInventoryForm
@@ -26,7 +32,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context['breadcrumb'] = {
-            "title": "Healthcare Dachshund",
+            "title": "Healthcare Dashboard",
             "parent": "Dashboard",
             "child": "Default"
         }
@@ -301,6 +307,125 @@ class AdminEditDataView(View):
                 return JsonResponse({"success": False, "error": "Invalid model"})
 
         return JsonResponse({"success": False, "error": "Invalid operation"})
+
+    @method_decorator(login_required)
+    def download_excel(self, request):
+        user = request.user
+        is_admin = user.is_staff
+        is_employee = self.is_employee_user(user)
+        is_customer = self.is_customer_user(user)
+
+        dashboard_choice = request.session.get('dashboard_choice', 'admin_dashboard')
+
+        if dashboard_choice not in ['admin_dashboard', 'customer_dashboard']:
+            dashboard_choice = 'admin_dashboard'
+
+        if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        if dashboard_choice == 'admin_dashboard' and not is_admin:
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        # إعداد البيانات للتصدير إلى Excel
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            if dashboard_choice == 'admin_dashboard' and is_admin:
+                admin_data = AdminData.objects.all().values()
+                inbound_data = AdminInbound.objects.all().values()
+                outbound_data = AdminOutbound.objects.all().values()
+                returns_data = AdminReturns.objects.all().values()
+                capacity_data = AdminCapacity.objects.all().values()
+                inventory_data = AdminInventory.objects.all().values()
+
+                pd.DataFrame(list(admin_data)).to_excel(writer, sheet_name='AdminData')
+                pd.DataFrame(list(inbound_data)).to_excel(writer, sheet_name='InboundData')
+                pd.DataFrame(list(outbound_data)).to_excel(writer, sheet_name='OutboundData')
+                pd.DataFrame(list(returns_data)).to_excel(writer, sheet_name='ReturnsData')
+                pd.DataFrame(list(capacity_data)).to_excel(writer, sheet_name='CapacityData')
+                pd.DataFrame(list(inventory_data)).to_excel(writer, sheet_name='InventoryData')
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=admin_data.xlsx'
+        response.write(output.getvalue())
+        return response
+
+    @method_decorator(login_required)
+    def download_pdf(self, request):
+        user = request.user
+        is_admin = user.is_staff
+        is_employee = self.is_employee_user(user)
+        is_customer = self.is_customer_user(user)
+
+        dashboard_choice = request.session.get('dashboard_choice', 'admin')
+
+        if dashboard_choice not in ['admin_dashboard', 'customer_dashboard']:
+            dashboard_choice = 'admin_dashboard'
+
+        if dashboard_choice == 'admin_dashboard' and not is_admin:
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        if dashboard_choice == 'customer_dashboard' and not (is_customer or is_employee):
+            return HttpResponseForbidden("You do not have permission to access this page.")
+
+        # Example: Fetching data related to Admin for PDF generation
+        admin_data = AdminData.objects.all()
+        admin_inbound_data = AdminInbound.objects.all()
+        admin_outbound_data = AdminOutbound.objects.all()
+        admin_returns_data = AdminReturns.objects.all()
+        admin_capacity_data = AdminCapacity.objects.all()
+        admin_inventory_data = AdminInventory.objects.all()
+
+        # Generating PDF using reportlab
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="admin_data.pdf"'
+
+        doc = SimpleDocTemplate(response, pagesize=letter)
+        elements = []
+
+        data_sets = [
+            ('Admin Data', admin_data),
+            ('Admin Inbound Data', admin_inbound_data),
+            ('Admin Outbound Data', admin_outbound_data),
+            ('Admin Returns Data', admin_returns_data),
+            ('Admin Capacity Data', admin_capacity_data),
+            ('Admin Inventory Data', admin_inventory_data),
+        ]
+
+        styles = getSampleStyleSheet()
+        heading_style = styles['Heading1']
+        normal_style = styles['Normal']
+
+        for title, data in data_sets:
+            # Add caption before each table
+            caption_text = f"<b>{title}</b>"
+            caption = Paragraph(caption_text, heading_style)
+            elements.append(caption)
+
+            # Prepare table data
+            data_list = [[key, value] for item in data.values() for key, value in item.items()]
+            table = Table(data_list, colWidths=[200, 200])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ]))
+            elements.append(table)
+            elements.append(Spacer(0, 20))  # Add space after each table
+
+        doc.build(elements)
+        return response
+
+
+def download_excel_view(request):
+    view = AdminEditDataView()
+    return view.download_excel(request)
+
+
+def download_pdf_view(request):
+    view = AdminEditDataView()
+    return view.download_pdf(request)
 
 
 def is_employee(user):

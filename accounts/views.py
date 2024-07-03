@@ -42,7 +42,7 @@ class CustomLoginView(AuthLoginView):
         # Print group memberships
         print(f"Groups: {[group.name for group in user.groups.all()]}")
 
-        if not user.is_approved:
+        if not user.is_superuser and not user.is_approved:
             messages.error(self.request, "Your account is pending approval.")
             logout(self.request)
             return redirect('accounts:login')
@@ -317,8 +317,8 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
         context['total_arrived'] = inbound_data.aggregate(Sum('arrived'))['arrived__sum'] or 0
         context['total_no_show'] = inbound_data.aggregate(Sum('no_show'))['no_show__sum'] or 0
 
-        context['total_waiting_for_mod_inspection'] = inbound_data.aggregate(Sum('waiting_for_mod_inspection'))[
-                                                          'waiting_for_mod_inspection__sum'] or 0
+        context['total_waiting_for_inspection'] = inbound_data.aggregate(Sum('waiting_for_inspection'))[
+                                                      'waiting_for_inspection__sum'] or 0
         context['total_dash_of_GR_reports_shared'] = \
             inbound_data.aggregate(Sum('total_dash_of_GR_reports_shared'))['total_dash_of_GR_reports_shared__sum'] or 0
         context['total_dash_of_GR_reports_with_discripancy'] = \
