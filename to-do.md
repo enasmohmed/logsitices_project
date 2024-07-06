@@ -48,7 +48,7 @@ edit add data ---> Done
 edit links for sidebar ----> Done
 user cards for super admin ---> done
 edit color chart for dashboard admin ---> Done
-edit full screen website responseve
+edit full screen website responseve ---> Done
 add fonts website ----> Done
 
 انا عايزه كل شركة يكون ليها موظفين معينين يقدر يشوفو الداتا ويعدلو عليها سواء شركة او ادمن ---> Done
