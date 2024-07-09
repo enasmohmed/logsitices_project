@@ -3,55 +3,132 @@
 {% load crispy_forms_tags %}
 
 
-<div class="col-xl-6">
+<div class="col-sm-12 col-md-12 col-lg-12">
     <div class="card height-equal">
         <div class="card-header pb-0">
             <h3>Add Admin Data</h3>
         </div>
+
         <div class="card-body custom-input">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <!-- Admin Data Form -->
-
-                <fieldset class="scheduler-border">
-                    <legend class="scheduler-border">Admin Data</legend>
-                    {{ admin_data_form|crispy }}
-                    <!-- Display Company Name -->
-                    <div class="form-group mt-4">
-                        <label for="company_name">Company Name or Hc Business</label>
-                        <input type="text" id="company_name" class="form-control" value="{{ company_name }}" readonly>
-                    </div>
-                </fieldset>
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4 col">
+                        <legend class="scheduler-border">Admin Data</legend>
+                        {% for field in admin_data_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
 
                 <!-- Admin Inbound Form -->
-                <fieldset class="scheduler-border mt-4">
-                    <legend class="scheduler-border">Admin Inbound</legend>
-                    {{ admin_inbound_form|crispy }}
-                </fieldset>
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4">
+                        <legend class="scheduler-border">Admin Inbound</legend>
+                        {% for field in admin_inbound_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
+
 
                 <!-- Admin Outbound Form -->
-                <fieldset class="scheduler-border mt-4">
-                    <legend class="scheduler-border">Admin Outbound</legend>
-                    {{ admin_outbound_form|crispy }}
-                </fieldset>
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4">
+                        <legend class="scheduler-border">Admin Outbound</legend>
+                        {% for field in admin_outbound_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
 
                 <!-- Admin Returns Form -->
-                <fieldset class="scheduler-border mt-4">
-                    <legend class="scheduler-border">Admin Returns</legend>
-                    {{ admin_returns_form|crispy }}
-                </fieldset>
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4">
+                        <legend class="scheduler-border">Admin Returns</legend>
+                        {% for field in admin_returns_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
+
 
                 <!-- Admin Capacity Form -->
-                <fieldset class="scheduler-border mt-4">
-                    <legend class="scheduler-border">Admin Capacity</legend>
-                    {{ admin_capacity_form|crispy }}
-                </fieldset>
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4 col">
+                        <legend class="scheduler-border">Admin Capacity</legend>
+                        {% for field in admin_capacity_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
 
                 <!-- Admin Inventory Form -->
-                <fieldset class="scheduler-border mt-4">
-                    <legend class="scheduler-border">Admin Inventory</legend>
-                    {{ admin_inventory_form|crispy }}
-                </fieldset>
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4 col">
+                        <legend class="scheduler-border">Admin Inventory</legend>
+                        {% for field in admin_inventory_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
+
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">Submit</button>

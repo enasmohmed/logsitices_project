@@ -10,4 +10,5 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Profile)
+# admin.site.register(HierarchicalGroup)
 admin.site.register(CustomUser, UserAdmin)

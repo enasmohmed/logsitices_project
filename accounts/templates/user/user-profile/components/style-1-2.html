@@ -2,7 +2,7 @@
 {% load sass_tags %}
 
 <!-- user profile first-style start-->
-<div class="col-xl-12 col-sm-12 col-xxl-6 col-ed-8 box-col-8">
+<div class="col-sm-12 col-md-12 col-lg-12">
     <div class="card social-profile">
         <div class="card-body">
             <div class="social-img-wrap">
@@ -34,8 +34,16 @@
                         <span class="f-light">User Groups</span>
                     </li>
                 </ul>
-            </div>
 
+            </div>
+            <hr>
+            <div class="col-12 col-lg-3">
+                <a href="{% url 'password_change' %}">
+                    <button type="button" class="btn btn-outline-primary">
+                        <span class="fa fa-key"></span> Change Password
+                    </button>
+                </a>
+            </div>
         </div>
     </div>
 </div>

@@ -5,6 +5,50 @@
 {% load widget_tweaks %}
 {% block content %}
 
+<style>
+
+    /* Customize text input field */
+    input[type="text"] {
+        background-color: #f2f2f2; /* Background color */
+        border: 1px solid #ccc; /* Border */
+        color: #333; /* Text color */
+        padding: 10px; /* Padding */
+    }
+
+    /* Customize email input field */
+    input[type="email"] {
+        background-color: #f9f9f9; /* Background color */
+        border: 1px solid #ccc; /* Border */
+        color: #333; /* Text color */
+        padding: 10px; /* Padding */
+    }
+
+    /* Customize password input field */
+    input[type="password"] {
+        background-color: #fefefe; /* Background color */
+        border: 1px solid #ccc; /* Border */
+        color: #333; /* Text color */
+        padding: 10px; /* Padding */
+    }
+
+    /* Customize select dropdown */
+    select {
+        background-color: #e6e6e6; /* Background color */
+        border: 1px solid #ccc; /* Border */
+        color: #333; /* Text color */
+        padding: 10px; /* Padding */
+    }
+
+    /* Customize form labels */
+    label , h4{
+        font-weight: bolder;
+        color: #5C6BC0;
+    }
+    .form-text{
+        font-size: 11px;
+    }
+</style>
+
 <!-- login page start-->
 <div class="container-fluid p-0">
     <div class="row m-0">
@@ -24,14 +68,13 @@
                             {% csrf_token %}
                             <h4>Create your account</h4>
                             <p>Enter your personal details to create account</p>
-                            {% bootstrap_form form %}
+                            {% bootstrap_form form %} <!-- استخدم تنسيق أفقي إذا كنت تفضل ذلك -->
                             {% buttons %}
                             <button type="submit" class="btn btn-primary">Register</button>
                             {% endbuttons %}
 
-                            <p class="mt-4 mb-0">Already have an account?<a class="ms-2"
-                                                                            href="{% url 'accounts:login' %}">Sign
-                                in</a>
+                            <p class="mt-4 mb-0">Already have an account?
+                                <a class="ms-2" href="{% url 'accounts:login' %}">Login</a>
                             </p>
                         </form>
                     </div>

@@ -17,9 +17,18 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     is_approved = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.username
+
+
+# class HierarchicalGroup(models.Model):
+#     name = models.CharField(max_length=255)
+#     parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subgroups', null=True, blank=True)
+#     users = models.ManyToManyField(CustomUser, related_name='groups_customer')
+#
+#     def __str__(self):
+#         return self.name
 
 
 class Profile(models.Model):

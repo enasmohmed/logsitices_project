@@ -157,14 +157,14 @@
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('AdminData', {{ admin.id }}, 'hc_business', this.innerText)">
-                                                    {{ admin.hc_business }}
+                                                    {{ admin.company.hc_business }}
                                                 </td>
                                                 <td>
                                                     <ul>
-                                                        {% for employee in admin.employees.all %}
+                                                        {% for employee in admin.company.employees.all %}
                                                         <li contenteditable="true"
-                                                            onblur="updateEmployees('AdminData', {{ admin.id }}, 'user.username', this.innerText)">
-                                                            {{ employee.username}}
+                                                            onblur="updateEmployees('AdminData', {{ admin.id }}, 'employees', this.innerText)">
+                                                            {{ employee.username }}
                                                         </li>
                                                         {% endfor %}
                                                     </ul>

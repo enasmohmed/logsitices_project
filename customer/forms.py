@@ -2,58 +2,145 @@
 from django import forms
 
 from customer.models import CustomerInbound, Customer, CustomerOutbound, CustomerReturns, CustomerExpiry, \
-    CustomerDamage, CustomerTravelDistance, CustomerPalletLocationAvailability, CustomerHSE
+    CustomerDamage, CustomerTravelDistance, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile, \
+    CustomerInventory
 
 
-class CompanyForm(forms.ModelForm):
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+
+class CustomerForm(forms.ModelForm):
+    username = forms.CharField(label='User', required=False, disabled=True)  # حقل لعرض اسم المستخدم
+
     class Meta:
         model = Customer
-        fields = '__all__'
+        fields = ['name_company']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Retrieve user from kwargs
+        super().__init__(*args, **kwargs)
+
+        if user:
+            self.fields['username'].initial = user.username  # تعيين اسم المستخدم الحالي في الحقل المخصص
+            company = None
+            if user.groups.filter(name='Employee').exists():
+                # Get company name for Employee users
+                company = EmployeeProfile.objects.filter(user=user).first().company
+            elif user.groups.filter(name='Customer').exists():
+                # Get company name for Customer users
+                company = Customer.objects.filter(employees__user=user).first()
+
+            if company:
+                self.fields['name_company'].initial = company.name_company
+                self.fields['name_company'].disabled = True  # Make the field disabled
 
 
-class InboundForm(forms.ModelForm):
+class EmployeeProfileForm(forms.ModelForm):
+    class Meta:
+        model = EmployeeProfile
+        fields = ['user', 'company', 'role']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+        if instance:
+            self.fields['user'].disabled = True  # Disable user field
+            self.fields['user'].widget.attrs['readonly'] = True
+            self.fields['company'].disabled = True  # Disable company field
+            self.fields['company'].widget.attrs['readonly'] = True
+            self.fields['role'].widget = forms.HiddenInput()  # Hide role field
+
+
+class CustomerInboundForm(forms.ModelForm):
     class Meta:
         model = CustomerInbound
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'total_shipments_in_asn', 'arrived', 'no_show', 'received_completely',
+                  'rejected_completely', 'received_partially', 'under_tamer_inspection', 'waiting_for_inspection',
+                  'waiting_for_action', 'total_dash_of_GR_reports_shared', 'dash_of_GR_reports_with_discripancy',
+                  'total_SKUS_received', 'dash_of_skus_damaged_during_receiving', 'total_received_with_putaway']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class OutboundForm(forms.ModelForm):
+class CustomerOutboundForm(forms.ModelForm):
     class Meta:
         model = CustomerOutbound
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'order_received_from_npco', 'pending_orders',
+                  'number_of_order_not_yet_picked', 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress',
+                  'number_of_orders_waiting_for_qc', 'number_of_orders_that_are_ready_for_dispatch',
+                  'number_of_orders_that_are_delivered_today', 'justification_for_the_delay_order_by_order',
+                  'total_skus_picked', 'total_dash_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
+                  'number_of_PODs_collected_Late']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class ReturnsForm(forms.ModelForm):
+class CustomerReturnsForm(forms.ModelForm):
     class Meta:
         model = CustomerReturns
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'total_orders_items_returned',
+                  'number_of_return_items_orders_updated_on_time', 'number_of_return_items_orders_updated_late']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class ExpiryForm(forms.ModelForm):
+class CustomerExpiryForm(forms.ModelForm):
     class Meta:
         model = CustomerExpiry
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'total_SKUs_expired', 'total_expired_SKUS_disposed',
+                  'nearly_expired_1_to_3_months', 'nearly_expired_3_to_6_months']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class DamageForm(forms.ModelForm):
+class CustomerDamageForm(forms.ModelForm):
     class Meta:
         model = CustomerDamage
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'Total_QTYs_Damaged_by_WH', 'Number_of_Damaged_during_receiving',
+                  'Total_Damaged_QTYs_Disposed']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class TravelDistanceForm(forms.ModelForm):
+class CustomerTravelDistanceForm(forms.ModelForm):
     class Meta:
         model = CustomerTravelDistance
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'Total_no_of_Customers_deliverd', 'Total_no_of_Pallet_deliverd']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class PalletLocationAvailabilityForm(forms.ModelForm):
+class CustomerInventoryForm(forms.ModelForm):
+    class Meta:
+        model = CustomerInventory
+        fields = ['time', 'assigned_day', 'Total_Locations_Audited', 'Total_Locations_with_Incorrect_SKU_and_Qty',
+                  'Total_SKUs_Reconciliation']
+        widgets = {
+            'time': DateInput(),
+        }
+
+
+class CustomerPalletLocationAvailabilityForm(forms.ModelForm):
     class Meta:
         model = CustomerPalletLocationAvailability
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'Total_Storage_Pallet', 'Total_Storage_Bin', 'Total_Storage_pallet_empty',
+                  'Total_Storage_Bin_empty', 'Total_occupied_pallet_location', 'Total_occupied_Bin_location']
+        widgets = {
+            'time': DateInput(),
+        }
 
 
-class HSEForm(forms.ModelForm):
+class CustomerHSEForm(forms.ModelForm):
     class Meta:
         model = CustomerHSE
-        fields = '__all__'
+        fields = ['time', 'assigned_day', 'Total_Incidents_on_the_side']
+        widgets = {
+            'time': DateInput(),
+        }

@@ -50,7 +50,7 @@
                             <p class="mb-0">{{ user_type }}</p>
                         </div>
                     </div>
-                    <ul class="profile-dropdown onhover-show-div">
+                    <ul class="profile-dropdown onhover-show-div" style="width: 220px;left: -47px !important;">
                         <li><a href="{% url 'accounts:user_profile' %}">
                             <i data-feather="user"></i><span>Account </span></a>
                         </li>
@@ -76,7 +76,7 @@
                         {% if user.is_superuser %}
                         <li>
                             <a href="{% url 'accounts:approve_users' %}">
-                                <span>Approve Users</span>
+                                <i data-feather="user-check"></i><span>Approve Users</span>
                             </a>
                         </li>
                         {% endif %}

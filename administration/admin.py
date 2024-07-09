@@ -1,10 +1,11 @@
 from django.contrib import admin
 
 from administration.models import AdminData, AdminInbound, AdminOutbound, AdminReturns, AdminCapacity, AdminInventory, \
-    EmployeeProfile
+    EmployeeProfile, Company
 
 # Register your models here.
 
+admin.site.register(Company)
 admin.site.register(AdminData)
 admin.site.register(EmployeeProfile)
 admin.site.register(AdminInbound)

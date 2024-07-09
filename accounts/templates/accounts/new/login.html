@@ -4,6 +4,16 @@
 {% load widget_tweaks %}
 {% block content %}
 
+<style>
+    /* Customize form labels */
+label , h4{
+    font-weight: bolder;
+    color: #5C6BC0;
+}
+.form-text{
+    font-size: 11px;
+}
+</style>
 <!-- login page start-->
 <div class="container-fluid p-0">
     <div class="row m-0">
@@ -42,12 +52,20 @@
                             </div>
                             <div class="form-group mb-0">
                                 <div class="text-end mt-3">
-                                    <button class="btn btn-primary btn-block w-100" type="submit">Sign in</button>
+                                    <button class="btn btn-primary btn-block w-100" type="submit">Login</button>
                                 </div>
                             </div>
-                            <p class="mt-4 mb-0 text-center">Don't have account?<a class="ms-2"
-                                                                                   href="{% url 'accounts:register' %}">Create
-                                Account</a></p>
+                            <p class="mt-4 mb-0">
+                                Don't have account?
+                                <a class="ms-2 " href="{% url 'accounts:register' %}">Create Account</a>
+                            </p>
+
+                            <p class="mt-2 mb-0">
+                                Can you reset your password?
+                                <a class="ms-2" href="{% url 'password_reset' %}">Reset Password?</a>
+                            </p>
+
+
                         </form>
                     </div>
                 </div>

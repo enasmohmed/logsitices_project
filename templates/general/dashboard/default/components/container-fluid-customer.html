@@ -931,7 +931,7 @@
                                    d="M464.37 49.2a22.07 22.07 0 0 0-31.88-.76l-18.31 18.25l31.18 31.1l18-17.91a22.16 22.16 0 0 0 1.01-30.68M252.76 336H176v-76.76l9.4-9.38L323.54 112H48v352h352V188.46L262.14 326.6zM400 143.16l32.79-32.86l-31.09-31.09L368.85 112H400z"/><path
                                    fill="#3F51B5" d="M208 304h31.49L400 143.16V112h-31.15L208 272.51z"/></svg>
                         </span>
-                        <h4 class="hse-h4 title-card">Create Data</h4>
+                        <h4 class="hse-h4 title-card"> Edit Data</h4>
                         <hr class="line-button">
                     </div>
                 </div>
@@ -939,7 +939,7 @@
                     <div class="container">
                         <h3>Dashboard For Customer</h3><br>
                         <div>
-                            <a href="{% url 'customer:data_entry' %}" class="btn btn-primary">Create</a>
+                            <a href="{% url 'customer:data_entry' %}" class="btn btn-primary">Edit</a>
                         </div>
 
                     </div>
@@ -1104,7 +1104,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var total_waiting_for_mod_inspection = {{ total_waiting_for_mod_inspection }};
+        var total_waiting_for_inspection = {{ total_waiting_for_inspection }};
         var total_dash_of_GR_reports_shared = {{ total_dash_of_GR_reports_shared }};
         var total_dash_of_GR_reports_with_discripancy = {{ total_dash_of_GR_reports_with_discripancy }};
 
@@ -1112,7 +1112,7 @@
             series: [
                 {
                     name: 'Reports',
-                    data: [total_waiting_for_mod_inspection, total_dash_of_GR_reports_shared, total_dash_of_GR_reports_with_discripancy]
+                    data: [total_waiting_for_inspection, total_dash_of_GR_reports_shared, total_dash_of_GR_reports_with_discripancy]
                 }
             ],
             chart: {
@@ -1131,7 +1131,7 @@
                     dataLabels: {
                         position: 'center',
                          style: {
-                            fontSize: '22px', // حجم الخط للتسميات
+                            fontSize: '25px', // حجم الخط للتسميات
                             colors: ['#fff'] // لون التسميات
                         }
                     },

@@ -20,10 +20,10 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 
-from accounts.forms import CustomerForm, CustomerInboundForm, CustomerOutboundForm, CustomerReturnsForm, \
-    CustomerExpiryForm, CustomerDamageForm, CustomerTravelDistanceForm, CustomerInventoryForm, \
-    CustomerPalletLocationAvailabilityForm, CustomerHSEForm
 from administration.models import AdminData
+from .forms import CustomerInboundForm, CustomerForm, CustomerOutboundForm, CustomerReturnsForm, CustomerExpiryForm, \
+    CustomerDamageForm, CustomerTravelDistanceForm, CustomerInventoryForm, CustomerPalletLocationAvailabilityForm, \
+    CustomerHSEForm
 from .models import Customer, CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
     CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile
 
@@ -588,8 +588,9 @@ def is_employee(user):
 @method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
 class AddCustomerDataView(View):
     def get(self, request):
-        current_user = request.user.username  # Get current user's username
+        current_user = request.user
         user_type = ''
+        company = None
 
         if request.user.groups.filter(name='Super Admin').exists():
             user_type = 'Super Admin'
@@ -597,8 +598,10 @@ class AddCustomerDataView(View):
             user_type = 'Admin'
         elif request.user.groups.filter(name='Employee').exists():
             user_type = 'Employee'
+            company = EmployeeProfile.objects.filter(user=request.user).first().company
         elif request.user.groups.filter(name='Customer').exists():
             user_type = 'Customer'
+            company = Customer.objects.filter(employees__user=request.user).first()
         else:
             user_type = 'Unknown'
 
@@ -613,7 +616,8 @@ class AddCustomerDataView(View):
             'customer_inventory_form': CustomerInventoryForm(),
             'customer_pallet_location_availability_form': CustomerPalletLocationAvailabilityForm(),
             'customer_hse_form': CustomerHSEForm(),
-            'current_user': current_user,  # Add current user's username to context
+            'current_user': current_user.username,  # Add current user's username to context
+            'company_name': company.name_company if company else '',  # Add company name to context
             'user_type': user_type,  # Add user type to context
             'breadcrumb': {
                 'title': 'Employee Dashboard',
@@ -624,7 +628,7 @@ class AddCustomerDataView(View):
         return render(request, 'general/dashboard/default/components/add_admin_data.html', context)
 
     def post(self, request):
-        customer_form = CustomerForm(request.POST)
+        customer_form = CustomerForm(request.POST, user=request.user)
         customer_inbound_form = CustomerInboundForm(request.POST)
         customer_outbound_form = CustomerOutboundForm(request.POST)
         customer_returns_form = CustomerReturnsForm(request.POST)
@@ -653,24 +657,35 @@ class AddCustomerDataView(View):
                 with transaction.atomic():
                     customer_data = customer_form.save(commit=False)
                     customer_data.user = request.user  # Assign the current user
-                    customer_data.save()
 
-                    # Fetch the company associated with the current user
                     company = None
                     if request.user.groups.filter(name='Employee').exists():
                         company = EmployeeProfile.objects.filter(user=request.user).first().company
                     elif request.user.groups.filter(name='Customer').exists():
                         company = Customer.objects.filter(employees__user=request.user).first()
 
+                    customer_data.company = company  # Assign the company
+                    customer_data.save()
+
+                    # Assign the company to all related forms
                     customer_inbound_form.instance.customer = customer_data
+                    customer_inbound_form.instance.company = company
                     customer_outbound_form.instance.customer = customer_data
+                    customer_outbound_form.instance.company = company
                     customer_returns_form.instance.customer = customer_data
+                    customer_returns_form.instance.company = company
                     customer_expiry_form.instance.customer = customer_data
+                    customer_expiry_form.instance.company = company
                     customer_damage_form.instance.customer = customer_data
+                    customer_damage_form.instance.company = company
                     customer_travel_distance_form.instance.customer = customer_data
+                    customer_travel_distance_form.instance.company = company
                     customer_inventory_form.instance.customer = customer_data
+                    customer_inventory_form.instance.company = company
                     customer_pallet_location_availability_form.instance.customer = customer_data
+                    customer_pallet_location_availability_form.instance.company = company
                     customer_hse_form.instance.customer = customer_data
+                    customer_hse_form.instance.company = company
 
                     customer_inbound_form.save()
                     customer_outbound_form.save()

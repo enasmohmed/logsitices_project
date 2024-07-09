@@ -14,10 +14,12 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import CreateView, TemplateView
 
+from administration.forms import AdminDataForm
 from administration.models import AdminData
+from customer.forms import CustomerForm
 from customer.models import CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
     CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
-from .forms import CustomUserCreationForm, ProfileForm, CustomerForm, AdminDataForm
+from .forms import CustomUserCreationForm, ProfileForm
 from .models import CustomUser
 
 User = get_user_model()
@@ -96,31 +98,49 @@ class CustomLogoutView(LogoutView):
     next_page = '/accounts/login/'
 
 
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def approve_users_view(request):
-    users_to_approve = CustomUser.objects.filter(is_approved=False)
-    if request.method == 'POST':
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')
+class ApproveUsersView(TemplateView):
+    template_name = 'accounts/approve_users.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['users'] = CustomUser.objects.filter(is_approved=False)
+        context['breadcrumb'] = {
+            "title": "Approve Users",
+            "parent": "Super User",
+            "child": "Admin"
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
         user_id = request.POST.get('user_id')
         user = CustomUser.objects.get(id=user_id)
         user.is_approved = True
-        user.is_staff = True  # تعيين المستخدم كـstaff
-        user.save()
 
-        # إضافة المستخدم إلى الجروب المناسب بناءً على دوره
-        if user.role == 'admin':
-            group, created = Group.objects.get_or_create(name='Admin')
-        elif user.role == 'customer':
-            group, created = Group.objects.get_or_create(name='Customer')
-        elif user.role == 'employee':
-            group, created = Group.objects.get_or_create(name='Employee')
+        # إذا كان المستخدم سوبر يوزر، الموافقة عليه وإعادته كـ staff
+        if user.is_superuser:
+            user.is_staff = True
+            user.save()
+            messages.success(request, f'تمت الموافقة على المستخدم {user.username} وهو سوبر يوزر.')
+        else:
+            user.is_staff = True  # تعيين المستخدم كـstaff
+            user.save()
 
-        user.groups.add(group)
-        user.save()
+            # إضافة المستخدم إلى الجروب المناسب بناءً على دوره
+            if user.user_type == 'admin':
+                group, created = Group.objects.get_or_create(name='Admin')
+            elif user.user_type == 'customer':
+                group, created = Group.objects.get_or_create(name='Customer')
+            elif user.user_type == 'employee':
+                group, created = Group.objects.get_or_create(name='Employee')
+
+            user.groups.add(group)
+            user.save()
+            messages.success(request,
+                             f'تمت الموافقة على المستخدم {user.username} وتم إضافته إلى المجموعة {group.name}.')
 
         return redirect('accounts:approve_users')
-
-    return render(request, 'accounts/approve_users.html', {'users': users_to_approve})
 
 
 def profile_view(request):
@@ -177,6 +197,15 @@ def user_profile(request):
 @login_required(login_url="/login")
 def redirect_to_dashboard(request):
     user = request.user
+    if request.method == 'POST':
+        dashboard_choice = request.POST.get('dashboard_choice')
+
+        request.session['dashboard_choice'] = dashboard_choice
+        if user.role == 'employee':
+            if dashboard_choice == 'admin_dashboard':
+                return redirect('accounts:admin_dashboard')
+        elif dashboard_choice == 'customer_dashboard':
+            return redirect('accounts:customer_dashboard')
 
     # التحقق من إذا كان المستخدم مشرفًا فائق الصلاحيات أو له دور 'admin'
     if user.is_superuser or user.role == 'admin':
@@ -184,7 +213,7 @@ def redirect_to_dashboard(request):
 
     # التحقق من إذا كان للمستخدم دور 'employee'
     elif user.role == 'employee':
-        return redirect('accounts:employee_dashboard')
+        return redirect('accounts:admin_dashboard')
 
     # إذا لم يكن المستخدم مشرفًا أو موظفًا، افتراض أن المستخدم له دور 'customer'
     elif user.role == 'customer':
