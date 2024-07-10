@@ -21,7 +21,13 @@
                 <ul class="social-follow">
                     <li>
                         <h5 class="mb-0">User Type</h5>
-                        <span class="f-light"> {{ user.role }}</span>
+                        <span class="f-light">
+                            {% if user.is_superuser %}
+                                Super Admin
+                            {% else %}
+                            {{ user.role }}
+                            {% endif %}
+                        </span>
                     </li>
                     <li>
                         <h5 class="mb-0">Date Joined</h5>
@@ -30,10 +36,14 @@
                     <li>
                         <h5 class="mb-0">User Group</h5>
                         <span class="f-light">
-                            {% for group in user.groups.all %}
-                                {{ group.name }}
-                                {% if not forloop.last %}, {% endif %}
-                            {% endfor %}
+                            {% if user.is_superuser %}
+                                Super Admin
+                            {% else %}
+                                {% for group in user.groups.all %}
+                                    {{ group.name }}
+                                    {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endif %}
                         </span>
                     </li>
                 </ul>

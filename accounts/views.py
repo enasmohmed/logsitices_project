@@ -105,12 +105,34 @@ class ApproveUsersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = CustomUser.objects.filter(is_approved=False)
+        users = CustomUser.objects.filter(is_approved=False)
+        user_data = []
+        for user in users:
+            user_data.append({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.get_role_display(),
+                'user_role': 'Superuser' if user.is_superuser else 'Staff' if user.is_staff else 'User',
+                'groups': ', '.join([group.name for group in user.groups.all()])
+            })
+        context['users'] = user_data
         context['breadcrumb'] = {
             "title": "Approve Users",
             "parent": "Super User",
             "child": "Admin"
         }
+
+        # Determine user type and add it to the context
+        if self.request.user.is_superuser:
+            context['user_type'] = "Super Admin"
+        elif self.request.user.groups.filter(name='Admin').exists():
+            context['user_type'] = "Admin"
+        elif self.request.user.groups.filter(name='Employee').exists():
+            context['user_type'] = "Employee"
+        else:
+            context['user_type'] = "Unknown"
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -118,27 +140,25 @@ class ApproveUsersView(TemplateView):
         user = CustomUser.objects.get(id=user_id)
         user.is_approved = True
 
-        # إذا كان المستخدم سوبر يوزر، الموافقة عليه وإعادته كـ staff
         if user.is_superuser:
             user.is_staff = True
             user.save()
-            messages.success(request, f'تمت الموافقة على المستخدم {user.username} وهو سوبر يوزر.')
+            messages.success(request, f'User has been approved {user.username} He is a super user.')
         else:
-            user.is_staff = True  # تعيين المستخدم كـstaff
+            user.is_staff = True
             user.save()
 
-            # إضافة المستخدم إلى الجروب المناسب بناءً على دوره
-            if user.user_type == 'admin':
+            if user.role == 'admin':
                 group, created = Group.objects.get_or_create(name='Admin')
-            elif user.user_type == 'customer':
+            elif user.role == 'customer':
                 group, created = Group.objects.get_or_create(name='Customer')
-            elif user.user_type == 'employee':
+            elif user.role == 'employee':
                 group, created = Group.objects.get_or_create(name='Employee')
 
             user.groups.add(group)
             user.save()
             messages.success(request,
-                             f'تمت الموافقة على المستخدم {user.username} وتم إضافته إلى المجموعة {group.name}.')
+                             f'User has been approved {user.username} It has been added to the group {group.name}.')
 
         return redirect('accounts:approve_users')
 
@@ -171,7 +191,9 @@ def user_profile(request):
     form = ProfileForm(instance=user)
 
     # تحديد نوع المستخدم بناءً على الصلاحيات وعضوية المجموعة
-    if user.is_superuser or user.groups.filter(name='Admin').exists():
+    if user.is_superuser:
+        user_type = "Super Admin"
+    elif user.groups.filter(name='Admin').exists():
         user_type = "Admin"
     elif user.groups.filter(name='Employee').exists():
         user_type = "Employee"
@@ -234,6 +256,8 @@ def user_cards(request):
 
     # تحديد نوع المستخدم بناءً على الصلاحيات وعضوية المجموعة
     if request.user.is_superuser:
+        user_type = "Super Admin"
+    elif request.user.groups.filter(name='Admin').exists():
         user_type = "Admin"
     elif request.user.groups.filter(name='Employee').exists():
         user_type = "Employee"
@@ -244,6 +268,8 @@ def user_cards(request):
     user_group = "Unknown"  # افتراض قيمة افتراضية
 
     if request.user.is_superuser:
+        user_group = "Super Admin"
+    elif request.user.groups.filter(name='Admin').exists():
         user_group = "Admin"
     elif request.user.groups.filter(name='Employee').exists():
         user_group = "Employee"
