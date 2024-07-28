@@ -219,30 +219,28 @@ def user_profile(request):
 @login_required(login_url="/login")
 def redirect_to_dashboard(request):
     user = request.user
+    dashboard_choice = request.session.get('dashboard_choice')
+
     if request.method == 'POST':
         dashboard_choice = request.POST.get('dashboard_choice')
-
         request.session['dashboard_choice'] = dashboard_choice
-        if user.role == 'employee':
-            if dashboard_choice == 'admin_dashboard':
-                return redirect('accounts:admin_dashboard')
-        elif dashboard_choice == 'customer_dashboard':
-            return redirect('accounts:customer_dashboard')
 
-    # التحقق من إذا كان المستخدم مشرفًا فائق الصلاحيات أو له دور 'admin'
     if user.is_superuser or user.role == 'admin':
+        request.session['dashboard_type'] = 'Admin Dashboard'
         return redirect('accounts:admin_dashboard')
-
-    # التحقق من إذا كان للمستخدم دور 'employee'
     elif user.role == 'employee':
-        return redirect('accounts:admin_dashboard')
-
-    # إذا لم يكن المستخدم مشرفًا أو موظفًا، افتراض أن المستخدم له دور 'customer'
+        if dashboard_choice == 'admin_dashboard':
+            request.session['dashboard_type'] = 'Admin Dashboard'
+            return redirect('accounts:admin_dashboard')
+        elif dashboard_choice == 'customer_dashboard':
+            request.session['dashboard_type'] = 'Customer Dashboard'
+            return redirect('accounts:customer_dashboard')
     elif user.role == 'customer':
+        request.session['dashboard_type'] = 'Customer Dashboard'
         return redirect('accounts:customer_dashboard')
 
-    # يمكنك إضافة إعادة توجيه افتراضية هنا إذا كان نوع المستخدم غير معروف
-    return redirect('accounts:default_dashboard')
+    request.session['dashboard_type'] = 'Unknown Dashboard'
+    return redirect('accounts:choose_dashboard')
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -526,38 +524,37 @@ class ChooseDashboardView(View):
         else:
             context['user_type'] = "Unknown"
 
+        context.update({
+            'admin_data_form': AdminDataForm(initial={'user': self.request.user}),
+            'customer_form': CustomerForm(initial={'user': self.request.user}),
+            'current_user': self.request.user.username,
+            'is_employee': self.request.user.groups.filter(name='Employee').exists(),
+            'dashboard_choice': self.request.session.get('dashboard_choice')
+        })
+
         return context
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        context.update({
-            'admin_data_form': AdminDataForm(initial={'user': request.user}),
-            'customer_form': CustomerForm(initial={'user': request.user}),
-            'current_user': request.user.username  # Add current user's username to context
-        })
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         choice = request.POST.get('choice')
         if choice == 'admin_dashboard':
             if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
-                return redirect('accounts:admin_dashboard')  # Replace with correct admin dashboard URL name
+                request.session['dashboard_choice'] = 'admin_dashboard'
+                request.session['dashboard_type'] = 'Admin Dashboard'
+                return redirect('accounts:admin_dashboard')
+
             elif request.user.groups.filter(name='Employee').exists():
                 request.session['dashboard_choice'] = 'admin_dashboard'
-                return redirect('accounts:admin_dashboard')  # Replace with correct admin dashboard URL name
+                request.session['dashboard_type'] = 'Admin Dashboard'
+                return redirect('accounts:admin_dashboard')
+
         elif choice == 'customer_dashboard':
             request.session['dashboard_choice'] = 'customer_dashboard'
-            return redirect('accounts:customer_dashboard')  # Replace with correct customer dashboard URL name
-
-        # Get current user and their role
-        current_user = request.user
-        user_role = current_user.role  # Replace with correct way to fetch user role
+            request.session['dashboard_type'] = 'Customer Dashboard'
+            return redirect('accounts:customer_dashboard')
 
         context = self.get_context_data(**kwargs)
-        context.update({
-            'admin_data_form': AdminDataForm(initial={'user': request.user}),
-            'customer_form': CustomerForm(initial={'user': request.user}),
-            'current_user': current_user.username,  # Add current user's username to context
-            'user_role': user_role  # Add user role to context
-        })
         return render(request, self.template_name, context)

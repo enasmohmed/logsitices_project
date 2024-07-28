@@ -44,12 +44,27 @@
                     <li class="sidebar-list">
                         <i class="fa fa-thumb-tack"></i>
                         <a class="sidebar-link sidebar-title"
-                           href="{% url 'accounts:redirect_to_dashboard' %}">
+                           href="#">
                             <svg class="fill-icon">
                                 <use href="{% static 'assets/svg/icon-sprite.svg' %}#fill-home"></use>
                             </svg>
                             <span class="lan-3">Dashboard</span></a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{% url 'accounts:redirect_to_dashboard' %}">
+                                    {{ request.session.dashboard_type }}
+                                </a>
+                            </li>
+                            {% if user.role == 'employee' %}
+                            {% if request.session.dashboard_choice == 'admin_dashboard' %}
+                            <li><a href="{% url 'accounts:choose_dashboard' %}">Choose Dashboard</a></li>
+                            {% elif request.session.dashboard_choice == 'customer_dashboard' %}
+                            <li><a href="{% url 'accounts:choose_dashboard' %}">Choose Dashboard</a></li>
+                            {% endif %}
+                            {% endif %}
+                        </ul>
                     </li>
+
                     <li class="sidebar-main-title">
                         <div>
                             <h6 class="lan-8">Applications</h6>
