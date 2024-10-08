@@ -1,9 +1,9 @@
 # forms.py
 from django import forms
 
-from customer.models import CustomerInbound, Customer, CustomerOutbound, CustomerReturns, CustomerExpiry, \
-    CustomerDamage, CustomerTravelDistance, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile, \
-    CustomerInventory
+from customer.models import CustomerInbound, Customer, CustomerReturns, CustomerExpiry, \
+    CustomerDamage, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile, \
+    CustomerInventory, CustomerTransportationOutbound, CustomerWHOutbound
 
 
 class DateInput(forms.DateInput):
@@ -55,23 +55,37 @@ class EmployeeProfileForm(forms.ModelForm):
 class CustomerInboundForm(forms.ModelForm):
     class Meta:
         model = CustomerInbound
-        fields = ['time', 'assigned_day', 'total_shipments_in_asn', 'arrived', 'no_show', 'received_completely',
+        fields = ['time', 'assigned_day', 'arrived', 'not_arrived', 'received_completely',
                   'rejected_completely', 'received_partially', 'under_tamer_inspection', 'waiting_for_inspection',
-                  'waiting_for_action', 'total_dash_of_GR_reports_shared', 'dash_of_GR_reports_with_discripancy',
-                  'total_SKUS_received', 'dash_of_skus_damaged_during_receiving', 'total_received_with_putaway']
+                  'waiting_for_action', 'total_number_of_GR_reports_shared', 'number_of_GR_reports_with_discripancy',
+                  'total_SKUS_received', 'number_of_skus_damaged_during_receiving', 'total_received_with_putaway']
         widgets = {
             'time': DateInput(),
         }
 
 
-class CustomerOutboundForm(forms.ModelForm):
+class CustomerTransportationOutboundForm(forms.ModelForm):
     class Meta:
-        model = CustomerOutbound
-        fields = ['time', 'assigned_day', 'order_received_from_npco', 'pending_orders',
+        model = CustomerTransportationOutbound
+        fields = ['time', 'assigned_day', 'released_order', 'pending_pick_orders',
+                  'number_of_order_not_yet_picked', 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress',
+                  'number_of_orders_waiting_for_qc','number_of_orders_that_are_ready_for_dispatch',
+                  'piked_order', 'justification_for_the_delay_order_by_order',
+                  'total_skus_picked', 'total_number_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
+                  'number_of_PODs_collected_Late']
+        widgets = {
+            'time': DateInput(),
+        }
+
+
+class CustomerWHOutboundForm(forms.ModelForm):
+    class Meta:
+        model = CustomerWHOutbound
+        fields = ['time', 'assigned_day', 'released_order', 'pending_pick_orders',
                   'number_of_order_not_yet_picked', 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress',
                   'number_of_orders_waiting_for_qc', 'number_of_orders_that_are_ready_for_dispatch',
-                  'number_of_orders_that_are_delivered_today', 'justification_for_the_delay_order_by_order',
-                  'total_skus_picked', 'total_dash_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
+                  'piked_order', 'justification_for_the_delay_order_by_order',
+                  'total_skus_picked', 'total_number_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
                   'number_of_PODs_collected_Late']
         widgets = {
             'time': DateInput(),
@@ -108,20 +122,10 @@ class CustomerDamageForm(forms.ModelForm):
         }
 
 
-class CustomerTravelDistanceForm(forms.ModelForm):
-    class Meta:
-        model = CustomerTravelDistance
-        fields = ['time', 'assigned_day', 'Total_no_of_Customers_deliverd', 'Total_no_of_Pallet_deliverd']
-        widgets = {
-            'time': DateInput(),
-        }
-
-
 class CustomerInventoryForm(forms.ModelForm):
     class Meta:
         model = CustomerInventory
-        fields = ['time', 'assigned_day', 'Total_Locations_Audited', 'Total_Locations_with_Incorrect_SKU_and_Qty',
-                  'Total_SKUs_Reconciliation']
+        fields = ['time', 'assigned_day', 'Total_Locations_match', 'Total_Locations_not_match']
         widgets = {
             'time': DateInput(),
         }

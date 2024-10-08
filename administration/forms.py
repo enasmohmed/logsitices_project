@@ -58,8 +58,8 @@ class AdminDataForm(forms.ModelForm):
 class AdminInboundForm(forms.ModelForm):
     class Meta:
         model = AdminInbound
-        fields = ['time', 'assigned_day', 'number_of_vehicles_daily', 'number_of_pallets', 'bulk', 'mix', 'cold',
-                  'frozen', 'ambient', 'pending_shipments', 'no_of_shipments']
+        fields = ['time', 'assigned_day', 'number_of_vehicles_daily', 'number_of_pallets', 'bulk', 'loose', 'cold',
+                  'frozen', 'ambient', 'pending_shipments', 'number_of_shipments', 'total_quantity', 'number_of_line']
         widgets = {
             'time': DateInput(),
         }
@@ -78,7 +78,7 @@ class AdminOutboundForm(forms.ModelForm):
 class AdminReturnsForm(forms.ModelForm):
     class Meta:
         model = AdminReturns
-        fields = ['time', 'assigned_day', 'no_of_return', 'no_of_lines', 'total_quantities']
+        fields = ['time', 'assigned_day', 'number_of_return', 'number_of_lines', 'total_quantities']
         widgets = {
             'time': DateInput(),
         }
@@ -87,7 +87,7 @@ class AdminReturnsForm(forms.ModelForm):
 class AdminCapacityForm(forms.ModelForm):
     class Meta:
         model = AdminCapacity
-        fields = ['time', 'assigned_day', 'total_available_locations_and_accupied']
+        fields = ['time', 'assigned_day', 'WH_storage', 'occupied_location', 'available_location']
         widgets = {
             'time': DateInput(),
         }

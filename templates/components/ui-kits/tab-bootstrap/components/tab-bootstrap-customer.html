@@ -86,12 +86,20 @@
                                role="tab" aria-controls="topline-top-inbound" aria-selected="false">Inbound
                             </a>
                         </li>
-                        <!--  Outbound Tab  -->
+                        <!--  Transportation Outbound Tab  -->
                         <li class="nav-item">
                             <a class="nav-link nav-border txt-danger nav-danger"
-                               id="topline-top-outbound-tab"
-                               data-bs-toggle="tab" href="#topline-top-outbound"
-                               role="tab" aria-controls="topline-top-outbound" aria-selected="false">Outbound
+                               id="topline-top-transportation_outbound-tab"
+                               data-bs-toggle="tab" href="#topline-top-transportation_outbound"
+                               role="tab" aria-controls="topline-top-transportation_outbound" aria-selected="false">Transportation Outbound
+                            </a>
+                        </li>
+                        <!--  WH Outbound Tab  -->
+                        <li class="nav-item">
+                            <a class="nav-link nav-border txt-danger nav-danger"
+                               id="topline-top-wh_outbound-tab"
+                               data-bs-toggle="tab" href="#topline-top-wh_outbound"
+                               role="tab" aria-controls="topline-top-wh_outbound" aria-selected="false">WH Outbound
                             </a>
                         </li>
                         <!--  Return Tab  -->
@@ -118,15 +126,7 @@
                                role="tab" aria-controls="topline-top-damages" aria-selected="false">Damage
                             </a>
                         </li>
-                        <!--  Travel Distances Tab -->
-                        <li class="nav-item">
-                            <a class="nav-link nav-border txt-danger nav-danger"
-                               id="topline-top-travel_distances-tab"
-                               data-bs-toggle="tab" href="#topline-top-travel_distances"
-                               role="tab" aria-controls="topline-top-travel_distances" aria-selected="false">Travel
-                                Distances
-                            </a>
-                        </li>
+
                         <!--  Inventories Tab -->
                         <li class="nav-item">
                             <a class="nav-link nav-border txt-danger nav-danger"
@@ -231,19 +231,18 @@
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Time</th>
                                                 <th scope="col">Day</th>
-                                                <th scope="col">Total Shipments in ASN</th>
                                                 <th scope="col">Arrived</th>
-                                                <th scope="col">No show</th>
+                                                <th scope="col">Not Arrived</th>
                                                 <th scope="col">Received Completely</th>
                                                 <th scope="col">Rejected Completely</th>
                                                 <th scope="col">Received Partially</th>
                                                 <th scope="col">Under Tamer Inspection</th>
-                                                <th scope="col">Waiting for MOD Inspection</th>
-                                                <th scope="col">Waiting for NUPCO Action</th>
-                                                <th scope="col">Total # of GR Reports Shared</th>
-                                                <th scope="col"># of GR reports with Discrepancy</th>
+                                                <th scope="col">Waiting for Inspection</th>
+                                                <th scope="col">Waiting for Action</th>
+                                                <th scope="col">Total Number of GR Reports Shared</th>
+                                                <th scope="col">Number of GR reports with Discrepancy</th>
                                                 <th scope="col">Total SKUs received</th>
-                                                <th scope="col"># of SKUs Damaged During Receiving</th>
+                                                <th scope="col">Number of SKUs Damaged During Receiving</th>
                                                 <th scope="col">Total Received with Putaway</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
@@ -260,17 +259,14 @@
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'assigned_day', this.innerText)">
                                                     {{ inbound.assigned_day }}
                                                 </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_shipments_in_asn', this.innerText)">
-                                                    {{ inbound.total_shipments_in_asn }}
-                                                </td>
+
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'arrived', this.innerText)">
                                                     {{ inbound.arrived }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'no_show', this.innerText)">
-                                                    {{ inbound.no_show }}
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'not_arrived', this.innerText)">
+                                                    {{ inbound.not_arrived }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'received_completely', this.innerText)">
@@ -289,28 +285,28 @@
                                                     {{ inbound.under_tamer_inspection }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'waiting_for_mod_inspection', this.innerText)">
-                                                    {{ inbound.waiting_for_mod_inspection }}
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'waiting_for_inspection', this.innerText)">
+                                                    {{ inbound.waiting_for_inspection }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'waiting_for_NUPCO_action', this.innerText)">
-                                                    {{ inbound.waiting_for_NUPCO_action }}
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'waiting_for_action', this.innerText)">
+                                                    {{ inbound.waiting_for_action }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_dash_of_GR_reports_shared', this.innerText)">
-                                                    {{ inbound.total_dash_of_GR_reports_shared }}
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_number_of_GR_reports_shared', this.innerText)">
+                                                    {{ inbound.total_number_of_GR_reports_shared }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'dash_of_GR_reports_that_include_variance', this.innerText)">
-                                                    {{ inbound.dash_of_GR_reports_with_discripancy }}
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'number_of_GR_reports_that_include_variance', this.innerText)">
+                                                    {{ inbound.number_of_GR_reports_with_discripancy }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_number_of_SKUS_received', this.innerText)">
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_SKUS_received', this.innerText)">
                                                     {{ inbound.total_SKUS_received }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'number_of_SKUS_damaged_during_receiving', this.innerText)">
-                                                    {{ inbound.dash_of_skus_damaged_during_receiving }}
+                                                    onblur="updateData('CustomerInbound', {{ inbound.id }}, 'number_of_skus_damaged_during_receiving', this.innerText)">
+                                                    {{ inbound.number_of_skus_damaged_during_receiving }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('CustomerInbound', {{ inbound.id }}, 'total_received_with_storing', this.innerText)">
@@ -331,12 +327,12 @@
                             </div>
                         </div>
 
-                        <!--  Table Outbound   -->
-                        <div class="tab-pane fade" id="topline-top-outbound" role="tabpanel"
-                             aria-labelledby="topline-top-outbound-tab">
+                        <!--  Table Transportation Outbound   -->
+                        <div class="tab-pane fade" id="topline-top-transportation_outbound" role="tabpanel"
+                             aria-labelledby="topline-top-transportation_outbound-tab">
                             <div class="card-body px-0 pb-0">
                                 <div class="user-header pb-2">
-                                    <h6 class="fw-bold">Outbound Details:</h6>
+                                    <h6 class="fw-bold">Transportation Outbound Details:</h6>
                                 </div>
                                 <div class="user-content">
                                     <div class="table-responsive custom-scrollbar">
@@ -346,13 +342,13 @@
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Time</th>
                                                 <th scope="col">Day</th>
-                                                <th scope="col">Order Received From NPCO</th>
-                                                <th scope="col">Pending Orders</th>
+                                                <th scope="col">Released Order</th>
+                                                <th scope="col">Pending Pick Orders</th>
                                                 <th scope="col">Number of Orders Not Yet Picked</th>
                                                 <th scope="col">Orders Picked But Not Yet Ready for Dispatch</th>
-                                                <th scope="col">Orders Waiting for MOD QC</th>
+                                                <th scope="col">Orders Waiting for QC</th>
                                                 <th scope="col">Orders Ready for Dispatch</th>
-                                                <th scope="col">Orders Delivered Today</th>
+                                                <th scope="col">Piked Order</th>
                                                 <th scope="col">Justification for Delay (Order by Order)</th>
                                                 <th scope="col">Total SKUs Picked</th>
                                                 <th scope="col">Total SKU Discrepancies in Orders</th>
@@ -362,74 +358,182 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {% for outbound in outbounds %}
-                                            <tr>
-                                                <td>{{ outbound.id }}</td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'time', this.innerText)">
-                                                    {{ outbound.time }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'day', this.innerText)">
-                                                    {{ outbound.day }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'order_received_from_npco', this.innerText)">
-                                                    {{ outbound.order_received_from_npco }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'pending_orders', this.innerText)">
-                                                    {{ outbound.pending_orders }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_order_not_yet_picked', this.innerText)">
-                                                    {{ outbound.number_of_order_not_yet_picked }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress', this.innerText)">
-                                                    {{outbound.number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress}}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_waiting_for_mod_qc', this.innerText)">
-                                                    {{ outbound.number_of_orders_waiting_for_mod_qc }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_that_are_ready_for_dispatch', this.innerText)">
-                                                    {{ outbound.number_of_orders_that_are_ready_for_dispatch }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_orders_that_are_delivered_today', this.innerText)">
-                                                    {{ outbound.number_of_orders_that_are_delivered_today }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'justification_for_the_delay_order_by_order', this.innerText)">
-                                                    {{ outbound.justification_for_the_delay_order_by_order }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'total_skus_picked', this.innerText)">
-                                                    {{ outbound.total_skus_picked }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'total_dash_of_SKU_discripancy_in_Order', this.innerText)">
-                                                    {{ outbound.total_dash_of_SKU_discripancy_in_Order }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_PODs_collected_on_time', this.innerText)">
-                                                    {{ outbound.number_of_PODs_collected_on_time }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerOutbound', {{ outbound.id }}, 'number_of_PODs_collected_Late', this.innerText)">
-                                                    {{ outbound.number_of_PODs_collected_Late }}
-                                                </td>
-                                                <td>
-                                                    <button type="button"
-                                                            onclick="deleteData('CustomerOutbound', {{ outbound.id }})">
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
+                                                {% for outbound in transportation_outbounds %}
+                                                <tr>
+                                                    <td>{{ outbound.id }}</td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'time', this.innerText)">
+                                                        {{ outbound.time }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'assigned_day', this.innerText)">
+                                                        {{ outbound.assigned_day }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'released_order', this.innerText)">
+                                                        {{ outbound.released_order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'pending_pick_orders', this.innerText)">
+                                                        {{ outbound.pending_pick_orders }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'number_of_order_not_yet_picked', this.innerText)">
+                                                        {{ outbound.number_of_order_not_yet_picked }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress', this.innerText)">
+                                                        {{ outbound.number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'number_of_orders_waiting_for_qc', this.innerText)">
+                                                        {{ outbound.number_of_orders_waiting_for_qc }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'number_of_orders_that_are_ready_for_dispatch', this.innerText)">
+                                                        {{ outbound.number_of_orders_that_are_ready_for_dispatch }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'piked_order', this.innerText)">
+                                                        {{ outbound.piked_order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'justification_for_the_delay_order_by_order', this.innerText)">
+                                                        {{ outbound.justification_for_the_delay_order_by_order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'total_skus_picked', this.innerText)">
+                                                        {{ outbound.total_skus_picked }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'total_number_of_SKU_discripancy_in_Order', this.innerText)">
+                                                        {{ outbound.total_number_of_SKU_discripancy_in_Order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'number_of_PODs_collected_on_time', this.innerText)">
+                                                        {{ outbound.number_of_PODs_collected_on_time }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerTransportationOutbound', {{ outbound.id }}, 'number_of_PODs_collected_Late', this.innerText)">
+                                                        {{ outbound.number_of_PODs_collected_Late }}
+                                                    </td>
+                                                    <td>
+                                                        <button type="button"
+                                                                onclick="deleteData('CustomerTransportationOutbound', {{ outbound.id }})">
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
                                             </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--  Table WH Outbound   -->
+                        <div class="tab-pane fade" id="topline-top-wh_outbound" role="tabpanel"
+                             aria-labelledby="topline-top-wh_outbound-tab">
+                            <div class="card-body px-0 pb-0">
+                                <div class="user-header pb-2">
+                                    <h6 class="fw-bold">WH Outbound Details:</h6>
+                                </div>
+                                <div class="user-content">
+                                    <div class="table-responsive custom-scrollbar">
+                                        <table class="table mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">ID</th>
+                                                <th scope="col">Time</th>
+                                                <th scope="col">Day</th>
+                                                <th scope="col">Released Order</th>
+                                                <th scope="col">Pending Pick Orders</th>
+                                                <th scope="col">Number of Orders Not Yet Picked</th>
+                                                <th scope="col">Orders Picked But Not Yet Ready for Dispatch</th>
+                                                <th scope="col">Orders Waiting for QC</th>
+                                                <th scope="col">Orders Ready for Dispatch</th>
+                                                <th scope="col">Piked Order</th>
+                                                <th scope="col">Justification for Delay (Order by Order)</th>
+                                                <th scope="col">Total SKUs Picked</th>
+                                                <th scope="col">Total SKU Discrepancies in Orders</th>
+                                                <th scope="col">Number of PODs Collected on Time</th>
+                                                <th scope="col">Number of PODs Collected Late</th>
+                                                <th scope="col">Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for outbound in wh_outbounds %}
+                                                <tr>
+                                                    <td>{{ outbound.id }}</td>
+                                                   <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'time', this.innerText)">
+                                                        {{ outbound.time }}
+                                                   </td>
+
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'assigned_day', this.innerText)">
+                                                        {{ outbound.assigned_day }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'released_order', this.innerText)">
+                                                        {{ outbound.released_order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'pending_pick_orders', this.innerText)">
+                                                        {{ outbound.pending_pick_orders }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'number_of_order_not_yet_picked', this.innerText)">
+                                                        {{ outbound.number_of_order_not_yet_picked }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress', this.innerText)">
+                                                        {{ outbound.number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'number_of_orders_waiting_for_qc', this.innerText)">
+                                                        {{ outbound.number_of_orders_waiting_for_qc }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'number_of_orders_that_are_ready_for_dispatch', this.innerText)">
+                                                        {{ outbound.number_of_orders_that_are_ready_for_dispatch }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'piked_order', this.innerText)">
+                                                        {{ outbound.piked_order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'justification_for_the_delay_order_by_order', this.innerText)">
+                                                        {{ outbound.justification_for_the_delay_order_by_order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'total_skus_picked', this.innerText)">
+                                                        {{ outbound.total_skus_picked }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'total_number_of_SKU_discripancy_in_Order', this.innerText)">
+                                                        {{ outbound.total_number_of_SKU_discripancy_in_Order }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'number_of_PODs_collected_on_time', this.innerText)">
+                                                        {{ outbound.number_of_PODs_collected_on_time }}
+                                                    </td>
+                                                    <td contenteditable="true"
+                                                        onblur="updateData('CustomerWHOutbound', {{ outbound.id }}, 'number_of_PODs_collected_Late', this.innerText)">
+                                                        {{ outbound.number_of_PODs_collected_Late }}
+                                                    </td>
+                                                    <td>
+                                                        <button type="button"
+                                                                onclick="deleteData('CustomerWHOutbound', {{ outbound.id }})">
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+
                                         </table>
                                     </div>
                                 </div>
@@ -622,61 +726,6 @@
                             </div>
                         </div>
 
-                        <!--  Table Travel Distances  -->
-                        <div class="tab-pane fade" id="topline-top-travel_distances" role="tabpanel"
-                             aria-labelledby="topline-top-travel_distances-tab">
-                            <div class="card-body px-0 pb-0">
-                                <div class="user-header pb-2">
-                                    <h6 class="fw-bold">Travel Distances Details:</h6>
-                                </div>
-                                <div class="user-content">
-                                    <div class="table-responsive custom-scrollbar">
-                                        <table class="table mb-0">
-                                            <thead>
-                                            <tr>
-                                                <th scope="col">ID</th>
-                                                <th scope="col">Time</th>
-                                                <th scope="col">Day</th>
-                                                <th scope="col">Total no. of Pallet delivered</th>
-                                                <th scope="col">Total no. of Customers delivered</th>
-                                                <th scope="col">Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for travel_distance in travel_distances %}
-                                            <tr>
-                                                <td>{{ travel_distance.id }}</td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'time', this.innerText)">
-                                                    {{ travel_distance.time }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'assigned_day', this.innerText)">
-                                                    {{ travel_distance.assigned_day }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'Total_no_of_Customers_deliverd', this.innerText)">
-                                                    {{ travel_distance.Total_no_of_Customers_deliverd }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerTravelDistance', {{ travel_distance.id }}, 'Total_no_of_Pallet_deliverd', this.innerText)">
-                                                    {{ travel_distance.Total_no_of_Pallet_deliverd }}
-                                                </td>
-                                                <td>
-                                                    <button type="button"
-                                                            onclick="deleteData('CustomerTravelDistance', {{ travel_distance.id }})">
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!--  Table Inventories  -->
                         <div class="tab-pane fade" id="topline-top-inventories" role="tabpanel"
                              aria-labelledby="topline-top-inventories-tab">
@@ -692,9 +741,8 @@
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Time</th>
                                                 <th scope="col">Day</th>
-                                                <th scope="col">Total Locations Audited</th>
-                                                <th scope="col">Total Locations with Incorrect SKU and Qty</th>
-                                                <th scope="col">Total SKUs Reconciliation</th>
+                                                <th scope="col">Total Locations Match</th>
+                                                <th scope="col">Total Locations Not Match</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
                                             </thead>
@@ -711,16 +759,12 @@
                                                     {{ inventory.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_Locations_Audited', this.innerText)">
-                                                    {{ inventory.Total_Locations_Audited }}
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_Locations_match', this.innerText)">
+                                                    {{ inventory.Total_Locations_match }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_Locations_with_Incorrect_SKU_and_Qty', this.innerText)">
-                                                    {{ inventory.Total_Locations_with_Incorrect_SKU_and_Qty }}
-                                                </td>
-                                                <td contenteditable="true"
-                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_SKUs_Reconciliation', this.innerText)">
-                                                    {{ inventory.Total_SKUs_Reconciliation }}
+                                                    onblur="updateData('CustomerInventory', {{ inventory.id }}, 'Total_Locations_not_match', this.innerText)">
+                                                    {{ inventory.Total_Locations_not_match }}
                                                 </td>
                                                 <td>
                                                     <button type="button"

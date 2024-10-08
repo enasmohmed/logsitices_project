@@ -1,18 +1,26 @@
 import calendar
 import json
+from io import BytesIO
 
+import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Sum
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+
 
 from .forms import AdminDataForm, AdminInboundForm, AdminOutboundForm, \
     AdminReturnsForm, AdminCapacityForm, AdminInventoryForm
@@ -86,9 +94,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['total_pallets'] = inbound_data.aggregate(Sum('number_of_pallets'))['number_of_pallets__sum'] or 0
         context['total_pending_shipments'] = inbound_data.aggregate(Sum('pending_shipments'))[
                                                  'pending_shipments__sum'] or 0
-        context['total_no_of_shipments'] = inbound_data.aggregate(Sum('no_of_shipments'))['no_of_shipments__sum'] or 0
+        context['total_number_of_shipments'] = inbound_data.aggregate(Sum('number_of_shipments'))['number_of_shipments__sum'] or 0
 
-        shipment_types = ['bulk', 'mix', 'cold', 'frozen', 'ambient']
+        context['total_quantity'] = inbound_data.aggregate(Sum('total_quantity'))['total_quantity__sum'] or 0
+
+        context['total_number_of_line'] = inbound_data.aggregate(Sum('number_of_line'))['number_of_line__sum'] or 0
+
+        shipment_types = ['bulk', 'loose', 'cold', 'frozen', 'ambient']
         shipment_data = {
             stype: inbound_data.aggregate(Sum(stype))[stype + '__sum'] or 0
             for stype in shipment_types
@@ -108,11 +120,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['chart_name_bulk'] = 'Bulk'
         context['chart_name_loose'] = 'Loose'
 
-        context['total_capacity'] = capacity_data.aggregate(Sum('total_available_locations_and_accupied'))[
-                                        'total_available_locations_and_accupied__sum'] or 0
+        context['WH_storage'] = capacity_data.aggregate(Sum('WH_storage'))['WH_storage__sum'] or 0
+        context['occupied_location'] = capacity_data.aggregate(Sum('occupied_location'))['occupied_location__sum'] or 0
+        context['available_location'] = capacity_data.aggregate(Sum('available_location'))['available_location__sum'] or 0
 
-        context['total_no_of_return'] = returns_data.aggregate(Sum('no_of_return'))['no_of_return__sum'] or 0
-        context['total_no_of_lines'] = returns_data.aggregate(Sum('no_of_lines'))['no_of_lines__sum'] or 0
+        context['total_number_of_return'] = returns_data.aggregate(Sum('number_of_return'))['number_of_return__sum'] or 0
+        context['total_number_of_lines'] = returns_data.aggregate(Sum('number_of_lines'))['number_of_lines__sum'] or 0
         context['total_quantities'] = returns_data.aggregate(Sum('total_quantities'))['total_quantities__sum'] or 0
 
         context['total_last_movement'] = inventory_data.aggregate(Sum('last_movement'))['last_movement__sum'] or 0
@@ -172,7 +185,11 @@ def is_customer(user):
     return user.groups.filter(name='Customer').exists()
 
 
-@method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
+def is_employee(user):
+    return user.groups.filter(name='Employee').exists()
+
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
 class AdminEditDataView(View):
     model_map = {
         'AdminData': AdminData,
@@ -194,8 +211,6 @@ class AdminEditDataView(View):
             return True
         return user == model_instance.user
 
-    @method_decorator(login_required, name='dispatch')
-    @method_decorator(csrf_exempt, name='dispatch')
     def get(self, request):
         user = request.user
         is_admin = user.is_staff
@@ -211,6 +226,12 @@ class AdminEditDataView(View):
             return HttpResponseForbidden("You do not have permission to access this page.")
 
         user_type = 'employee' if is_employee else 'customer'
+
+        if 'download' in request.GET:
+            if request.GET.get('format') == 'pdf':
+                return self.download_pdf(request)
+            else:
+                return self.download_excel(request)
 
         context = {
             "user": user,
@@ -245,132 +266,111 @@ class AdminEditDataView(View):
 
         return render(request, "excel.html", context)
 
-    @method_decorator(login_required, name='dispatch')
-    @method_decorator(csrf_exempt, name='dispatch')
-    def post(self, request):
+    def download_excel(self, request):
         user = request.user
-        company_name = "Hc business"  # اسم الشركة الافتراضي
-        employee_name = user.username  # اسم المستخدم الحالي
+        is_employee = self.is_employee_user(user)
 
-        dashboard_choice = request.session.get('dashboard_choice', 'admin')
+        # جلب البيانات المراد تحميلها
+        admin_data = AdminData.objects.filter(company=EmployeeProfile.objects.get(user=user).company)
+        admin_inbound_data = AdminInbound.objects.filter(admin_data__in=admin_data)
+        admin_outbound_data = AdminOutbound.objects.filter(admin_data__in=admin_data)
+        admin_returns_data = AdminReturns.objects.filter(admin_data__in=admin_data)
+        admin_capacity_data = AdminCapacity.objects.filter(admin_data__in=admin_data)
+        admin_inventory_data = AdminInventory.objects.filter(admin_data__in=admin_data)
 
-        if dashboard_choice not in ['admin', 'customer']:
-            dashboard_choice = 'admin'
+        # إعداد البيانات للتصدير إلى Excel
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            pd.DataFrame(list(admin_data.values())).to_excel(writer, sheet_name='AdminData')
+            pd.DataFrame(list(admin_inbound_data.values())).to_excel(writer, sheet_name='AdminInbound')
+            pd.DataFrame(list(admin_outbound_data.values())).to_excel(writer, sheet_name='AdminOutbound')
+            pd.DataFrame(list(admin_returns_data.values())).to_excel(writer, sheet_name='AdminReturns')
+            pd.DataFrame(list(admin_capacity_data.values())).to_excel(writer, sheet_name='AdminCapacity')
+            pd.DataFrame(list(admin_inventory_data.values())).to_excel(writer, sheet_name='AdminInventory')
 
-        if dashboard_choice == 'customer' and not self.is_employee_user(user):
-            return JsonResponse({"success": False, "error": "Permission denied."})
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=admin_data.xlsx'
+        response.write(output.getvalue())
+        return response
 
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "error": "Invalid JSON"})
+    def download_pdf(self, request):
+        user = request.user
+        is_employee = self.is_employee_user(user)
 
-        if 'add' in data:
-            model_name = data['add'].get('model')
-            fields = data['add'].get('fields', {})
+        # جلب البيانات المراد تحميلها
+        admin_data = AdminData.objects.filter(company=EmployeeProfile.objects.get(user=user).company)
+        admin_inbound_data = AdminInbound.objects.filter(admin_data__in=admin_data)
+        admin_outbound_data = AdminOutbound.objects.filter(admin_data__in=admin_data)
+        admin_returns_data = AdminReturns.objects.filter(admin_data__in=admin_data)
+        admin_capacity_data = AdminCapacity.objects.filter(admin_data__in=admin_data)
+        admin_inventory_data = AdminInventory.objects.filter(admin_data__in=admin_data)
 
-            if model_name in self.model_map:
-                model = self.model_map[model_name]
-                # إضافة اسم الشركة واسم المستخدم
-                fields['company'] = EmployeeProfile.objects.get(user=user).company
-                fields['user'] = user
+        # إعداد ملف PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename=admin_data.pdf'
 
-                obj = model(**fields)
-                obj.save()
+        doc = SimpleDocTemplate(response, pagesize=letter)
+        elements = []
 
-                # إضافة المستخدم إلى حقل employees في AdminData
-                if model_name == 'AdminData':
-                    obj.employees.add(user)
-                    obj.save()
+        # تخصيص الأنماط
+        styles = getSampleStyleSheet()
+        heading_style = ParagraphStyle(
+            'HeadingStyle',
+            parent=styles['Heading1'],
+            fontSize=16,
+            textColor=colors.darkblue,
+            spaceAfter=20
+        )
 
-                # إعادة التوجيه إلى صفحة تعديل البيانات بعد الحفظ
-                response_data = {
-                    "success": True,
-                    "id": obj.id,
-                    "redirect_url": reverse('edit_data_view'),
-                    "user": user.username,
-                    "company_name": fields['company'].hc_business  # اسم الشركة التي تم حفظها
-                }
-                return JsonResponse(response_data)
+        normal_style = ParagraphStyle(
+            'NormalStyle',
+            parent=styles['Normal'],
+            fontName='Helvetica',
+            fontSize=12,
+            textColor=colors.black,
+            spaceAfter=10
+        )
 
+        data_sets = [
+            ('AdminData', admin_data),
+            ('AdminInbound', admin_inbound_data),
+            ('AdminOutbound', admin_outbound_data),
+            ('AdminReturns', admin_returns_data),
+            ('AdminCapacity', admin_capacity_data),
+            ('AdminInventory', admin_inventory_data)
+        ]
+
+        for title, data in data_sets:
+            # إضافة العنوان
+            elements.append(Paragraph(f"{title}", heading_style))
+
+            # إعداد البيانات كجدول
+            if data.exists():  # تحقق مما إذا كان هناك بيانات
+                data_list = [[key for key in data.values()[0].keys()]]  # إضافة العناوين كصف أول
+                for item in data.values():
+                    data_list.append([value for value in item.values()])  # إضافة القيم
+
+                table = Table(data_list)
+                table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                    ('FONT', (0, 0), (-1, -1), 'Helvetica', 10),  # تخصيص الخط
+                    ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # تغيير لون النص في الصفوف
+                ]))
+                elements.append(table)
             else:
-                return JsonResponse({"success": False, "error": "Invalid model"})
+                elements.append(Paragraph(f"No data available for {title}.", normal_style))
 
-        elif 'update' in data:
-            model_name = data['update'].get('model')
-            model_id = data['update'].get('id')
-            field_name = data['update'].get('field')
-            new_value = data['update'].get('value')
+            elements.append(Spacer(0, 20))  # إضافة مساحة بعد كل جدول
 
-            if model_name in self.model_map:
-                model = self.model_map[model_name]
-                try:
-                    obj = model.objects.get(id=model_id)
-                except model.DoesNotExist:
-                    return JsonResponse({"success": False, "error": "Object not found"})
-
-                if not self.has_permission(user, obj):
-                    return JsonResponse({"success": False, "error": "Permission denied."})
-
-                setattr(obj, field_name, new_value)
-                obj.save()
-
-                response_data = {
-                    "success": True,
-                    "user": user.username,
-                    "company_name": obj.company.hc_business
-                }
-                return JsonResponse(response_data)
-
-            else:
-                return JsonResponse({"success": False, "error": "Invalid model"})
-
-        elif 'delete' in data:
-            model_name = data['delete'].get('model')
-            model_id = data['delete'].get('id')
-
-            if model_name in self.model_map:
-                model = self.model_map[model_name]
-                try:
-                    obj = model.objects.get(id=model_id)
-                except model.DoesNotExist:
-                    return JsonResponse({"success": False, "error": "Object not found"})
-
-                if not self.has_permission(user, obj):
-                    return JsonResponse({"success": False, "error": "Permission denied."})
-
-                obj.delete()
-
-                response_data = {
-                    "success": True,
-                    "user": user.username,
-                    "company_name": obj.company.hc_business
-                }
-                return JsonResponse(response_data)
-
-            else:
-                return JsonResponse({"success": False, "error": "Invalid model"})
-
-        return JsonResponse({"success": False, "error": "Invalid operation"})
-
-
-def download_excel_view(request):
-    view = AdminEditDataView()
-    return view.download_excel(request)
-
-
-def download_pdf_view(request):
-    view = AdminEditDataView()
-    return view.download_pdf(request)
+        doc.build(elements)
+        return response
 
 
 def is_employee(user):
     return user.groups.filter(name='Employee').exists()
-
-
-def is_employee(user):
-    return user.groups.filter(name='Employee').exists()
-
 
 @method_decorator([login_required, user_passes_test(is_employee)], name='dispatch')
 class AddAdminDataView(View):

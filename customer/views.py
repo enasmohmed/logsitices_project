@@ -21,12 +21,11 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
 
 from administration.models import AdminData
-from .forms import CustomerInboundForm, CustomerForm, CustomerOutboundForm, CustomerReturnsForm, CustomerExpiryForm, \
-    CustomerDamageForm, CustomerTravelDistanceForm, CustomerInventoryForm, CustomerPalletLocationAvailabilityForm, \
-    CustomerHSEForm
-from .models import Customer, CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
-    CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile
-
+from .forms import CustomerInboundForm, CustomerForm, CustomerReturnsForm, CustomerExpiryForm, \
+    CustomerDamageForm, CustomerInventoryForm, CustomerPalletLocationAvailabilityForm, \
+    CustomerHSEForm, CustomerTransportationOutboundForm, CustomerWHOutboundForm
+from .models import Customer, CustomerInbound, CustomerTransportationOutbound,CustomerWHOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
+     CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, EmployeeProfile
 
 ### View Customer Dashboard
 @method_decorator(login_required, name='dispatch')
@@ -62,97 +61,135 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
 
         # فلترة البيانات بناءً على القيم المدخلة
         inbound_data = CustomerInbound.objects.all()
-        outbound_data = CustomerOutbound.objects.all()
+        transportation_outbound_data = CustomerTransportationOutbound.objects.all()
+        wh_outbound_data = CustomerWHOutbound.objects.all()
         returns_data = CustomerReturns.objects.all()
         expiry_data = CustomerExpiry.objects.all()
         damage_data = CustomerDamage.objects.all()
-        travel_distance_data = CustomerTravelDistance.objects.all()
         inventory_data = CustomerInventory.objects.all()
         pallet_location_availability_data = CustomerPalletLocationAvailability.objects.all()
         hse_data = CustomerHSE.objects.all()
 
         if year:
             inbound_data = inbound_data.filter(time__year=year)
-            outbound_data = outbound_data.filter(time__year=year)
+            transportation_outbound_data = transportation_outbound_data.filter(time__year=year)
+            wh_outbound_data = wh_outbound_data.filter(time__year=year)
             returns_data = returns_data.filter(time__year=year)
             expiry_data = expiry_data.filter(time__year=year)
             damage_data = damage_data.filter(time__year=year)
-            travel_distance_data = travel_distance_data.filter(time__year=year)
             inventory_data = inventory_data.filter(time__year=year)
             pallet_location_availability_data = pallet_location_availability_data.filter(time__year=year)
             hse_data = hse_data.filter(time__year=year)
 
         if month:
             inbound_data = inbound_data.filter(time__month=month)
-            outbound_data = outbound_data.filter(time__month=month)
+            transportation_outbound_data = transportation_outbound_data.filter(time__month=month)
+            wh_outbound_data = wh_outbound_data.filter(time__month=month)
             returns_data = returns_data.filter(time__month=month)
             expiry_data = expiry_data.filter(time__month=month)
             damage_data = damage_data.filter(time__month=month)
-            travel_distance_data = travel_distance_data.filter(time__month=month)
             inventory_data = inventory_data.filter(time__month=month)
             pallet_location_availability_data = pallet_location_availability_data.filter(time__month=month)
             hse_data = hse_data.filter(time__month=month)
 
         if day:
             inbound_data = inbound_data.filter(time__day=day)
-            outbound_data = outbound_data.filter(time__day=day)
+            transportation_outbound_data = transportation_outbound_data.filter(time__day=day)
+            wh_outbound_data = wh_outbound_data.filter(time__day=day)
             returns_data = returns_data.filter(time__day=day)
             expiry_data = expiry_data.filter(time__day=day)
             damage_data = damage_data.filter(time__day=day)
-            travel_distance_data = travel_distance_data.filter(time__day=day)
             inventory_data = inventory_data.filter(time__day=day)
             pallet_location_availability_data = pallet_location_availability_data.filter(time__day=day)
             hse_data = hse_data.filter(time__day=day)
 
         # إضافة البيانات المفلترة إلى السياق
         context['inbound_data'] = inbound_data
-        context['outbound_data'] = outbound_data
+        context['transportation_outbound_data'] = transportation_outbound_data
+        context['wh_outbound_data'] = wh_outbound_data
         context['returns_data'] = returns_data
         context['expiry_data'] = expiry_data
         context['damage_data'] = damage_data
-        context['travel_distance_data'] = travel_distance_data
         context['inventory_data'] = inventory_data
         context['pallet_location_availability_data'] = pallet_location_availability_data
         context['hse_data'] = hse_data
 
         # الحصول على جميع بيانات Inbound
         context['inbound_data'] = inbound_data
-        context['total_shipments_in_asn'] = inbound_data.aggregate(Sum('total_shipments_in_asn'))[
-                                                'total_shipments_in_asn__sum'] or 0
+
         context['total_arrived'] = inbound_data.aggregate(Sum('arrived'))['arrived__sum'] or 0
-        context['total_no_show'] = inbound_data.aggregate(Sum('no_show'))['no_show__sum'] or 0
 
-        context['total_waiting_for_inspection'] = inbound_data.aggregate(Sum('waiting_for_inspection'))[
-                                                      'waiting_for_inspection__sum'] or 0
-        context['total_dash_of_GR_reports_shared'] = \
-            inbound_data.aggregate(Sum('total_dash_of_GR_reports_shared'))['total_dash_of_GR_reports_shared__sum'] or 0
-        context['total_dash_of_GR_reports_with_discripancy'] = \
-            inbound_data.aggregate(Sum('dash_of_GR_reports_with_discripancy'))[
-                'dash_of_GR_reports_with_discripancy__sum'] or 0
+        context['total_not_arrived'] = inbound_data.aggregate(Sum('not_arrived'))['not_arrived__sum'] or 0
 
-        context['total_received_completely'] = inbound_data.aggregate(Sum('received_completely'))[
-                                                   'received_completely__sum'] or 0
-        context['total_received_partially'] = inbound_data.aggregate(Sum('received_partially'))[
-                                                  'received_partially__sum'] or 0
-        context['total_rejected_completely'] = inbound_data.aggregate(Sum('rejected_completely'))[
-                                                   'rejected_completely__sum'] or 0
+        context['total_received_completely'] = inbound_data.aggregate(Sum('received_completely'))['received_completely__sum'] or 0
 
-        # الحصول على جميع بيانات Outound
-        context['outbound_data'] = outbound_data
-        context['total_order_received_from_npco'] = outbound_data.aggregate(Sum('order_received_from_npco'))[
-                                                        'order_received_from_npco__sum'] or 0
-        context['total_pending_orders'] = outbound_data.aggregate(Sum('pending_orders'))['pending_orders__sum'] or 0
-        context['total_number_of_orders_that_are_delivered_today'] = \
-            outbound_data.aggregate(Sum('number_of_orders_that_are_delivered_today'))[
-                'number_of_orders_that_are_delivered_today__sum'] or 0
+        context['total_received_partially'] = inbound_data.aggregate(Sum('received_partially'))['received_partially__sum'] or 0
+
+        context['total_rejected_completely'] = inbound_data.aggregate(Sum('rejected_completely'))['rejected_completely__sum'] or 0
+
+        context['total_under_tamer_inspection'] = inbound_data.aggregate(Sum('under_tamer_inspection'))['under_tamer_inspection__sum'] or 0
+
+        context['total_waiting_for_inspection'] = inbound_data.aggregate(Sum('waiting_for_inspection'))['waiting_for_inspection__sum'] or 0
+
+        context['total_waiting_for_action'] = inbound_data.aggregate(Sum('waiting_for_action'))['waiting_for_action__sum'] or 0
+
+        context['total_number_of_GR_reports_shared'] = \
+            inbound_data.aggregate(Sum('total_number_of_GR_reports_shared'))['total_number_of_GR_reports_shared__sum'] or 0
+
+        context['total_number_of_GR_reports_with_discripancy'] = \
+            inbound_data.aggregate(Sum('number_of_GR_reports_with_discripancy'))['number_of_GR_reports_with_discripancy__sum'] or 0
+
+        context['total_SKUS_received'] = inbound_data.aggregate(Sum('total_SKUS_received'))['total_SKUS_received__sum'] or 0
+
+        context['total_number_of_skus_damaged_during_receiving'] = inbound_data.aggregate(Sum('number_of_skus_damaged_during_receiving'))['number_of_skus_damaged_during_receiving__sum'] or 0
+
+        context['total_received_with_putaway'] = inbound_data.aggregate(Sum('total_received_with_putaway'))['total_received_with_putaway__sum'] or 0
+
+
+        # الحصول على جميع بيانات Transportation Outbound_data
+        context['transportation_outbound_data'] = transportation_outbound_data
+
+        context['total_released_order'] = transportation_outbound_data.aggregate(Sum('released_order'))['released_order__sum'] or 0
+
+        context['total_pending_pick_orders'] = transportation_outbound_data.aggregate(Sum('pending_pick_orders'))['pending_pick_orders__sum'] or 0
+
+        context['total_number_of_order_not_yet_picked'] = transportation_outbound_data.aggregate(Sum('number_of_order_not_yet_picked'))['number_of_order_not_yet_picked__sum'] or 0
+
+        context['total_number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress'] = transportation_outbound_data.aggregate(Sum('number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress'))['number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress__sum'] or 0
+
+        context['total_number_of_orders_waiting_for_qc'] = transportation_outbound_data.aggregate(Sum('number_of_orders_waiting_for_qc'))['number_of_orders_waiting_for_qc__sum'] or 0
+
+        context['total_number_of_orders_that_are_ready_for_dispatch'] = transportation_outbound_data.aggregate(Sum('number_of_orders_that_are_ready_for_dispatch'))['number_of_orders_that_are_ready_for_dispatch__sum'] or 0
+
+        context['total_piked_order'] = transportation_outbound_data.aggregate(Sum('piked_order'))['piked_order__sum'] or 0
+
+        context['total_justification_for_the_delay_order_by_order'] = transportation_outbound_data.aggregate(Sum('justification_for_the_delay_order_by_order'))['justification_for_the_delay_order_by_order__sum'] or 0
+
+        context['total_total_skus_picked'] = transportation_outbound_data.aggregate(Sum('total_skus_picked'))['total_skus_picked__sum'] or 0
+
+        context['total_total_number_of_SKU_discripancy_in_Order'] = transportation_outbound_data.aggregate(Sum('total_number_of_SKU_discripancy_in_Order'))['total_number_of_SKU_discripancy_in_Order__sum'] or 0
+
+        context['total_number_of_PODs_collected_on_time'] = transportation_outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))['number_of_PODs_collected_on_time__sum'] or 0
+
+        context['total_number_of_PODs_collected_Late'] = transportation_outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))['number_of_PODs_collected_Late__sum'] or 0
+
+
+
+        # الحصول على جميع بيانات WH Outbound_data
+        context['wh_outbound_data'] = wh_outbound_data
+        context['total_released_order'] = wh_outbound_data.aggregate(Sum('released_order'))['released_order__sum'] or 0
+
+        context['total_pending_pick_orders'] = wh_outbound_data.aggregate(Sum('pending_pick_orders'))['pending_pick_orders__sum'] or 0
+        context['total_piked_order'] = wh_outbound_data.aggregate(Sum('piked_order'))['piked_order__sum'] or 0
 
         context['total_number_of_PODs_collected_on_time'] = \
-            outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))[
+            wh_outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))[
                 'number_of_PODs_collected_on_time__sum'] or 0
-        context['total_number_of_PODs_collected_Late'] = outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
+        context['total_number_of_PODs_collected_Late'] = wh_outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
                                                              'number_of_PODs_collected_Late__sum'] or 0
-        context['total_total_skus_picked'] = outbound_data.aggregate(Sum('total_skus_picked'))[
+        context['total_total_skus_picked'] = wh_outbound_data.aggregate(Sum('total_skus_picked'))[
                                                  'total_skus_picked__sum'] or 0
+
 
         # الحصول على جميع بيانات Returns
         context['returns_data'] = returns_data
@@ -189,50 +226,39 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
 
         # Damage
         context['damage_data'] = damage_data
-        context['Total_QTYs_Damaged_by_WH'] = damage_data.aggregate(Sum('Total_QTYs_Damaged_by_WH'))[
-                                                  'Total_QTYs_Damaged_by_WH__sum'] or 0
-        context['Total_Number_of_Damaged_during_receiving'] = \
-            damage_data.aggregate(Sum('Number_of_Damaged_during_receiving'))[
+        context['Total_QTYs_Damaged_by_WH'] = damage_data.aggregate(Sum('Total_QTYs_Damaged_by_WH'))['Total_QTYs_Damaged_by_WH__sum'] or 0
+        context['Total_Number_of_Damaged_during_receiving'] = damage_data.aggregate(Sum('Number_of_Damaged_during_receiving'))[
                 'Number_of_Damaged_during_receiving__sum'] or 0
         context['Total_Damaged_QTYs_Disposed'] = damage_data.aggregate(Sum('Total_Damaged_QTYs_Disposed'))[
                                                      'Total_Damaged_QTYs_Disposed__sum'] or 0
 
-        # الحصول على جميع بيانات TravelDistance
-        context['travel_distance_data'] = travel_distance_data
-        context['Total_no_of_Pallet_deliverd'] = travel_distance_data.aggregate(Sum('Total_no_of_Pallet_deliverd'))[
-                                                     'Total_no_of_Pallet_deliverd__sum'] or 0
-        context['Total_no_of_Customers_deliverd'] = \
-            travel_distance_data.aggregate(Sum('Total_no_of_Customers_deliverd'))[
-                'Total_no_of_Customers_deliverd__sum'] or 0
-
         # Inventory
         context['inventory_data'] = inventory_data
-        context['Total_Locations_Audited'] = inventory_data.aggregate(Sum('Total_Locations_Audited'))[
-                                                 'Total_Locations_Audited__sum'] or 0
-        context['Total_Locations_with_Incorrect_SKU_and_Qty'] = \
-            inventory_data.aggregate(Sum('Total_Locations_with_Incorrect_SKU_and_Qty'))[
-                'Total_Locations_with_Incorrect_SKU_and_Qty__sum'] or 0
-        context['Total_SKUs_Reconciliation'] = inventory_data.aggregate(Sum('Total_SKUs_Reconciliation'))[
-                                                   'Total_SKUs_Reconciliation__sum'] or 0
+        context['Total_Locations_match'] = inventory_data.aggregate(Sum('Total_Locations_match'))['Total_Locations_match__sum'] or 0
+        context['Total_Locations_not_match'] = inventory_data.aggregate(Sum('Total_Locations_not_match'))['Total_Locations_not_match__sum'] or 0
+
 
         # PalletLocationAvailability
         context['pallet_location_availability_data'] = pallet_location_availability_data
         context['Total_Storage_Pallet'] = pallet_location_availability_data.aggregate(Sum('Total_Storage_Pallet'))[
                                               'Total_Storage_Pallet__sum'] or 0
-        context['Total_Storage_Bin'] = pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin'))[
-                                           'Total_Storage_Bin__sum'] or 0
         context['Total_Storage_pallet_empty'] = \
             pallet_location_availability_data.aggregate(Sum('Total_Storage_pallet_empty'))[
                 'Total_Storage_pallet_empty__sum'] or 0
-        context['Total_Storage_Bin_empty'] = \
-            pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin_empty'))[
-                'Total_Storage_Bin_empty__sum'] or 0
-        context['Total_Storage_Bin_empty'] = \
-            pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin_empty'))[
-                'Total_Storage_Bin_empty__sum'] or 0
+
+        context['Total_Storage_Bin'] = pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin'))[
+                                           'Total_Storage_Bin__sum'] or 0
         context['Total_occupied_pallet_location'] = \
             pallet_location_availability_data.aggregate(Sum('Total_occupied_pallet_location'))[
                 'Total_occupied_pallet_location__sum'] or 0
+
+        context['Total_Storage_Bin_empty'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin_empty'))[
+                'Total_Storage_Bin_empty__sum'] or 0
+        context['Total_Storage_Bin_empty'] = \
+            pallet_location_availability_data.aggregate(Sum('Total_Storage_Bin_empty'))[
+                'Total_Storage_Bin_empty__sum'] or 0
+
         context['Total_occupied_Bin_location'] = \
             pallet_location_availability_data.aggregate(Sum('Total_occupied_Bin_location'))[
                 'Total_occupied_Bin_location__sum'] or 0
@@ -273,11 +299,11 @@ class CustomerEditDataView(View):
     model_map = {
         'Customer': Customer,
         'CustomerInbound': CustomerInbound,
-        'CustomerOutbound': CustomerOutbound,
+        'CustomerTransportationOutbound': CustomerTransportationOutbound,
+        'CustomerWHOutbound': CustomerWHOutbound,
         'CustomerReturns': CustomerReturns,
         'CustomerExpiry': CustomerExpiry,
         'CustomerDamage': CustomerDamage,
-        'CustomerTravelDistance': CustomerTravelDistance,
         'CustomerInventory': CustomerInventory,
         'CustomerPalletLocationAvailability': CustomerPalletLocationAvailability,
         'CustomerHSE': CustomerHSE,
@@ -341,11 +367,11 @@ class CustomerEditDataView(View):
         elif dashboard_choice == 'customer_dashboard' and company:
             companies = Customer.objects.filter(employees__user=user)
             inbounds = CustomerInbound.objects.filter(company=company)
-            outbounds = CustomerOutbound.objects.filter(company=company)
+            transportation_outbounds = CustomerTransportationOutbound.objects.filter(company=company)
+            wh_outbounds = CustomerWHOutbound.objects.filter(company=company)
             returns = CustomerReturns.objects.filter(company=company)
             expiries = CustomerExpiry.objects.filter(company=company)
             damages = CustomerDamage.objects.filter(company=company)
-            travel_distances = CustomerTravelDistance.objects.filter(company=company)
             inventories = CustomerInventory.objects.filter(company=company)
             pallet_location_availabilities = CustomerPalletLocationAvailability.objects.filter(company=company)
             hses = CustomerHSE.objects.filter(company=company)
@@ -353,11 +379,11 @@ class CustomerEditDataView(View):
             context.update({
                 "companies": companies,
                 "inbounds": inbounds,
-                "outbounds": outbounds,
+                "transportation_outbounds": transportation_outbounds,
+                "wh_outbounds": wh_outbounds,
                 "returns": returns,
                 "expiries": expiries,
                 "damages": damages,
-                "travel_distances": travel_distances,
                 "inventories": inventories,
                 "pallet_location_availabilities": pallet_location_availabilities,
                 "hses": hses,
@@ -468,11 +494,11 @@ class CustomerEditDataView(View):
             elif dashboard_choice == 'customer_dashboard' and company:
                 companies = Customer.objects.filter(employees__user=user).values()
                 inbounds = CustomerInbound.objects.filter(company=company).values()
-                outbounds = CustomerOutbound.objects.filter(company=company).values()
+                transportation_outbounds = CustomerTransportationOutbound.objects.filter(company=company).values()
+                wh_outbounds = CustomerWHOutbound.objects.filter(company=company).values()
                 returns = CustomerReturns.objects.filter(company=company).values()
                 expiries = CustomerExpiry.objects.filter(company=company).values()
                 damages = CustomerDamage.objects.filter(company=company).values()
-                travel_distances = CustomerTravelDistance.objects.filter(company=company).values()
                 inventories = CustomerInventory.objects.filter(company=company).values()
                 pallet_location_availabilities = CustomerPalletLocationAvailability.objects.filter(
                     company=company).values()
@@ -480,11 +506,11 @@ class CustomerEditDataView(View):
 
                 pd.DataFrame(list(companies)).to_excel(writer, sheet_name='Companies')
                 pd.DataFrame(list(inbounds)).to_excel(writer, sheet_name='Inbounds')
-                pd.DataFrame(list(outbounds)).to_excel(writer, sheet_name='Outbounds')
+                pd.DataFrame(list(transportation_outbounds)).to_excel(writer, sheet_name='TransportationOutbound')
+                pd.DataFrame(list(wh_outbounds)).to_excel(writer, sheet_name='WHOutbound')
                 pd.DataFrame(list(returns)).to_excel(writer, sheet_name='Returns')
                 pd.DataFrame(list(expiries)).to_excel(writer, sheet_name='Expiries')
                 pd.DataFrame(list(damages)).to_excel(writer, sheet_name='Damages')
-                pd.DataFrame(list(travel_distances)).to_excel(writer, sheet_name='TravelDistances')
                 pd.DataFrame(list(inventories)).to_excel(writer, sheet_name='Inventories')
                 pd.DataFrame(list(pallet_location_availabilities)).to_excel(writer,
                                                                             sheet_name='PalletLocationAvailabilities')
@@ -524,18 +550,18 @@ class CustomerEditDataView(View):
         # Example: Fetching data related to the company for PDF generation
         companies = Customer.objects.filter(employees__company=company)
         inbounds = CustomerInbound.objects.filter(company=company)
-        outbounds = CustomerOutbound.objects.filter(company=company)
+        transportation_outbounds = CustomerTransportationOutbound.objects.filter(company=company)
+        wh_outbounds = CustomerWHOutbound.objects.filter(company=company)
         returns = CustomerReturns.objects.filter(company=company)
         expiries = CustomerExpiry.objects.filter(company=company)
         damages = CustomerDamage.objects.filter(company=company)
-        travel_distances = CustomerTravelDistance.objects.filter(company=company)
         inventories = CustomerInventory.objects.filter(company=company)
         pallet_location_availabilities = CustomerPalletLocationAvailability.objects.filter(company=company)
         hses = CustomerHSE.objects.filter(company=company)
 
         # Generating PDF using reportlab
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename=data.pdf'
+        response['Content-Disposition'] = 'attachment; filename=data-customer.pdf'
 
         doc = SimpleDocTemplate(response, pagesize=letter)
         elements = []
@@ -543,11 +569,11 @@ class CustomerEditDataView(View):
         data_sets = [
             ('Companies', companies),
             ('Inbounds', inbounds),
-            ('Outbounds', outbounds),
+            ('TransportationOutbound', transportation_outbounds),
+            ('WHOutbounds', wh_outbounds),
             ('Returns', returns),
             ('Expiries', expiries),
             ('Damages', damages),
-            ('Travel Distances', travel_distances),
             ('Inventories', inventories),
             ('Pallet Location Availabilities', pallet_location_availabilities),
             ('HSEs', hses)
@@ -608,11 +634,11 @@ class AddCustomerDataView(View):
         context = {
             'customer_form': CustomerForm(user=request.user),  # Pass current user to form
             'customer_inbound_form': CustomerInboundForm(),
-            'customer_outbound_form': CustomerOutboundForm(),
+            'customer_transportation_outbound_form': CustomerTransportationOutboundForm(),
+            'customer_wh_outbound_form': CustomerWHOutboundForm(),
             'customer_returns_form': CustomerReturnsForm(),
             'customer_expiry_form': CustomerExpiryForm(),
             'customer_damage_form': CustomerDamageForm(),
-            'customer_travel_distance_form': CustomerTravelDistanceForm(),
             'customer_inventory_form': CustomerInventoryForm(),
             'customer_pallet_location_availability_form': CustomerPalletLocationAvailabilityForm(),
             'customer_hse_form': CustomerHSEForm(),
@@ -630,11 +656,11 @@ class AddCustomerDataView(View):
     def post(self, request):
         customer_form = CustomerForm(request.POST, user=request.user)
         customer_inbound_form = CustomerInboundForm(request.POST)
-        customer_outbound_form = CustomerOutboundForm(request.POST)
+        customer_transportation_outbound_form = CustomerTransportationOutboundForm(request.POST)
+        customer_wh_outbound_form = CustomerWHOutboundForm(request.POST)
         customer_returns_form = CustomerReturnsForm(request.POST)
         customer_expiry_form = CustomerExpiryForm(request.POST)
         customer_damage_form = CustomerDamageForm(request.POST)
-        customer_travel_distance_form = CustomerTravelDistanceForm(request.POST)
         customer_inventory_form = CustomerInventoryForm(request.POST)
         customer_pallet_location_availability_form = CustomerPalletLocationAvailabilityForm(request.POST)
         customer_hse_form = CustomerHSEForm(request.POST)
@@ -642,11 +668,11 @@ class AddCustomerDataView(View):
         forms = [
             customer_form,
             customer_inbound_form,
-            customer_outbound_form,
+            customer_transportation_outbound_form,
+            customer_wh_outbound_form,
             customer_returns_form,
             customer_expiry_form,
             customer_damage_form,
-            customer_travel_distance_form,
             customer_inventory_form,
             customer_pallet_location_availability_form,
             customer_hse_form
@@ -670,16 +696,16 @@ class AddCustomerDataView(View):
                     # Assign the company to all related forms
                     customer_inbound_form.instance.customer = customer_data
                     customer_inbound_form.instance.company = company
-                    customer_outbound_form.instance.customer = customer_data
-                    customer_outbound_form.instance.company = company
+                    customer_transportation_outbound_form.instance.customer = customer_data
+                    customer_transportation_outbound_form.instance.company = company
+                    customer_wh_outbound_form.instance.customer = customer_data
+                    customer_wh_outbound_form.instance.company = company
                     customer_returns_form.instance.customer = customer_data
                     customer_returns_form.instance.company = company
                     customer_expiry_form.instance.customer = customer_data
                     customer_expiry_form.instance.company = company
                     customer_damage_form.instance.customer = customer_data
                     customer_damage_form.instance.company = company
-                    customer_travel_distance_form.instance.customer = customer_data
-                    customer_travel_distance_form.instance.company = company
                     customer_inventory_form.instance.customer = customer_data
                     customer_inventory_form.instance.company = company
                     customer_pallet_location_availability_form.instance.customer = customer_data
@@ -688,11 +714,11 @@ class AddCustomerDataView(View):
                     customer_hse_form.instance.company = company
 
                     customer_inbound_form.save()
-                    customer_outbound_form.save()
+                    customer_transportation_outbound_form.save()
+                    customer_wh_outbound_form.save()
                     customer_returns_form.save()
                     customer_expiry_form.save()
                     customer_damage_form.save()
-                    customer_travel_distance_form.save()
                     customer_inventory_form.save()
                     customer_pallet_location_availability_form.save()
                     customer_hse_form.save()

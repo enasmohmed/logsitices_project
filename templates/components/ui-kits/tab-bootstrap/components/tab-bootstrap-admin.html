@@ -210,7 +210,7 @@
                                                 <th scope="col">Frozen</th>
                                                 <th scope="col">Ambient</th>
                                                 <th scope="col">Pending Shipments</th>
-                                                <th scope="col">No of Shipments</th>
+                                                <th scope="col">Number of Shipments</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
                                             </thead>
@@ -259,8 +259,8 @@
                                                     {{ inbound.pending_shipments }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('AdminInbound', {{ inbound.id }}, 'no_of_shipments', this.innerText)">
-                                                    {{ inbound.no_of_shipments }}
+                                                    onblur="updateData('AdminInbound', {{ inbound.id }}, 'number_of_shipments', this.innerText)">
+                                                    {{ inbound.number_of_shipments }}
                                                 </td>
                                                 <td>
                                                     <button type="button"
@@ -372,8 +372,8 @@
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Time</th>
                                                 <th scope="col">Day</th>
-                                                <th scope="col">No of Return</th>
-                                                <th scope="col">No of Lines</th>
+                                                <th scope="col">Number of Return</th>
+                                                <th scope="col">Number of Lines</th>
                                                 <th scope="col">Total Quantities</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
@@ -391,12 +391,12 @@
                                                     {{ returns.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('AdminReturns', {{ returns.id }}, 'no_of_return', this.innerText)">
-                                                    {{ returns.no_of_return }}
+                                                    onblur="updateData('AdminReturns', {{ returns.id }}, 'number_of_return', this.innerText)">
+                                                    {{ returns.number_of_return }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('AdminReturns', {{ returns.id }}, 'no_of_lines', this.innerText)">
-                                                    {{ returns.no_of_lines }}
+                                                    onblur="updateData('AdminReturns', {{ returns.id }}, 'number_of_lines', this.innerText)">
+                                                    {{ returns.number_of_lines }}
                                                 </td>
                                                 <td contenteditable="true"
                                                     onblur="updateData('AdminReturns', {{ returns.id }}, 'total_quantities', this.innerText)">
@@ -432,7 +432,9 @@
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Time</th>
                                                 <th scope="col">Day</th>
-                                                <th scope="col">total available locations and accupied</th>
+                                                <th scope="col">WH Storage</th>
+                                                <th scope="col">Occupied Location</th>
+                                                <th scope="col">Available Location</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
                                             </thead>
@@ -449,8 +451,16 @@
                                                     {{ capacity.assigned_day }}
                                                 </td>
                                                 <td contenteditable="true"
-                                                    onblur="updateData('AdminCapacity', {{ capacity.id }}, 'total_available_locations_and_accupied', this.innerText)">
-                                                    {{ capacity.total_available_locations_and_accupied }}
+                                                    onblur="updateData('AdminCapacity', {{ capacity.id }}, 'WH_storage', this.innerText)">
+                                                    {{ capacity.WH_storage }}
+                                                </td>
+                                                <td contenteditable="true"
+                                                    onblur="updateData('AdminCapacity', {{ capacity.id }}, 'occupied_location', this.innerText)">
+                                                    {{ capacity.occupied_location }}
+                                                </td>
+                                                <td contenteditable="true"
+                                                    onblur="updateData('AdminCapacity', {{ capacity.id }}, 'available_location', this.innerText)">
+                                                    {{ capacity.available_location }}
                                                 </td>
                                                 <td>
                                                     <button type="button"
@@ -482,7 +492,7 @@
                                                 <th scope="col">ID</th>
                                                 <th scope="col">Time</th>
                                                 <th scope="col">Day</th>
-                                                <th scope="col">total available locations and accupied</th>
+                                                <th scope="col">Last Movement</th>
                                                 <th scope="col">Actions</th>
                                             </tr>
                                             </thead>
@@ -521,10 +531,10 @@
 
                     <div class="download-buttons">
                         <button type="button" class="btn btn-secondary">
-                            <a href="{% url 'administration:download_excel' %}">Download Excel</a>
+                            <a href="{% url 'administration:admin_edit' %}?download=true&format=excel">Download Excel</a>
                         </button>
                         <button type="button" class="btn btn-secondary">
-                            <a href="{% url 'administration:download_pdf' %}">Download PDF</a>
+                            <a href="{% url 'administration:admin_edit' %}?download=true&format=pdf">Download PDF</a>
                         </button>
                     </div>
 

@@ -472,12 +472,20 @@
                 bottom: -20px;
             }
       }
+
+#chart-inventory {
+    margin-top: 5px;
+}
+.edit-data{
+
+}
 </style>
 
 <!-- Container-fluid starts-->
 <div class="container-fluid default-dashboard general-widget">
     <div class="row">
 
+<!--        Inbound-->
         <div class="col-xl-12 col-lg-12 box-col-12e">
             <div class="card">
                 <div class="card-header pb-0">
@@ -551,6 +559,7 @@
         </div>
 
 
+<!--        Outbound-->
         <div class="col-xl-7 col-lg-7 box-col-7e">
             <div class="card">
                 <div class="card-header">
@@ -561,7 +570,7 @@
                                       d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/>
                             </svg>
                         </span>
-                        <h4 class="outbound-h4 title-card">Outbound</h4>
+                        <h4 class="outbound-h4 title-card">Transportation Outbound</h4>
                         <hr class="line-button">
                     </div>
                 </div>
@@ -571,31 +580,30 @@
                         <div class="col-md-4">
                             <div class="outbound">
                                 <div class="card-header">
-                                    <h4 class="card-title">Order Received</h4>
+                                    <h4 class="card-title">Released Order</h4>
                                 </div>
                                 <div class="custom-card">
-                                    <div class="card-number">{{ total_order_received_from_npco }}</div>
+                                    <div class="card-number">{{ total_released_order }}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="outbound">
                                 <div class="card-header" style="background-color: #9FA8DA;border: 2px solid #9FA8DA;">
-                                    <h4 class="card-title">
-                                        Number of orders that are delivered today</h4>
+                                    <h4 class="card-title">Piked Order</h4>
                                 </div>
                                 <div class="custom-card">
-                                    <div class="card-number">{{ total_number_of_orders_that_are_delivered_today }}</div>
+                                    <div class="card-number">{{ total_pending_pick_orders }}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="outbound">
                                 <div class="card-header" style="background-color: #80CBC4;border: 2px solid #80CBC4;">
-                                    <h4 class="card-title">Pending Orders</h4>
+                                    <h4 class="card-title">Pending Pick Order</h4>
                                 </div>
                                 <div class="custom-card">
-                                    <div class="card-number">{{ total_pending_orders }}</div>
+                                    <div class="card-number">{{ total_piked_order }}</div>
                                 </div>
                             </div>
                         </div>
@@ -610,16 +618,15 @@
                             <div class="detail-text">Number of POD'S collected Late</div>
                             <div class="detail-number">{{ total_number_of_PODs_collected_Late }}</div>
                         </div>
-                        <div class="detail">
-                            <div class="detail-text">Total SKUS Picked</div>
-                            <div class="detail-number">{{ total_total_skus_picked }}</div>
-                        </div>
+
                     </div>
                 </div>
 
             </div>
         </div>
 
+
+<!--        Returns && HSE-->
         <div class="col-xl-5 col-lg-5 box-col-5e">
             <div class="card">
                 <div class="card-header">
@@ -637,26 +644,19 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-7 col-md-6">
-                            <p class="d-flex" style="color: #64B5F6;line-height: 1.2;">
+                            <p class="d-flex" style="color: #64B5F6;line-height: 1.2;margin-top: 30px;">
                                 <span class="mt-2" style="margin-right: 5px;">
                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path
                                            fill="#64B5F6"
                                            d="M192 72v144a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8V72a8 8 0 0 1 8-8h144a8 8 0 0 1 8 8m24-40H72a8 8 0 0 0 0 16h136v136a8 8 0 0 0 16 0V40a8 8 0 0 0-8-8"/></svg>
-                                </span> Sum of Number of Return Items Orders updated Late
+                                </span> Number of Return Items Orders updated Late
                             </p>
-                            <p class="d-flex" style="color: #9FA8DA;line-height: 1.2;">
+                            <p class="d-flex" style="color: #9FA8DA;line-height: 1.2;margin-top: 30px;">
                                 <span class="mt-2" style="margin-right: 5px;">
                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path
                                            fill="#9FA8DA"
                                            d="M192 72v144a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8V72a8 8 0 0 1 8-8h144a8 8 0 0 1 8 8m24-40H72a8 8 0 0 0 0 16h136v136a8 8 0 0 0 16 0V40a8 8 0 0 0-8-8"/></svg>
-                                </span>Sum of Number of Return Items Orders updated on Time
-                            </p>
-                            <p class="d-flex" style="color: #80CBC4;line-height: 1.2;">
-                                  <span class="mt-2" style="margin-right: 5px;">
-                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256"><path
-                                           fill="#80CBC4"
-                                           d="M192 72v144a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8V72a8 8 0 0 1 8-8h144a8 8 0 0 1 8 8m24-40H72a8 8 0 0 0 0 16h136v136a8 8 0 0 0 16 0V40a8 8 0 0 0-8-8"/></svg>
-                                </span>Sum of Total Orders Items Returned
+                                </span>Number of Return Items Orders updated on Time
                             </p>
                         </div>
                         <div class="col-lg-5 col-md-6">
@@ -666,100 +666,63 @@
                     </div>
                 </div>
             </div>
-
-            <div class="card">
+            <div class="card selling-product">
                 <div class="card-header">
                     <div class="header-top">
                         <span class="flip-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 36 36"><ellipse
-                                    cx="18" cy="11.28" fill="#3F51B5" rx="4.76" ry="4.7"/><path fill="#3F51B5"
-                                                                                                d="M10.78 11.75h.48v-.43a6.7 6.7 0 0 1 3.75-6a4.62 4.62 0 1 0-4.21 6.46Zm13.98-.47v.43h.48A4.58 4.58 0 1 0 21 5.29a6.7 6.7 0 0 1 3.76 5.99m-2.47 5.17a21.5 21.5 0 0 1 5.71 2a2.7 2.7 0 0 1 .68.53H34v-3.42a.72.72 0 0 0-.38-.64a18 18 0 0 0-8.4-2.05h-.66a6.66 6.66 0 0 1-2.27 3.58M6.53 20.92A2.76 2.76 0 0 1 8 18.47a21.5 21.5 0 0 1 5.71-2a6.66 6.66 0 0 1-2.27-3.55h-.66a18 18 0 0 0-8.4 2.05a.72.72 0 0 0-.38.64V22h4.53Zm14.93 5.77h5.96v1.4h-5.96z"/><path
-                                    fill="#3F51B5"
-                                    d="M32.81 21.26h-6.87v-1a1 1 0 0 0-2 0v1H22v-2.83a20 20 0 0 0-4-.43a19.3 19.3 0 0 0-9.06 2.22a.76.76 0 0 0-.41.68v5.61h7.11v6.09a1 1 0 0 0 1 1h16.17a1 1 0 0 0 1-1V22.26a1 1 0 0 0-1-1m-1 10.36H17.64v-8.36h6.3v.91a1 1 0 0 0 2 0v-.91h5.87Z"/></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24"><g
+                                   fill="none" fill-rule="evenodd"><path
+                                   d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path
+                                   fill="#3F51B5"
+                                   d="M11.298 2.195a2 2 0 0 1 1.404 0l7 2.625A2 2 0 0 1 21 6.693v5.363a9 9 0 0 1-4.975 8.05l-3.354 1.677a1.5 1.5 0 0 1-1.342 0l-3.354-1.677A9 9 0 0 1 3 12.056V6.693A2 2 0 0 1 4.298 4.82zM12 4.068L5 6.693v5.363a7 7 0 0 0 3.87 6.26L12 19.883z"/></g></svg>
                         </span>
-                        <h4 class="returns title-card">Employee</h4>
+                        <h4 class="hse-h4 title-card">HSE</h4>
                         <hr class="line-button">
                     </div>
                 </div>
+                <div class="card-body" style="margin: 10px 0 25px 0;">
 
-                <div class="card-body employee">
-                    <div class="row">
-                        <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24">
-                                <path fill="#64B5F6"
-                                      d="M11.94 3A3.993 3.993 0 0 0 8 7c-.06 1.64-.19 3.47-.97 4.59C9.71 13.22 12 13 12 13s2.29.22 4.97-1.41C16.12 10.22 15.94 8.54 16 7c0-2.21-1.79-4-4-4zM8.86 13.32C6 13.93 4 15.35 4 17v4h8l-3-4H6.5m5.5 4l1.78-7.19S13 14 12 14s-1.78-.19-1.78-.19M12 21h8v-4c0-1.65-2-3.07-4.86-3.68L17.5 17H15Z"/>
-                            </svg>
-                        </div>
-                        <div class="number-circle">{{ total_no_of_employees }}</div>
-                        <div class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 32 32">
-                                <path fill="#64B5F6"
-                                      d="M28.523 23.813c-.518-.51-6.795-2.938-7.934-3.396c-1.133-.45-1.585-1.697-1.585-1.697s-.51.282-.51-.51c0-.793.51.51 1.02-2.548c0 0 1.415-.397 1.134-3.68h-.34s.85-3.51 0-4.698c-.853-1.188-1.187-1.98-3.06-2.548c-1.87-.567-1.19-.454-2.548-.396c-1.36.057-2.492.793-2.492 1.188c0 0-.85.057-1.188.397c-.34.34-.906 1.924-.906 2.32s.283 3.06.566 3.624l-.337.11c-.283 3.284 1.132 3.682 1.132 3.682c.51 3.058 1.02 1.755 1.02 2.548c0 .792-.51.51-.51.51s-.453 1.246-1.585 1.697c-1.132.453-7.416 2.887-7.927 3.396c-.51.52-.453 2.896-.453 2.896h26.954s.063-2.378-.453-2.897zm-6.335 2.25h-4.562v-1.25h4.562z"/>
-                            </svg>
-                        </div>
+                    <div class="row expiry">
+                        <div class="text">Total Incidents on the side</div>
+                        <div class="number-box location">{{ Total_Incidents_on_the_side }}</div>
                     </div>
+
                 </div>
-
             </div>
-
         </div>
 
-
-        <div class="col-xl-6 col-lg-6 col-md-6 box-col-6">
-            <div class="card">
+<!--        Damage-->
+        <div class="col-xl-6 col-xl-6 col-md-6 box-col-6e">
+            <div class="card selling-product">
                 <div class="card-header">
                     <div class="header-top">
                         <span class="flip-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 512 512"><path
-                                    fill="#3F51B5"
-                                    d="M92.6 21c-32 0-64.04 24-64.04 72L92.6 221l64-128c0-48-32-72-64-72m282.3 39c-6.9.29-13.6 1.6-19.2 2.8l3.8 17.6c5.6-1.25 11.4-2.04 16.3-2.4zM92.6 61c17.7 0 32 14.33 32 32c0 17.7-14.3 32-32 32c-17.67 0-32-14.3-32-32c0-17.67 14.33-32 32-32m302.2.2l-3 17.7c4.9 1.03 9.8 2.32 14.1 4.9l8.7-15.8c-6.1-3.25-12.9-6.17-19.8-6.8m-57.5 6.7c-6.1 2.38-12.2 4.51-17.4 6.6L327 91c5.5-2.34 11.3-4.38 16.2-6.1zM431 81.3L417.3 93c3.6 4.12 6.4 9.2 8.6 13.3l16.1-8.1c-3.4-6.55-6.4-11.51-11-16.9m-127.8.9c-6.1 3.11-11.1 5.88-16.5 8.6l8.8 15.8c5.2-3 10.9-5.9 15.5-8.2zm-32.3 17.9c-5.3 3.1-10.5 6.2-15.6 9.6l9.8 15c4.9-3.2 10-6.2 15-9.2zM448.2 118c-5.9 1-11.9 1.7-17.8 2.4c.4 5 .1 10.4-.9 14.6l17.5 4.1c1-7.2 1.9-14.6 1.2-21.1m-208.1 1.7c-5 3.4-9.9 6.9-14.9 10.3l10.4 14.7c4.8-3.5 9.7-6.8 14.6-10.2zm-29.6 21.1c-5 3.6-10.2 7.6-14.5 10.9l10.9 14.3c5.5-4 9.3-7 14.3-10.7zm213 8c-3 4.6-6.5 9.2-10 12.7l13.1 12.5c4.3-5.1 8.9-10.3 12.1-15.5zm-241.8 14.1c-4.9 3.8-9.8 7.7-14.1 11.3l11.4 13.9c4.7-3.9 9.5-7.9 13.9-11.1zM401.1 173c-4.6 3.7-9.4 7.3-13.8 10.3l10.3 14.8c5.3-3.6 10.5-7.5 15-11.1zm-247.4 12.9c-4.7 3.8-9.2 7.8-13.8 11.7l11.7 13.7c4.5-3.9 9-7.8 13.6-11.6zm218.9 7c-5.1 3-10.4 6.1-15.2 8.7l8.6 15.9c5.4-3.3 11.5-6.2 16-9.2zm-246.4 16.6c-4.5 4-8.9 8-13.4 12.1l12.1 13.4c4.4-4 8.9-8 13.3-12zm215.5.4c-5.3 2.6-10.6 5.3-15.9 7.9l7.7 16.2c6.2-3 10.8-5.5 16.4-8.1zm-32 15.4c-5.5 2.5-10.8 4.9-16.4 7.2l7.3 16.5c5.5-2.4 11-4.9 16.5-7.4zM99.6 234c-5.1 4.5-8.65 8-13.3 12.5l12.7 13c4.7-4.5 8.5-8.4 12.9-12.2zm177.3 5.8c-5.5 2.3-11 4.7-16.5 7l7 16.7c5.6-2.3 11.1-4.7 16.6-7.1zm-33.1 14c-5.5 2.4-11 4.8-16.6 7l7 16.7c5.5-2.3 11.1-4.7 16.6-7zm184.8 7.2c-32 0-64 24-64 72l64 128l64-128c0-48-32-72-64-72m-218 6.8c-5.7 2.6-11.7 5-16.6 7.1l7.1 16.6c5.9-2.5 11.5-4.9 16.5-7.1zM177.4 282c-5.4 2.5-11.7 5.3-16.5 7.5l7.4 16.4c5.9-2.6 11.1-5.2 16.3-7.4zm-33 15c-5.6 2.7-11.4 5.5-16.4 8l8.1 16.1c5.4-2.8 11-5.4 15.9-7.8zm284.2 4c17.7 0 32 14.3 32 32s-14.3 32-32 32s-32-14.3-32-32s14.3-32 32-32m-316.8 12.3c-5.3 2.9-10.6 5.9-16 9l9 15.6c5.1-3 10.3-5.8 15.5-8.6zM80.1 332c-5.61 3.2-11.03 7.5-15.7 10.6L75.3 357c4.97-3.6 10.32-7.3 14.6-9.9zm-29.9 22.6c-4.8 4.4-9.53 9.5-13.2 13.8l13.7 11.7c3.85-4.7 7.2-8.2 11.7-12.2zm217.8 1.3l1.6 17.9c5.2-.9 10.4-.3 15.6.5l3.1-17.7c-6.6-1-13.6-1.7-20.3-.7m-37.2 10l6.8 16.7c5.2-2.3 10.6-4.1 16.1-5.8c-1.9-5.7-3.3-11.5-4.8-17.3c-6.3 1.8-12.6 4.2-18.1 6.4m77.5-.9l-10.2 14.8c4.2 3.1 8.3 6.4 11.6 10.5l13.6-11.8c-5.1-5.2-9-10.1-15-13.5m-94.5 9c-5.5 2.8-10.8 6-16.1 9.1l9.1 15.5c5.2-2.8 10.3-6.1 15.4-8.8zM26.01 385c-3.02 6.5-5.47 13.5-6.61 19.7l17.7 3.1c1.08-5.7 2.63-9.8 4.9-14.7c-5.49-2.4-10.73-5.3-15.99-8.1m156.09 7.8c-5.1 3.3-10.1 6.6-15.1 10l10 15c5-3.3 9.9-6.7 14.9-10zm152.7 1.2l-15.1 9.8c3.2 4.8 6.3 9.8 9.2 14.9l15.6-9c-3.5-5.6-6-10.6-9.7-15.7m-182.7 19c-5 3.3-10 6.5-14.9 10l10 15c4.8-3.5 9.9-6.8 15-10.2zm-114.8 9.5c-5.79 1.2-11.63 2.2-17.45 3.3c1.05 7 3.86 13.8 6.4 19.2l16.25-7.8c-2.17-5-4.23-10.2-5.2-14.7m316.1 2.8l-15.6 9c3.1 5.4 6.7 11.2 9.6 15.8l15.1-9.7c-3.4-5.3-6.3-10.3-9.1-15.1m-231 7.5c-5 3.1-9.9 6.1-15.1 9l8.9 15.7c5.3-3.1 10.6-6.2 15.7-9.5zm-71.3 16.3l-12.3 13.2c5.56 5.3 12.42 8.8 19.9 10.4l4-17.5c-4.44-.9-8.59-3.1-11.6-6.1m41 .3c-5.01 2.3-10.21 4.1-15.6 5.2l4.1 17.6c6.42-1.3 12.46-3.7 18.5-6.2zm280.3 4.8l-13.9 11.3c4.3 5.3 9.6 10.4 14.2 14l11.1-14.2c-4.4-3.4-8.2-7.5-11.4-11.1m24.1 17.5l-4.5 17.5c7.9 1.6 13.8 2.1 21.2 1.3l-2.2-17.9c-4.9.8-9.7.3-14.5-.9"/></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 22 22"><path
+                                   fill="#3F51B5"
+                                   d="M4 16h1v-2h1v-1h1v-1h1v-1h2v-1h5v1h1v2h1v2h1V8H4m16 10h-4v-2h-1v-2h-1v-2h-3v1H9v1H8v1H7v2H6v1H2V4h2v2h2V4h2v2h2V4h2v2h2V4h2v2h2V4h2m-9 16H6v-1h1v-1h3v1h1m5 1h-4v-2h1v-1h1v1h1v1h1Z"/></svg>
                         </span>
-                        <h4 class="returns title-card">Travel Distance</h4>
+                        <h4 class="damage-h4 title-card">Damage</h4>
                         <hr class="line-button">
                     </div>
                 </div>
-
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-center">
-                        <!-- الأيقونة -->
-                        <span style="margin-right: 20%;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 24 24">
-                                <path fill="#3F51B5"
-                                      d="M16.78 21.84a1.998 1.998 0 1 1-1.56-3.68a1.998 1.998 0 1 1 1.56 3.68M7.62 6c1.11 0 2-.89 2-2a2 2 0 0 0-2-2c-1.12 0-2 .9-2 2c0 1.11.88 2 2 2m14.43 10.34L18.2 18c.22.22.42.5.56.82c.14.33.2.68.24 1l3.83-1.64zM10.16 8.78l.74 1.81c-.24-.09-.46-.21-.64-.33c-.6-.39-1.04-.88-1.33-1.46l-.74-1.57c-.19-.35-.42-.61-.74-.79c-.29-.17-.6-.26-.92-.26s-.62.08-.91.22c-1.4 1.1-1.75 3.14-1.75 3.14l-.34 1.57c-.09.52-.14 1.04-.14 1.57v4.96L1 20.87L2.5 22l2.77-3.75l.17-3.25l1.68 2.34V22h1.85v-6.06l-1.85-2.61v-.65c0-.44 0-.87.11-1.29l.35-1.2c.38.55.84 1.03 1.39 1.44c.45.34 1.71.94 2.9 1.23L14 17.8c.22-.22.5-.42.83-.56c.32-.14.67-.2.99-.24L12 8zm5.2 3.34l1.96 4.6l5.63-2.41L21 9.72"/>
-                            </svg>
-                        </span>
-
-                        <!-- الرقم -->
-                        <div class="border px-2" style="width: 20%;padding: 7px;text-align: center;">
-                            <p class="mb-0" style="font-size: 20px;">{{ Total_no_of_Pallet_deliverd }}</p>
-                        </div>
+                <div class="card-body damage">
+                    <div class="column">
+                        <div class="circle-1">{{ Total_QTYs_Damaged_by_WH }}</div>
+                        <div class="text">Total QTYS Damaged by WH</div>
                     </div>
-                    <p class="text-center">Total no. of Pallet delivered</p>
-
-                    <div class="d-flex align-items-center justify-content-center">
-                        <!-- الأيقونة -->
-                        <span style="margin-right: 20%;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 48 48"><g
-                                    fill="none" stroke="#3F51B5" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="4"><path d="m20 33l6 2s15-3 17-3s2 2 0 4s-9 8-15 8s-10-3-14-3H4"/><path
-                                    d="M4 29c2-2 6-5 10-5s13.5 4 15 6s-3 5-3 5M16 18v-8a2 2 0 0 1 2-2h24a2 2 0 0 1 2 2v16"/><path
-                                    d="M25 8h10v9H25z"/></g></svg>
-                        </span>
-
-                        <!-- الرقم -->
-                        <div class="border px-2" style="width: 20%;padding: 7px;text-align: center;">
-                            <p class="mb-0" style="font-size: 20px;">{{ Total_no_of_Customers_deliverd }}</p>
-                        </div>
+                    <hr class="vertical-hr">
+                    <div class="column">
+                        <div class="text">Number of Damaged during receiving</div>
+                        <div class="circle-2">{{ Total_Number_of_Damaged_during_receiving }}</div>
                     </div>
-                    <p class="text-center">Total no. of Customers delivered</p>
 
                 </div>
-
             </div>
         </div>
 
+<!--        Expiry-->
         <div class="col-xl-6 col-lg-6 col-md-6 box-col-6">
-            <div class="card">
+             <div class="card">
                 <div class="card-header">
                     <div class="header-top">
                         <span class="flip-icon">
@@ -772,7 +735,7 @@
                     </div>
                 </div>
 
-                <div class="card-body" style="margin-top: -17px;">
+                <div class="card-body" style="margin: 10px 0 25px 0;">
                     <!-- الصف الأول -->
                     <div class="row expiry">
                         <div class="text">Total SKUS</div>
@@ -795,59 +758,74 @@
             </div>
         </div>
 
-
-        <div class="col-xl-5 col-xl-5 col-md-5 box-col-5e">
-            <div class="card selling-product">
+<!--        WHoutbound-->
+        <div class="col-xl-7 col-lg-7 box-col-7e">
+            <div class="card">
                 <div class="card-header">
                     <div class="header-top">
                         <span class="flip-icon">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24"><path
-                                   fill="#3F51B5" d="M3 22V9H2V2h20v7h-1v13zM4 7h16V4H4zm5 7h6v-2H9z"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
+                                <path fill="#3F51B5"
+                                      d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/>
+                            </svg>
                         </span>
-                        <h4 class="inventory-h4 title-card">Inventory</h4>
+                        <h4 class="outbound-h4 title-card">WH Outbound</h4>
                         <hr class="line-button">
                     </div>
                 </div>
+
                 <div class="card-body">
-                    <div id="chart-inventory"></div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="outbound">
+                                <div class="card-header">
+                                    <h4 class="card-title">Released Order</h4>
+                                </div>
+                                <div class="custom-card">
+                                    <div class="card-number">{{ total_released_order }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="outbound">
+                                <div class="card-header" style="background-color: #9FA8DA;border: 2px solid #9FA8DA;">
+                                    <h4 class="card-title">Piked Order</h4>
+                                </div>
+                                <div class="custom-card">
+                                    <div class="card-number">{{ total_pending_pick_orders }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="outbound">
+                                <div class="card-header" style="background-color: #80CBC4;border: 2px solid #80CBC4;">
+                                    <h4 class="card-title">Pending Pick Order</h4>
+                                </div>
+                                <div class="custom-card">
+                                    <div class="card-number">{{ total_piked_order }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="vertical-hr">
+                    <div class="details-container">
+                        <div class="detail">
+                            <div class="detail-text">Number of POD'S collected Time</div>
+                            <div class="detail-number">{{ total_number_of_PODs_collected_on_time }}</div>
+                        </div>
+                        <div class="detail">
+                            <div class="detail-text">Number of POD'S collected Late</div>
+                            <div class="detail-number">{{ total_number_of_PODs_collected_Late }}</div>
+                        </div>
+
+                    </div>
                 </div>
+
             </div>
         </div>
 
-        <div class="col-xl-7 col-xl-7 col-md-7 box-col-7e">
-            <div class="card selling-product">
-                <div class="card-header">
-                    <div class="header-top">
-                        <span class="flip-icon">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 22 22"><path
-                                   fill="#3F51B5"
-                                   d="M4 16h1v-2h1v-1h1v-1h1v-1h2v-1h5v1h1v2h1v2h1V8H4m16 10h-4v-2h-1v-2h-1v-2h-3v1H9v1H8v1H7v2H6v1H2V4h2v2h2V4h2v2h2V4h2v2h2V4h2v2h2V4h2m-9 16H6v-1h1v-1h3v1h1m5 1h-4v-2h1v-1h1v1h1v1h1Z"/></svg>
-                        </span>
-                        <h4 class="damage-h4 title-card">Damage</h4>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body damage">
-                    <div class="column">
-                        <div class="circle-1">{{ Total_QTYs_Damaged_by_WH }}</div>
-                        <div class="text">Total QTYS Damaged by WH</div>
-                    </div>
-                    <hr class="vertical-hr">
-                    <div class="column">
-                        <div class="text">Naraber of Damaged during receiving</div>
-                        <div class="circle-2">{{ Total_Number_of_Damaged_during_receiving }}</div>
-                    </div>
-                    <hr class="vertical-hr">
-                    <div class="column">
-                        <div class="circle-3">{{ Total_Damaged_QTYs_Disposed }}</div>
-                        <div class="text">Total Damaged QTYS Disposed</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-xl-7 col-xl-7 col-md-7 box-col-7e">
+<!--        Pallet Location Availability-->
+        <div class="col-xl-5 col-xl-5 col-md-5 box-col-5e">
             <div class="card selling-product">
                 <div class="card-header">
                     <div class="header-top">
@@ -860,32 +838,35 @@
                         <hr class="line-button">
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="margin: 12px 0 52px 0;">
 
                     <div class="row expiry">
                         <div class="text">Total Storage Pallet</div>
                         <div class="number-box location">{{ Total_Storage_Pallet }}</div>
                     </div>
 
+                      <div class="row expiry">
+                        <div class="text">Total Storage Pallet Empty</div>
+                        <div class="number-box location">{{ Total_Storage_pallet_empty }}</div>
+                    </div>
+
+                     <div class="row expiry">
+                        <div class="text">Total Occupied Pallet Location</div>
+                        <div class="number-box location">{{ Total_occupied_pallet_location }}</div>
+                    </div>
+
+
                     <div class="row expiry">
                         <div class="text">Total Storage Bin</div>
                         <div class="number-box location">{{ Total_Storage_Bin_empty }}</div>
                     </div>
 
-                    <div class="row expiry">
-                        <div class="text">Total Storage Pallet Empty</div>
-                        <div class="number-box location">{{ Total_Storage_pallet_empty }}</div>
-                    </div>
 
                     <div class="row expiry">
                         <div class="text">Total Storage Bin Empty</div>
                         <div class="number-box location">{{ Total_Storage_Bin_empty }}</div>
                     </div>
 
-                    <div class="row expiry">
-                        <div class="text">Total Occupied Pallet Location</div>
-                        <div class="number-box location">{{ Total_occupied_pallet_location }}</div>
-                    </div>
 
                     <div class="row expiry">
                         <div class="text">Total Occupied Bin Location</div>
@@ -896,60 +877,27 @@
             </div>
         </div>
 
+<!--        Inventory-->
         <div class="col-xl-5 col-xl-5 col-md-5 box-col-5e">
             <div class="card selling-product">
                 <div class="card-header">
                     <div class="header-top">
                         <span class="flip-icon">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24"><g
-                                   fill="none" fill-rule="evenodd"><path
-                                   d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path
-                                   fill="#3F51B5"
-                                   d="M11.298 2.195a2 2 0 0 1 1.404 0l7 2.625A2 2 0 0 1 21 6.693v5.363a9 9 0 0 1-4.975 8.05l-3.354 1.677a1.5 1.5 0 0 1-1.342 0l-3.354-1.677A9 9 0 0 1 3 12.056V6.693A2 2 0 0 1 4.298 4.82zM12 4.068L5 6.693v5.363a7 7 0 0 0 3.87 6.26L12 19.883z"/></g></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24"><path
+                                   fill="#3F51B5" d="M3 22V9H2V2h20v7h-1v13zM4 7h16V4H4zm5 7h6v-2H9z"/></svg>
                         </span>
-                        <h4 class="hse-h4 title-card">HSE</h4>
+                        <h4 class="inventory-h4 title-card">Inventory</h4>
                         <hr class="line-button">
                     </div>
                 </div>
-                <div class="card-body">
-
-                    <div class="row expiry">
-                        <div class="text">Total Incidents on the side</div>
-                        <div class="number-box location">{{ Total_Incidents_on_the_side }}</div>
-                    </div>
-
+                <div class="card-body" style="margin: 12px 0 52px 0;">
+                    <div id="chart-inventory"></div>
                 </div>
             </div>
-
-
-            <div class="card selling-product">
-                <div class="card-header">
-                    <div class="header-top">
-                        <span class="flip-icon">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 512 512"><path
-                                   fill="#3F51B5"
-                                   d="M464.37 49.2a22.07 22.07 0 0 0-31.88-.76l-18.31 18.25l31.18 31.1l18-17.91a22.16 22.16 0 0 0 1.01-30.68M252.76 336H176v-76.76l9.4-9.38L323.54 112H48v352h352V188.46L262.14 326.6zM400 143.16l32.79-32.86l-31.09-31.09L368.85 112H400z"/><path
-                                   fill="#3F51B5" d="M208 304h31.49L400 143.16V112h-31.15L208 272.51z"/></svg>
-                        </span>
-                        <h4 class="hse-h4 title-card"> Edit Data</h4>
-                        <hr class="line-button">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="container">
-                        <h3>Dashboard For Customer</h3><br>
-                        <div>
-                            <a href="{% url 'customer:data_entry' %}" class="btn btn-primary">Edit</a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-
         </div>
 
-        <div class="col-xl-12 col-xl-12 col-md-12 box-col-7e">
+<!--        Filters-->
+        <div class="col-xl-7 col-xl-7 col-md-7 box-col-7e">
             <div class="card selling-product">
                 <div class="card-header pb-0">
                     <div class="header-top" style="padding: 10px;">
@@ -1007,27 +955,21 @@
 
 </div>
 
-
-<script>
-    window.chartData = {
-        totalShipmentsInASN: {{ total_shipments_in_asn }},
-        totalArrived: {{ total_arrived }},
-        totalNoShow: {{ total_no_show }},
-    };
-
-</script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        window.chartData = {
+            totalArrived: {{ total_arrived }},
+            totalNotArrived: {{ total_not_arrived }},
+        };
+
         var data = window.chartData || {
-            totalShipmentsInASN: 10,
             totalArrived: 20,
-            totalNoShow: 5
+            totalNotArrived: 10
         };
 
         var options = {
             series: [{
-                data: [data.totalShipmentsInASN, data.totalArrived, data.totalNoShow]
+                data: [data.totalArrived, data.totalNotArrived]
             }],
             chart: {
                 type: 'bar',
@@ -1056,7 +998,7 @@
                 offsetY: -5
             },
             xaxis: {
-                categories: ['Total Shipments in ASN', 'Total Arrived', 'Total No Show'],
+                categories: ['Arrived', 'Not Arrived'],
                 labels: {
                     style: {
                         fontSize: '16px'  // تكبير حجم الخط لمحور x
@@ -1078,7 +1020,7 @@
                     }
                 }
             },
-            colors: ['#64B5F6', '#9FA8DA', '#80CBC4'],
+            colors: ['#9FA8DA', '#80CBC4'],
             grid: {
                 show: false  // إخفاء الشبكة
             },
@@ -1102,17 +1044,18 @@
     });
 </script>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var total_waiting_for_inspection = {{ total_waiting_for_inspection }};
-        var total_dash_of_GR_reports_shared = {{ total_dash_of_GR_reports_shared }};
-        var total_dash_of_GR_reports_with_discripancy = {{ total_dash_of_GR_reports_with_discripancy }};
+        var total_number_of_GR_reports_shared = {{ total_number_of_GR_reports_shared }};
+        var total_number_of_GR_reports_with_discripancy = {{ total_number_of_GR_reports_with_discripancy }};
 
         var options = {
             series: [
                 {
                     name: 'Reports',
-                    data: [total_waiting_for_inspection, total_dash_of_GR_reports_shared, total_dash_of_GR_reports_with_discripancy]
+                    data: [total_waiting_for_inspection, total_number_of_GR_reports_shared, total_number_of_GR_reports_with_discripancy]
                 }
             ],
             chart: {
@@ -1141,7 +1084,7 @@
                 enabled: true, // تعطيل التسميات الافتراضية للبارات
             },
             xaxis: {
-                categories: ["Pending", "Total # of GR Reports Shared", "# of GR Reports with Discrepancy"],
+                categories: ["Pending", "Total Number of GR Reports Shared", "Number of GR Reports with Discrepancy"],
                 labels: {
                     show: false,
                 },
@@ -1183,10 +1126,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         var totalOrdersItemsReturned = {{ total_orders_items_returned }};
         var totalNumberOfReturnItemsOrdersUpdatedOnTime = {{ total_number_of_return_items_orders_updated_on_time }};
-        var totalNumberOfReturnItemsOrdersUpdatedLate = {{ total_number_of_return_items_orders_updated_late }};
 
         var options = {
-            series: [totalOrdersItemsReturned, totalNumberOfReturnItemsOrdersUpdatedOnTime, totalNumberOfReturnItemsOrdersUpdatedLate],
+            series: [totalOrdersItemsReturned, totalNumberOfReturnItemsOrdersUpdatedOnTime],
             chart: {
                 type: 'pie',
                 height: 180, // تعيين ارتفاع أكبر للشارت
@@ -1199,9 +1141,8 @@
                 }
             },
             labels: [
-                'Sum of Number of Return Items Orders updated Late',
-                'Sum of Number of Return Items Orders updated on Time',
-                'Sum of Total Orders Items Returned'
+                'Number of Return Items Orders updated Late',
+                'Number of Return Items Orders updated on Time',
             ],
             dataLabels: {
                 enabled: true,
@@ -1239,22 +1180,27 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var totalLocationsAudited = {{ Total_Locations_Audited }};
-        var totalLocationsWithIncorrectSKUAndQty = {{ Total_Locations_with_Incorrect_SKU_and_Qty }};
-        var totalSKUsReconciliation = {{ Total_SKUs_Reconciliation }};
+        var totalLocationsMatch = {{ Total_Locations_match }};
+        var totalLocationsNotMatch = {{ Total_Locations_not_match }};
 
         var options = {
             series: [
                 {
                     name: "Inventory Data",
-                    data: [totalLocationsAudited, totalLocationsWithIncorrectSKUAndQty, totalSKUsReconciliation],
+                    data: [totalLocationsMatch, totalLocationsNotMatch],
                 },
             ],
             chart: {
                 type: 'bar',
-                height: 250,
+                height: 150,
                 toolbar: {
                     show: false  // إخفاء الشرطات الثلاث على اليمين
+                },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
                 }
             },
             plotOptions: {
@@ -1262,59 +1208,54 @@
                     borderRadius: 0,
                     horizontal: true,
                     distributed: true,
-                    barHeight: '70%',
-                    isFunnel: true,
-                    dataLabels: {
-                        position: 'center', // Center the labels inside the bars
-                    },
+                    barHeight: '80%',  // تقليل ارتفاع الأعمدة
                 },
             },
-            colors: [
-                '#64B5F6',
-                '#9FA8DA',
-                '#80CBC4',
-
-            ],
+            colors: ['#64B5F6', '#9FA8DA'],
             dataLabels: {
                 formatter: function (val, opt) {
                     var categories = [
-                        'Total Locations Audited',
-                        'Total Locations with Incorrect SKU and Qty',
-                        'Total SKUs Reconciliation',
+                        'Total Locations match',
+                        'Total Locations not match',
                     ];
                     return categories[opt.dataPointIndex] + ': ' + val;
                 },
                 enabled: true,
                 offsetY: 0,
                 style: {
-                    fontSize: '10px', // Smaller font size
-                    colors: ['#000'], // Text color
-                },
-                dropShadow: {
-                    enabled: false,
+                    fontSize: '12px',  // ضبط حجم النص
+                    colors: ['#000'],  // لون النص
                 },
             },
             xaxis: {
                 categories: [
-                    'Total Locations Audited',
-                    'Total Locations with Incorrect SKU and Qty',
-                    'Total SKUs Reconciliation',
+                    'Total Locations match',
+                    'Total Locations not match',
                 ],
                 labels: {
-                    show: false, // Hide x-axis labels
+                    show: false,  // إظهار النصوص على المحور x
+                    style: {
+                        fontSize: '12px'  // ضبط حجم الخط
+                    }
                 },
                 axisBorder: {
-                    show: false, // Hide x-axis border
+                    show: false,  // إخفاء حدود المحور x
                 },
                 axisTicks: {
-                    show: false, // Hide x-axis ticks
+                    show: false,  // إخفاء العلامات على المحور x
                 },
             },
             yaxis: {
-                show: false, // Hide y-axis
+                show: false,  // إخفاء المحور y
             },
             grid: {
-                show: false  // إخفاء الشبكة
+                show: false,
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                }
             },
             legend: {
                 show: false,
@@ -1325,5 +1266,6 @@
         chart.render();
     });
 </script>
+
 
 <!-- Container-fluid Ends-->

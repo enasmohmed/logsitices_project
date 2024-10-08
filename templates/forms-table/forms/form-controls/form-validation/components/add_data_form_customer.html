@@ -69,8 +69,8 @@
                 <!-- Customer Outbound Form -->
                 <div class="row">
                     <fieldset class="scheduler-border mt-4 col">
-                        <legend class="scheduler-border">Customer Outbound</legend>
-                        {% for field in customer_outbound_form %}
+                        <legend class="scheduler-border">Customer Transportation Outbound</legend>
+                        {% for field in customer_transportation_outbound_form %}
                         {% if forloop.counter0|divisibleby:2 %}
                         <div class="row">
                             {% endif %}
@@ -138,11 +138,11 @@
                     </fieldset>
                 </div>
 
-                <!-- Customer Travel Distance Form -->
+                <!-- Customer WH Outbound Form -->
                 <div class="row">
                     <fieldset class="scheduler-border mt-4 col">
-                        <legend class="scheduler-border">Customer Travel Distance</legend>
-                        {% for field in customer_travel_distance_form %}
+                        <legend class="scheduler-border">Customer WH Outbound</legend>
+                        {% for field in customer_wh_outbound_form %}
                         {% if forloop.counter0|divisibleby:2 %}
                         <div class="row">
                             {% endif %}

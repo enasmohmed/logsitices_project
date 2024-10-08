@@ -60,12 +60,14 @@ class AdminInbound(models.Model):
     number_of_vehicles_daily = models.IntegerField(blank=True, null=True)
     number_of_pallets = models.IntegerField(blank=True, null=True)
     bulk = models.IntegerField(blank=True, null=True)
-    mix = models.IntegerField(blank=True, null=True)
+    loose = models.IntegerField(blank=True, null=True)
     cold = models.IntegerField(blank=True, null=True)
     frozen = models.IntegerField(blank=True, null=True)
     ambient = models.IntegerField(blank=True, null=True)
     pending_shipments = models.IntegerField(blank=True, null=True)
-    no_of_shipments = models.IntegerField(blank=True, null=True)
+    number_of_shipments = models.IntegerField(blank=True, null=True)
+    total_quantity = models.IntegerField(blank=True, null=True)
+    number_of_line = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -109,8 +111,8 @@ class AdminReturns(models.Model):
         sund = "Sunday", "Sunday"
 
     assigned_day = models.CharField(max_length=10, choices=Weekday.choices)
-    no_of_return = models.IntegerField(blank=True, null=True)
-    no_of_lines = models.IntegerField(blank=True, null=True)
+    number_of_return = models.IntegerField(blank=True, null=True)
+    number_of_lines = models.IntegerField(blank=True, null=True)
     total_quantities = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
@@ -130,7 +132,10 @@ class AdminCapacity(models.Model):
         sund = "Sunday", "Sunday"
 
     assigned_day = models.CharField(max_length=10, choices=Weekday.choices)
-    total_available_locations_and_accupied = models.IntegerField(blank=True, null=True)
+    WH_storage = models.IntegerField(blank=True, null=True)
+    occupied_location = models.IntegerField(blank=True, null=True)
+    available_location = models.IntegerField(blank=True, null=True)
+
 
     def __str__(self):
         return str(self.id)

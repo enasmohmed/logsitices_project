@@ -17,8 +17,9 @@ from django.views.generic import CreateView, TemplateView
 from administration.forms import AdminDataForm
 from administration.models import AdminData
 from customer.forms import CustomerForm
-from customer.models import CustomerInbound, CustomerOutbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
-    CustomerTravelDistance, CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE
+from customer.models import CustomerInbound, CustomerReturns, CustomerExpiry, CustomerDamage, \
+    CustomerInventory, CustomerPalletLocationAvailability, CustomerHSE, CustomerTransportationOutbound, \
+    CustomerWHOutbound
 from .forms import CustomUserCreationForm, ProfileForm
 from .models import CustomUser
 
@@ -310,55 +311,55 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
 
         # فلترة البيانات بناءً على القيم المدخلة
         inbound_data = CustomerInbound.objects.all()
-        outbound_data = CustomerOutbound.objects.all()
+        transportation_outbound_data = CustomerTransportationOutbound.objects.all()
+        wh_outbound_data = CustomerWHOutbound.objects.all()
         returns_data = CustomerReturns.objects.all()
         expiry_data = CustomerExpiry.objects.all()
         damage_data = CustomerDamage.objects.all()
-        travel_distance_data = CustomerTravelDistance.objects.all()
         inventory_data = CustomerInventory.objects.all()
         pallet_location_availability_data = CustomerPalletLocationAvailability.objects.all()
         hse_data = CustomerHSE.objects.all()
 
         if year:
             inbound_data = inbound_data.filter(time__year=year)
-            outbound_data = outbound_data.filter(time__year=year)
+            transportation_outbound_data = transportation_outbound_data.filter(time__year=year)
+            wh_outbound_data = wh_outbound_data.filter(time__year=year)
             returns_data = returns_data.filter(time__year=year)
             expiry_data = expiry_data.filter(time__year=year)
             damage_data = damage_data.filter(time__year=year)
-            travel_distance_data = travel_distance_data.filter(time__year=year)
             inventory_data = inventory_data.filter(time__year=year)
             pallet_location_availability_data = pallet_location_availability_data.filter(time__year=year)
             hse_data = hse_data.filter(time__year=year)
 
         if month:
             inbound_data = inbound_data.filter(time__month=month)
-            outbound_data = outbound_data.filter(time__month=month)
+            transportation_outbound_data = transportation_outbound_data.filter(time__month=month)
+            wh_outbound_data = wh_outbound_data.filter(time__month=month)
             returns_data = returns_data.filter(time__month=month)
             expiry_data = expiry_data.filter(time__month=month)
             damage_data = damage_data.filter(time__month=month)
-            travel_distance_data = travel_distance_data.filter(time__month=month)
             inventory_data = inventory_data.filter(time__month=month)
             pallet_location_availability_data = pallet_location_availability_data.filter(time__month=month)
             hse_data = hse_data.filter(time__month=month)
 
         if day:
             inbound_data = inbound_data.filter(time__day=day)
-            outbound_data = outbound_data.filter(time__day=day)
+            transportation_outbound_data = transportation_outbound_data.filter(time__day=day)
+            wh_outbound_data = wh_outbound_data.filter(time__day=day)
             returns_data = returns_data.filter(time__day=day)
             expiry_data = expiry_data.filter(time__day=day)
             damage_data = damage_data.filter(time__day=day)
-            travel_distance_data = travel_distance_data.filter(time__day=day)
             inventory_data = inventory_data.filter(time__day=day)
             pallet_location_availability_data = pallet_location_availability_data.filter(time__day=day)
             hse_data = hse_data.filter(time__day=day)
 
         # إضافة البيانات المفلترة إلى السياق
         context['inbound_data'] = inbound_data
-        context['outbound_data'] = outbound_data
+        context['transportation_outbound_data'] = transportation_outbound_data
+        context['wh_outbound_data'] = wh_outbound_data
         context['returns_data'] = returns_data
         context['expiry_data'] = expiry_data
         context['damage_data'] = damage_data
-        context['travel_distance_data'] = travel_distance_data
         context['inventory_data'] = inventory_data
         context['pallet_location_availability_data'] = pallet_location_availability_data
         context['hse_data'] = hse_data
@@ -385,21 +386,32 @@ class EmployeeDashboardView(LoginRequiredMixin, TemplateView):
         context['total_rejected_completely'] = inbound_data.aggregate(Sum('rejected_completely'))[
                                                    'rejected_completely__sum'] or 0
 
-        # الحصول على جميع بيانات Outound
-        context['outbound_data'] = outbound_data
-        context['total_order_received_from_npco'] = outbound_data.aggregate(Sum('order_received_from_npco'))[
-                                                        'order_received_from_npco__sum'] or 0
-        context['total_pending_orders'] = outbound_data.aggregate(Sum('pending_orders'))['pending_orders__sum'] or 0
-        context['total_number_of_orders_that_are_delivered_today'] = \
-            outbound_data.aggregate(Sum('number_of_orders_that_are_delivered_today'))[
-                'number_of_orders_that_are_delivered_today__sum'] or 0
+        # Transportation Outbound
+        context['transportation_outbound_data'] = transportation_outbound_data
+        context['total_released_order'] = transportation_outbound_data.aggregate(Sum('released_order'))['released_order__sum'] or 0
+        context['total_pending_pick_orders'] = transportation_outbound_data.aggregate(Sum('pending_pick_orders'))['pending_pick_orders__sum'] or 0
+        context['total_piked_order'] = transportation_outbound_data.aggregate(Sum('piked_order'))['piked_order__sum'] or 0
 
         context['total_number_of_PODs_collected_on_time'] = \
-            outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))[
+            transportation_outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))[
                 'number_of_PODs_collected_on_time__sum'] or 0
-        context['total_number_of_PODs_collected_Late'] = outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
+        context['total_number_of_PODs_collected_Late'] = transportation_outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
                                                              'number_of_PODs_collected_Late__sum'] or 0
-        context['total_total_skus_picked'] = outbound_data.aggregate(Sum('total_skus_picked'))[
+        context['total_total_skus_picked'] = transportation_outbound_data.aggregate(Sum('total_skus_picked'))[
+                                                 'total_skus_picked__sum'] or 0
+
+        # WH Outbound
+        context['wh_outbound_data'] = wh_outbound_data
+        context['total_released_order'] = wh_outbound_data.aggregate(Sum('released_order'))['released_order__sum'] or 0
+        context['total_pending_pick_orders'] = wh_outbound_data.aggregate(Sum('pending_pick_orders'))['pending_pick_orders__sum'] or 0
+        context['total_piked_order'] = wh_outbound_data.aggregate(Sum('piked_order'))['piked_order__sum'] or 0
+
+        context['total_number_of_PODs_collected_on_time'] = \
+            wh_outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))[
+                'number_of_PODs_collected_on_time__sum'] or 0
+        context['total_number_of_PODs_collected_Late'] = wh_outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
+                                                             'number_of_PODs_collected_Late__sum'] or 0
+        context['total_total_skus_picked'] = wh_outbound_data.aggregate(Sum('total_skus_picked'))[
                                                  'total_skus_picked__sum'] or 0
 
         # الحصول على جميع بيانات Returns
