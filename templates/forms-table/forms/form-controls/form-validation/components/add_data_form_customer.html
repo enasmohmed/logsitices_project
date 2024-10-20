@@ -66,7 +66,7 @@
                     </fieldset>
                 </div>
 
-                <!-- Customer Outbound Form -->
+                <!-- Customer Transportation Outbound Form -->
                 <div class="row">
                     <fieldset class="scheduler-border mt-4 col">
                         <legend class="scheduler-border">Customer Transportation Outbound</legend>
@@ -84,6 +84,24 @@
                     </fieldset>
                 </div>
 
+                <!-- Customer WH Outbound Form -->
+                <div class="row">
+                    <fieldset class="scheduler-border mt-4 col">
+                        <legend class="scheduler-border">Customer WH Outbound</legend>
+                        {% for field in customer_wh_outbound_form %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="col-md-6">
+                                {{ field|as_crispy_field }}
+                            </div>
+                            {% if forloop.counter|divisibleby:2 or forloop.last %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </div>
+                
                 <!-- Customer Returns Form -->
                 <div class="row">
                     <fieldset class="scheduler-border mt-4 col">
@@ -138,23 +156,6 @@
                     </fieldset>
                 </div>
 
-                <!-- Customer WH Outbound Form -->
-                <div class="row">
-                    <fieldset class="scheduler-border mt-4 col">
-                        <legend class="scheduler-border">Customer WH Outbound</legend>
-                        {% for field in customer_wh_outbound_form %}
-                        {% if forloop.counter0|divisibleby:2 %}
-                        <div class="row">
-                            {% endif %}
-                            <div class="col-md-6">
-                                {{ field|as_crispy_field }}
-                            </div>
-                            {% if forloop.counter|divisibleby:2 or forloop.last %}
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                    </fieldset>
-                </div>
 
                 <!-- Customer Inventory Form -->
                 <div class="row">
