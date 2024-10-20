@@ -88,7 +88,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             capacity_data = capacity_data.filter(time__day=day)
             inventory_data = inventory_data.filter(time__day=day)
 
-        # Calculate total statistics for filtered data
+        # Inbound
         context['total_vehicles_daily'] = inbound_data.aggregate(Sum('number_of_vehicles_daily'))[
                                               'number_of_vehicles_daily__sum'] or 0
         context['total_pallets'] = inbound_data.aggregate(Sum('number_of_pallets'))['number_of_pallets__sum'] or 0
@@ -107,6 +107,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         }
         context['shipment_data'] = shipment_data
 
+        # Outbound
         context['tender_sum'] = outbound_data.aggregate(Sum('tender'))['tender__sum'] or 0
         context['private_sum'] = outbound_data.aggregate(Sum('private'))['private__sum'] or 0
         context['bulk_sum'] = outbound_data.aggregate(Sum('bulk'))['bulk__sum'] or 0
@@ -120,14 +121,17 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['chart_name_bulk'] = 'Bulk'
         context['chart_name_loose'] = 'Loose'
 
+        # Capacity
         context['WH_storage'] = capacity_data.aggregate(Sum('WH_storage'))['WH_storage__sum'] or 0
         context['occupied_location'] = capacity_data.aggregate(Sum('occupied_location'))['occupied_location__sum'] or 0
         context['available_location'] = capacity_data.aggregate(Sum('available_location'))['available_location__sum'] or 0
 
+        # Returns
         context['total_number_of_return'] = returns_data.aggregate(Sum('number_of_return'))['number_of_return__sum'] or 0
         context['total_number_of_lines'] = returns_data.aggregate(Sum('number_of_lines'))['number_of_lines__sum'] or 0
         context['total_quantities'] = returns_data.aggregate(Sum('total_quantities'))['total_quantities__sum'] or 0
 
+        # Inventory
         context['total_last_movement'] = inventory_data.aggregate(Sum('last_movement'))['last_movement__sum'] or 0
 
         # Calculate count of years, months, and days

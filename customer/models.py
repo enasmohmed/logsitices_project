@@ -35,21 +35,18 @@ class CustomerInbound(models.Model):
         fri = "Friday", "Friday"
         sund = "Sunday", "Sunday"
 
-    assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
-
-    arrived = models.IntegerField(blank=True, null=True)
-    not_arrived = models.IntegerField(blank=True, null=True)
-    received_completely = models.IntegerField(blank=True, null=True)
-    rejected_completely = models.IntegerField(blank=True, null=True)
-    received_partially = models.IntegerField(blank=True, null=True)
-    under_tamer_inspection = models.IntegerField(blank=True, null=True)
-    waiting_for_inspection = models.IntegerField(blank=True, null=True)
-    waiting_for_action = models.IntegerField(blank=True, null=True)
-    total_number_of_GR_reports_shared = models.IntegerField(blank=True, null=True)
-    number_of_GR_reports_with_discripancy = models.IntegerField(blank=True, null=True)
-    total_SKUS_received = models.IntegerField(blank=True, null=True)
-    number_of_skus_damaged_during_receiving = models.IntegerField(blank=True, null=True)
-    total_received_with_putaway = models.IntegerField(blank=True, null=True)
+    assigned_day = models.CharField(max_length=10, choices=Weekday.choices)
+    number_of_vehicles_daily = models.IntegerField(blank=True, null=True)
+    number_of_pallets = models.IntegerField(blank=True, null=True)
+    bulk = models.IntegerField(blank=True, null=True)
+    loose = models.IntegerField(blank=True, null=True)
+    cold = models.IntegerField(blank=True, null=True)
+    frozen = models.IntegerField(blank=True, null=True)
+    ambient = models.IntegerField(blank=True, null=True)
+    pending_shipments = models.IntegerField(blank=True, null=True)
+    number_of_shipments = models.IntegerField(blank=True, null=True)
+    total_quantity = models.IntegerField(blank=True, null=True)
+    number_of_line = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)
@@ -72,19 +69,13 @@ class CustomerTransportationOutbound(models.Model):
 
     released_order = models.IntegerField(blank=True, null=True)
     pending_pick_orders = models.IntegerField(blank=True, null=True)
-    number_of_order_not_yet_picked = models.IntegerField(blank=True, null=True)
-    number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress = models.IntegerField(blank=True, null=True)
-    number_of_orders_waiting_for_qc = models.IntegerField(blank=True, null=True)
-    number_of_orders_that_are_ready_for_dispatch = models.IntegerField(blank=True, null=True)
     piked_order = models.IntegerField(blank=True, null=True)
-    justification_for_the_delay_order_by_order = models.IntegerField(blank=True, null=True)
-    total_skus_picked = models.IntegerField(blank=True, null=True)
-    total_number_of_SKU_discripancy_in_Order = models.IntegerField(blank=True, null=True)
     number_of_PODs_collected_on_time = models.IntegerField(blank=True, null=True)
     number_of_PODs_collected_Late = models.IntegerField(blank=True, null=True)
 
+
     def __str__(self):
-        return str(self.id)
+            return str(self.id)
 
 
 class CustomerWHOutbound(models.Model):
@@ -104,16 +95,19 @@ class CustomerWHOutbound(models.Model):
 
     released_order = models.IntegerField(blank=True, null=True)
     pending_pick_orders = models.IntegerField(blank=True, null=True)
-    number_of_order_not_yet_picked = models.IntegerField(blank=True, null=True)
-    number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress = models.IntegerField(blank=True, null=True)
-    number_of_orders_waiting_for_qc = models.IntegerField(blank=True, null=True)
-    number_of_orders_that_are_ready_for_dispatch = models.IntegerField(blank=True, null=True)
     piked_order = models.IntegerField(blank=True, null=True)
-    justification_for_the_delay_order_by_order = models.IntegerField(blank=True, null=True)
-    total_skus_picked = models.IntegerField(blank=True, null=True)
-    total_number_of_SKU_discripancy_in_Order = models.IntegerField(blank=True, null=True)
     number_of_PODs_collected_on_time = models.IntegerField(blank=True, null=True)
     number_of_PODs_collected_Late = models.IntegerField(blank=True, null=True)
+
+    # number_of_order_not_yet_picked = models.IntegerField(blank=True, null=True)
+    # number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress = models.IntegerField(blank=True, null=True)
+    # number_of_orders_waiting_for_qc = models.IntegerField(blank=True, null=True)
+    # number_of_orders_that_are_ready_for_dispatch = models.IntegerField(blank=True, null=True)
+    # justification_for_the_delay_order_by_order = models.IntegerField(blank=True, null=True)
+    # total_skus_picked = models.IntegerField(blank=True, null=True)
+    # total_number_of_SKU_discripancy_in_Order = models.IntegerField(blank=True, null=True)
+
+
 
     def __str__(self):
         return str(self.id)
@@ -189,7 +183,7 @@ class CustomerDamage(models.Model):
     assigned_day = models.CharField(max_length=20, choices=Weekday.choices)
     Total_QTYs_Damaged_by_WH = models.IntegerField(blank=True, null=True)
     Number_of_Damaged_during_receiving = models.IntegerField(blank=True, null=True)
-    Total_Damaged_QTYs_Disposed = models.IntegerField(blank=True, null=True)
+    Total_Araive_Damaged = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.id)

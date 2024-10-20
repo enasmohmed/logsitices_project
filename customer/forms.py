@@ -55,10 +55,8 @@ class EmployeeProfileForm(forms.ModelForm):
 class CustomerInboundForm(forms.ModelForm):
     class Meta:
         model = CustomerInbound
-        fields = ['time', 'assigned_day', 'arrived', 'not_arrived', 'received_completely',
-                  'rejected_completely', 'received_partially', 'under_tamer_inspection', 'waiting_for_inspection',
-                  'waiting_for_action', 'total_number_of_GR_reports_shared', 'number_of_GR_reports_with_discripancy',
-                  'total_SKUS_received', 'number_of_skus_damaged_during_receiving', 'total_received_with_putaway']
+        fields = ['time', 'assigned_day', 'number_of_vehicles_daily', 'number_of_pallets', 'bulk', 'loose', 'cold',
+                  'frozen', 'ambient', 'pending_shipments', 'number_of_shipments', 'total_quantity', 'number_of_line']
         widgets = {
             'time': DateInput(),
         }
@@ -68,11 +66,7 @@ class CustomerTransportationOutboundForm(forms.ModelForm):
     class Meta:
         model = CustomerTransportationOutbound
         fields = ['time', 'assigned_day', 'released_order', 'pending_pick_orders',
-                  'number_of_order_not_yet_picked', 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress',
-                  'number_of_orders_waiting_for_qc','number_of_orders_that_are_ready_for_dispatch',
-                  'piked_order', 'justification_for_the_delay_order_by_order',
-                  'total_skus_picked', 'total_number_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
-                  'number_of_PODs_collected_Late']
+                  'piked_order','number_of_PODs_collected_on_time','number_of_PODs_collected_Late']
         widgets = {
             'time': DateInput(),
         }
@@ -82,11 +76,7 @@ class CustomerWHOutboundForm(forms.ModelForm):
     class Meta:
         model = CustomerWHOutbound
         fields = ['time', 'assigned_day', 'released_order', 'pending_pick_orders',
-                  'number_of_order_not_yet_picked', 'number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress',
-                  'number_of_orders_waiting_for_qc', 'number_of_orders_that_are_ready_for_dispatch',
-                  'piked_order', 'justification_for_the_delay_order_by_order',
-                  'total_skus_picked', 'total_number_of_SKU_discripancy_in_Order', 'number_of_PODs_collected_on_time',
-                  'number_of_PODs_collected_Late']
+                  'piked_order', 'number_of_PODs_collected_on_time','number_of_PODs_collected_Late']
         widgets = {
             'time': DateInput(),
         }
@@ -116,7 +106,7 @@ class CustomerDamageForm(forms.ModelForm):
     class Meta:
         model = CustomerDamage
         fields = ['time', 'assigned_day', 'Total_QTYs_Damaged_by_WH', 'Number_of_Damaged_during_receiving',
-                  'Total_Damaged_QTYs_Disposed']
+                  'Total_Araive_Damaged']
         widgets = {
             'time': DateInput(),
         }

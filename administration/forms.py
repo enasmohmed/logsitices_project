@@ -52,7 +52,7 @@ class AdminDataForm(forms.ModelForm):
                 employee_profile = EmployeeProfile.objects.get(user=user)
                 self.fields['company'] = forms.CharField(initial=employee_profile.company.hc_business, disabled=True)
             except EmployeeProfile.DoesNotExist:
-                pass  # يمكنك إضافة معالجة خاصة هنا حسب احتياجاتك
+               pass
 
 
 class AdminInboundForm(forms.ModelForm):

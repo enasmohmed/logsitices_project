@@ -9,7 +9,7 @@
    .vertical-hr {
       border-left: 2px solid #231c1c;
       height: 100%;
-      margin-right: 60px;
+      /*margin-right: 60px;*/
   }
   .custom-box {
       border: 1px solid #6c757d;
@@ -320,21 +320,22 @@
        .chart-container {
            width: 100%;
            height: 100%;
-           min-height: 300px; /* يمكنك تعديل الارتفاع الأدنى حسب الحاجة */
+           min-height: 300px;
        }
 
 
     .damage {
-           display: flex;
+            display: flex;
            flex-wrap: wrap;
            justify-content: space-around;
            padding: 20px;
+
        }
        .damage .column {
            flex: 1;
            text-align: center;
-           padding: 10px;
-           margin: 10px;
+
+
        }
        .damage .circle-1 {
            width: 100px;
@@ -345,7 +346,7 @@
            display: flex;
            align-items: center;
            justify-content: center;
-           margin: 0 auto 10px auto;
+           margin: 50px auto 10px auto;
            font-size: 24px;
            font-weight: bold;
        }
@@ -358,7 +359,7 @@
            display: flex;
            align-items: center;
            justify-content: center;
-           margin: 0 auto 10px auto;
+           margin: 20px auto 10px auto;
            font-size: 24px;
            font-weight: bold;
        }
@@ -371,15 +372,19 @@
            display: flex;
            align-items: center;
            justify-content: center;
-           margin: 0 auto 10px auto;
+           margin: 40px auto 10px auto;
            font-size: 24px;
            font-weight: bold;
        }
-       .damage .text {
+       .damage .column .text {
            font-size: 18px;
-           margin-bottom: 10px;
+
            text-align: center;
+           width: 100%;
+            max-width: 600px;
+            margin-bottom: auto;
        }
+
        .damage .vertical-hr {
            border-left: 2px solid #1366c8;
            height: auto;
@@ -479,78 +484,198 @@
 .edit-data{
 
 }
+
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 0px 0px 0px -50px;
+}
+
+#chart-part-1, #chart-part-2 {
+    width: 45%;
+    text-align: center;
+}
+
+
+.chart-inbound{
+    display: flex;
+    justify-content: space-between;
+}
+#chart-part-1{
+    width: 50%;
+}
+.divider {
+    width: 1px;
+    background-color: #d3d3d3;
+    height: 100%;
+    margin: 0 20px;
+   position: absolute;
+}
+#chart-part-2{
+    width: 50%;
+}
+
+#arrival-chart, #report-chart {
+    width: 100%;
+}
+#report-chart {
+    margin-left: 20px; /* مسافة إضافية إذا لزم الأمر */
+}
 </style>
 
 <!-- Container-fluid starts-->
 <div class="container-fluid default-dashboard general-widget">
     <div class="row">
 
-<!--        Inbound-->
-        <div class="col-xl-12 col-lg-12 box-col-12e">
-            <div class="card">
+<!--        Inbounds-->
+        <div class="col-lg-12 col-xl-12 col-md-12">
+            <div class="card selling-product">
                 <div class="card-header pb-0">
                     <div class="header-top">
-                        <span> <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
-                                <path fill="#3F51B5"
-                                      d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/>
-                            </svg>
-                        </span>
-                        <h4 class="inbound title-card">Inbound</h4>
+                        <h4 class="title-card">Inbounds</h4>
                         <hr class="line-button">
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row" style="margin-top: 4%;">
-                        <!-- النصف الأيسر -->
-                        <div class="col-md-4">
-                            <!-- مربعات -->
-                            <div class="container">
-                                <div id="box1" class="custom-box">
-                                    <div class="box-number">{{ total_received_completely }}</div>
-                                </div>
-                                <div class="box-header">
-                                    <h4 class="box-title">Received Completely</h4>
-                                </div>
+                <div class="card-body d-block">
+                    <div class="row">
+                        <div class="col-lg-5 col-md-12">
+                            <div class="table-responsive custom-scrollbar overflow-hidden">
+                                <table class="table display">
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                            <span class="bg-light-primary">
+                                               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                    viewBox="0 0 24 24"><path fill="#3F51B5"
+                                                                              d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/></svg>
+                                            </span>
+                                                <div class="flex-grow-0 ms-2 mt-3"><span>Number of vehicles daily</span>
+                                                </div>
+                                            </div>
+                                        </td>
 
-                            </div>
-                            <div class="container">
-                                <div id="box2" class="custom-box">
-                                    <div class="box-number">{{ total_received_partially }}</div>
-                                </div>
-                                <div class="box-header">
-                                    <h4 class="box-title">Received Partially</h4>
-                                </div>
-                            </div>
-                            <div class="container">
-                                <div id="box3" class="custom-box">
-                                    <div class="box-number">{{ total_rejected_completely }}</div>
-                                </div>
-                                <div class="box-header">
-                                    <h4 class="box-title">Rejected Completely</h4>
-                                </div>
+                                        <td></td>
+                                        <td>
+                                            <span class="mt-4"
+                                                  style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{ total_vehicles_daily }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="bg-light-primary">
+                                                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                        viewBox="0 0 24 24"><path fill="#3F51B5"
+                                                                                  d="M16.78 21.84a1.998 1.998 0 1 1-1.56-3.68a1.998 1.998 0 1 1 1.56 3.68M7.62 6c1.11 0 2-.89 2-2a2 2 0 0 0-2-2c-1.12 0-2 .9-2 2c0 1.11.88 2 2 2m14.43 10.34L18.2 18c.22.22.42.5.56.82c.14.33.2.68.24 1l3.83-1.64zM10.16 8.78l.74 1.81c-.24-.09-.46-.21-.64-.33c-.6-.39-1.04-.88-1.33-1.46l-.74-1.57c-.19-.35-.42-.61-.74-.79c-.29-.17-.6-.26-.92-.26s-.62.08-.91.22c-1.4 1.1-1.75 3.14-1.75 3.14l-.34 1.57c-.09.52-.14 1.04-.14 1.57v4.96L1 20.87L2.5 22l2.77-3.75l.17-3.25l1.68 2.34V22h1.85v-6.06l-1.85-2.61v-.65c0-.44 0-.87.11-1.29l.35-1.2c.38.55.84 1.03 1.39 1.44c.45.34 1.71.94 2.9 1.23L14 17.8c.22-.22.5-.42.83-.56c.32-.14.67-.2.99-.24L12 8zm5.2 3.34l1.96 4.6l5.63-2.41L21 9.72"/></svg>
+                                                </span>
+                                                <div class="flex-grow-0 ms-2 mt-3"><span>Number Of pallets</span></div>
+                                            </div>
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <span class="mt-3"
+                                                  style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{total_pallets}}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="bg-light-primary">
+                                                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                        viewBox="0 0 24 24"><path fill="#3F51B5"
+                                                                                  d="M3 4a2 2 0 0 0-2 2v11h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h6a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2v-5l-3-4h-3V4m-7 2l4 4l-4 4v-3H4V9h6m7 .5h2.5l1.97 2.5H17M6 15.5A1.5 1.5 0 0 1 7.5 17A1.5 1.5 0 0 1 6 18.5A1.5 1.5 0 0 1 4.5 17A1.5 1.5 0 0 1 6 15.5m12 0a1.5 1.5 0 0 1 1.5 1.5a1.5 1.5 0 0 1-1.5 1.5a1.5 1.5 0 0 1-1.5-1.5a1.5 1.5 0 0 1 1.5-1.5"/></svg>
+                                                </span>
+                                                <div class="flex-grow-0 ms-2 mt-3"><span>Number of shipments</span></div>
+                                            </div>
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <span class="mt-3"
+                                                  style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;">{{ total_number_of_shipments }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="bg-light-primary">
+                                                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                        viewBox="0 0 20 20"><path fill="#3F51B5"
+                                                                                  d="M2.042 9.889v4.361c0 .966.784 1.75 1.75 1.75h.258a2.5 2.5 0 0 0 4.9 0h1.1a2.5 2.5 0 0 0 4.9 0h1.55a1.5 1.5 0 0 0 1.5-1.5v-3.764a1.5 1.5 0 0 0-.158-.67l-1.618-3.237A1.5 1.5 0 0 0 14.882 6H14V4.75A1.75 1.75 0 0 0 12.25 3h-2.09c.218.324.341.712.341 1.118v3.764a2 2 0 0 1-1.105 1.789l-3 1.5a2 2 0 0 1-1.789 0zM14 7h.882a.5.5 0 0 1 .448.276L16.692 10H14zm-7.5 7a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3m4.5 1.5a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0M1.5 4.118v3.764a1 1 0 0 0 .553.895l3 1.5a1 1 0 0 0 .894 0l3-1.5a1 1 0 0 0 .553-.895V4.118a1 1 0 0 0-.553-.894l-3-1.5a1 1 0 0 0-.894 0l-3 1.5a1 1 0 0 0-.553.894m1.694-.078l2.306.973l2.306-.973a.5.5 0 0 1 .388.92L6 5.888V8.5a.5.5 0 1 1-1 0V5.887l-2.194-.926a.5.5 0 1 1 .388-.921"/></svg>
+                                                </span>
+                                                <div class="flex-grow-0 ms-2 mt-3"><span>Pending shipments</span></div>
+                                            </div>
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <span class="mt-3"
+                                                  style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;"> {{ total_pending_shipments }} </span>
+                                        </td>
+                                    </tr>
+
+                                     <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="bg-light-primary">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><path fill="#3F51B5" d="M3 20h2v-2h6v2h2v-2h6v2h2v-5h-2v1h-2v-1h-2v1h-2v-1h-2v1H9v-1H7v1H5v-1H3m2-2h14V4H5Z"/>
+                                                  </svg>
+                                                </span>
+                                                <div class="flex-grow-0 ms-2 mt-3"><span>Total quantity</span></div>
+                                            </div>
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <span class="mt-3"
+                                                  style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;"> {{ total_quantity }} </span>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td>
+                                            <div class="d-flex">
+                                                <span class="bg-light-primary">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"><path fill="#3F51B5" d="M7 9V7h14v2zm0 4v-2h14v2zm0 4v-2h14v2zM4 9q-.425 0-.712-.288T3 8t.288-.712T4 7t.713.288T5 8t-.288.713T4 9m0 4q-.425 0-.712-.288T3 12t.288-.712T4 11t.713.288T5 12t-.288.713T4 13m0 4q-.425 0-.712-.288T3 16t.288-.712T4 15t.713.288T5 16t-.288.713T4 17"/>
+                                                  </svg>
+                                                </span>
+                                                <div class="flex-grow-0 ms-2 mt-3"><span>Number of line</span></div>
+                                            </div>
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <span class="mt-3"
+                                                  style="border: 2px solid #000;width: 100%;padding: 0px 10px 0px 10px;border-radius: 12%;text-align: center;position: relative;"> {{ total_number_of_line }} </span>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-
                         <div class="col-md-1 d-flex align-items-center justify-content-center">
                             <hr class="vertical-hr">
                         </div>
-                        <!-- النصف الأيمن -->
-                        <div class="col-md-7">
-                            <!-- شارتات -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="chart-asn" style="margin-left: -50px;"></div>
+                        <div class="col-lg-6 col-md-12">
+<!--                            <div id="growth-chart"></div>-->
+                                <div id="chart-container" class="flex-container">
+                                    <div id="chart-part-1">
+                                        <h3>Shipment type</h3>
+                                        <div id="growth-chart-part-1"></div>
+                                    </div>
+
+                                    <!-- الخط العمودي بين القسمين -->
+                                    <div class="divider"></div>
+
+                                    <div id="chart-part-2">
+                                        <h3>Shipment temperature</h3>
+                                        <div id="growth-chart-part-2"></div>
+                                    </div>
                                 </div>
-
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="chart-mod" style="position: relative;"></div>
-                                </div>
-
-                            </div>
-
 
                         </div>
                     </div>
@@ -559,7 +684,7 @@
         </div>
 
 
-<!--        Outbound-->
+<!--        WH Outbound-->
         <div class="col-xl-7 col-lg-7 box-col-7e">
             <div class="card">
                 <div class="card-header">
@@ -570,7 +695,7 @@
                                       d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/>
                             </svg>
                         </span>
-                        <h4 class="outbound-h4 title-card">Transportation Outbound</h4>
+                        <h4 class="outbound-h4 title-card">WH Outbound</h4>
                         <hr class="line-button">
                     </div>
                 </div>
@@ -707,13 +832,18 @@
                 </div>
                 <div class="card-body damage">
                     <div class="column">
-                        <div class="circle-1">{{ Total_QTYs_Damaged_by_WH }}</div>
                         <div class="text">Total QTYS Damaged by WH</div>
+                        <div class="circle-1">{{ Total_QTYs_Damaged_by_WH }}</div>
                     </div>
                     <hr class="vertical-hr">
                     <div class="column">
                         <div class="text">Number of Damaged during receiving</div>
                         <div class="circle-2">{{ Total_Number_of_Damaged_during_receiving }}</div>
+                    </div>
+                    <hr class="vertical-hr">
+                     <div class="column">
+                        <div class="text">Total Araive Damaged </div>
+                        <div class="circle-3">{{ Total_Araive_Damaged }}</div>
                     </div>
 
                 </div>
@@ -758,7 +888,7 @@
             </div>
         </div>
 
-<!--        WHoutbound-->
+<!--        Transportation Outbound-->
         <div class="col-xl-7 col-lg-7 box-col-7e">
             <div class="card">
                 <div class="card-header">
@@ -769,7 +899,7 @@
                                       d="M3 13.5L2.25 12H7.5l-.6-1.5H2L1.25 9h7.8l-.6-1.5H1.11L.25 6H4a2 2 0 0 1 2-2h12v4h3l3 4v5h-2a3 3 0 0 1-3 3a3 3 0 0 1-3-3h-4a3 3 0 0 1-3 3a3 3 0 0 1-3-3H4v-3.5zm16 5a1.5 1.5 0 0 0 1.5-1.5a1.5 1.5 0 0 0-1.5-1.5a1.5 1.5 0 0 0-1.5 1.5a1.5 1.5 0 0 0 1.5 1.5m1.5-9H18V12h4.46zM9 18.5a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 9 15.5A1.5 1.5 0 0 0 7.5 17A1.5 1.5 0 0 0 9 18.5"/>
                             </svg>
                         </span>
-                        <h4 class="outbound-h4 title-card">WH Outbound</h4>
+                        <h4 class="outbound-h4 title-card">Transportation Outbound</h4>
                         <hr class="line-button">
                     </div>
                 </div>
@@ -955,169 +1085,139 @@
 
 </div>
 
+<!--Inbound -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        window.chartData = {
-            totalArrived: {{ total_arrived }},
-            totalNotArrived: {{ total_not_arrived }},
-        };
+    var categoriesPart1 = ["bulk", "loose"]; // العمودين الأولين
+    var categoriesPart2 = ["cold", "frozen", "ambient"]; // الأعمدة الثلاثة المتبقية
 
-        var data = window.chartData || {
-            totalArrived: 20,
-            totalNotArrived: 10
-        };
+    var shipmentDataPart1 = [
+        {{ shipment_data.bulk|default:0 }},
+        {{ shipment_data.loose|default:0 }}
+    ];
 
-        var options = {
-            series: [{
-                data: [data.totalArrived, data.totalNotArrived]
-            }],
-            chart: {
-                type: 'bar',
-                height: 150,
-                toolbar: {
-                    show: false  // إخفاء الشرطات الثلاث على اليمين
-                }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 0,  // إزالة الزوايا الدائرية
-                    horizontal: true,
-                    barHeight: '80%',  // تقليل حجم البارات لتقريب المسافات بينها
-                    distributed: true  // جعل كل بار له لون مختلف
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function (val) {
-                    return val;
-                },
-                style: {
-                    fontSize: '14px'
-                },
-                offsetX: 0,
-                offsetY: -5
-            },
-            xaxis: {
-                categories: ['Arrived', 'Not Arrived'],
-                labels: {
-                    style: {
-                        fontSize: '16px'  // تكبير حجم الخط لمحور x
-                    },
-                    show: false  // إخفاء النصوص على المحور x
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: {
-                        fontSize: '13px',  // تكبير حجم الخط لمحور y
-                        whiteSpace: 'nowrap',  // ضمان عدم التفاف النص
-                        maxWidth: 600,  // تحديد أقصى عرض للنص
-                    },
-                    offsetX: -10,  // ضبط المسافة بين النص والمحور
-                    padding: {
-                        left: 0,
-                        right: 0
-                    }
-                }
-            },
-            colors: ['#9FA8DA', '#80CBC4'],
-            grid: {
-                show: false  // إخفاء الشبكة
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val;  // عرض القيمة فقط بدون أي نص إضافي
-                    }
-                }
-            },
-            stroke: {
-                show: false  // إخفاء الخطوط حول الأعمدة
-            },
-            legend: {
-                show: false  // إخفاء النصوص تحت البارات
-            }
-        };
+    var shipmentDataPart2 = [
+        {{ shipment_data.cold|default:0 }},
+        {{ shipment_data.frozen|default:0 }},
+        {{ shipment_data.ambient|default:0 }}
+    ];
 
-        var chart = new ApexCharts(document.querySelector("#chart-asn"), options);
-        chart.render();
-    });
-</script>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var total_waiting_for_inspection = {{ total_waiting_for_inspection }};
-        var total_number_of_GR_reports_shared = {{ total_number_of_GR_reports_shared }};
-        var total_number_of_GR_reports_with_discripancy = {{ total_number_of_GR_reports_with_discripancy }};
-
-        var options = {
-            series: [
-                {
-                    name: 'Reports',
-                    data: [total_waiting_for_inspection, total_number_of_GR_reports_shared, total_number_of_GR_reports_with_discripancy]
-                }
-            ],
-            chart: {
-                height: 280,
-                type: 'bar',
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 10,
-                    barWidth: '50%',
-                    barHeight: '70%',  // تقليل حجم البارات لتقريب المسافات بينها
-                    distributed: true,
-                    dataLabels: {
-                        position: 'center',
-                         style: {
-                            fontSize: '25px', // حجم الخط للتسميات
-                            colors: ['#fff'] // لون التسميات
-                        }
-                    },
-                }
-            },
-            dataLabels: {
-                enabled: true, // تعطيل التسميات الافتراضية للبارات
-            },
-            xaxis: {
-                categories: ["Pending", "Total Number of GR Reports Shared", "Number of GR Reports with Discrepancy"],
-                labels: {
-                    show: false,
-                },
-            },
-            yaxis: {
-                axisBorder: {
-                    show: false
-                },
-                axisTicks: {
-                    show: false,
-                },
-                labels: {
-                    show: false,
-                }
-            },
-            legend: {
-                show: true, // يمكنك ضبط هذا الخيار على false لإخفاء التعليقات التوضيحية
-            },
-            colors: ['#64B5F6', '#9FA8DA', '#80CBC4'],
-            grid: {
-                show: false,
-            },
+    // إعدادات الجزء الأول (عمودين)
+    var optionsPart1 = {
+        series: [{
+            name: 'Shipments',
+            data: shipmentDataPart1
+        }],
+        chart: {
+            height: 250,
+            type: 'bar',
             toolbar: {
                 show: false,
+            }
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: '50%',
+                distributed: true,
+                borderRadius: 4,
+            }
+        },
+        colors: ['#64B5F6', '#9FA8DA'],
+        grid: {
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: false } }
+        },
+        xaxis: {
+            categories: categoriesPart1,
+            labels: {
+                style: {
+                    fontWeight: 600,
+                    colors: 'black',
+                },
+                rotate: 0
             },
-        };
+            axisBorder: { show: false },
+        },
+        dataLabels: {
+            enabled: true,
+            offsetY: 100,
+            style: {
+                fontSize: '15px',
+                colors: ["black"],
+                fontWeight: 600,
+            }
+        },
+        yaxis: { labels: { show: false } },
+        legend: { show: false },
+        tooltip: {
+            custom: function ({ series, seriesIndex, dataPointIndex }) {
+                return '<div class="apex-tooltip p-2">' + '<span>' + 'Shipments' + '<h3>' + '$' + series[seriesIndex][dataPointIndex] + '</h3>' + '</span>' + '</div>';
+            },
+        },
+    };
 
-        var chart = new ApexCharts(document.querySelector("#chart-mod"), options);
-        chart.render().then(function () {
-            addCustomLabels();
-        });
-    });
+    // إعدادات الجزء الثاني (3 أعمدة)
+    var optionsPart2 = {
+        series: [{
+            name: 'Shipments',
+            data: shipmentDataPart2
+        }],
+        chart: {
+            height: 250,
+            type: 'bar',
+            toolbar: {
+                show: false,
+            }
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: '50%',
+                distributed: true,
+                borderRadius: 4,
+            }
+        },
+        colors: ['#80CBC4', '#64B5F6', '#9FA8DA'],
+        grid: {
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: false } }
+        },
+        xaxis: {
+            categories: categoriesPart2,
+            labels: {
+                style: {
+                    fontWeight: 600,
+                    colors: 'black',
+                },
+                rotate: 0
+            },
+            axisBorder: { show: false },
+        },
+        dataLabels: {
+            enabled: true,
+            offsetY: 100,
+            style: {
+                fontSize: '15px',
+                colors: ["black"],
+                fontWeight: 600,
+            }
+        },
+        yaxis: { labels: { show: false } },
+        legend: { show: false },
+        tooltip: {
+            custom: function ({ series, seriesIndex, dataPointIndex }) {
+                return '<div class="apex-tooltip p-2">' + '<span>' + 'Shipments' + '<h3>' + '$' + series[seriesIndex][dataPointIndex] + '</h3>' + '</span>' + '</div>';
+            },
+        },
+    };
 
+    // رندر الجزء الأول
+    var chartPart1 = new ApexCharts(document.querySelector("#growth-chart-part-1"), optionsPart1);
+    chartPart1.render();
+
+    // رندر الجزء الثاني
+    var chartPart2 = new ApexCharts(document.querySelector("#growth-chart-part-2"), optionsPart2);
+    chartPart2.render();
+});
 
 </script>
 

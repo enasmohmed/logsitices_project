@@ -50,7 +50,7 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
             context['user_type'] = 'Anonymous'
 
         context['breadcrumb'] = {
-            "title": "Operation Dashboard",
+            "title": "Healthcare Dashboard",
             "parent": "Dashboard",
             "child": "Default"
         }
@@ -114,37 +114,26 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         context['pallet_location_availability_data'] = pallet_location_availability_data
         context['hse_data'] = hse_data
 
-        # الحصول على جميع بيانات Inbound
+        # Inbound
         context['inbound_data'] = inbound_data
+        context['total_vehicles_daily'] = inbound_data.aggregate(Sum('number_of_vehicles_daily'))[
+                                              'number_of_vehicles_daily__sum'] or 0
+        context['total_pallets'] = inbound_data.aggregate(Sum('number_of_pallets'))['number_of_pallets__sum'] or 0
+        context['total_pending_shipments'] = inbound_data.aggregate(Sum('pending_shipments'))[
+                                                 'pending_shipments__sum'] or 0
+        context['total_number_of_shipments'] = inbound_data.aggregate(Sum('number_of_shipments'))[
+                                                   'number_of_shipments__sum'] or 0
 
-        context['total_arrived'] = inbound_data.aggregate(Sum('arrived'))['arrived__sum'] or 0
+        context['total_quantity'] = inbound_data.aggregate(Sum('total_quantity'))['total_quantity__sum'] or 0
 
-        context['total_not_arrived'] = inbound_data.aggregate(Sum('not_arrived'))['not_arrived__sum'] or 0
+        context['total_number_of_line'] = inbound_data.aggregate(Sum('number_of_line'))['number_of_line__sum'] or 0
 
-        context['total_received_completely'] = inbound_data.aggregate(Sum('received_completely'))['received_completely__sum'] or 0
-
-        context['total_received_partially'] = inbound_data.aggregate(Sum('received_partially'))['received_partially__sum'] or 0
-
-        context['total_rejected_completely'] = inbound_data.aggregate(Sum('rejected_completely'))['rejected_completely__sum'] or 0
-
-        context['total_under_tamer_inspection'] = inbound_data.aggregate(Sum('under_tamer_inspection'))['under_tamer_inspection__sum'] or 0
-
-        context['total_waiting_for_inspection'] = inbound_data.aggregate(Sum('waiting_for_inspection'))['waiting_for_inspection__sum'] or 0
-
-        context['total_waiting_for_action'] = inbound_data.aggregate(Sum('waiting_for_action'))['waiting_for_action__sum'] or 0
-
-        context['total_number_of_GR_reports_shared'] = \
-            inbound_data.aggregate(Sum('total_number_of_GR_reports_shared'))['total_number_of_GR_reports_shared__sum'] or 0
-
-        context['total_number_of_GR_reports_with_discripancy'] = \
-            inbound_data.aggregate(Sum('number_of_GR_reports_with_discripancy'))['number_of_GR_reports_with_discripancy__sum'] or 0
-
-        context['total_SKUS_received'] = inbound_data.aggregate(Sum('total_SKUS_received'))['total_SKUS_received__sum'] or 0
-
-        context['total_number_of_skus_damaged_during_receiving'] = inbound_data.aggregate(Sum('number_of_skus_damaged_during_receiving'))['number_of_skus_damaged_during_receiving__sum'] or 0
-
-        context['total_received_with_putaway'] = inbound_data.aggregate(Sum('total_received_with_putaway'))['total_received_with_putaway__sum'] or 0
-
+        shipment_types = ['bulk', 'loose', 'cold', 'frozen', 'ambient']
+        shipment_data = {
+            stype: inbound_data.aggregate(Sum(stype))[stype + '__sum'] or 0
+            for stype in shipment_types
+        }
+        context['shipment_data'] = shipment_data
 
         # الحصول على جميع بيانات Transportation Outbound_data
         context['transportation_outbound_data'] = transportation_outbound_data
@@ -153,21 +142,7 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
 
         context['total_pending_pick_orders'] = transportation_outbound_data.aggregate(Sum('pending_pick_orders'))['pending_pick_orders__sum'] or 0
 
-        context['total_number_of_order_not_yet_picked'] = transportation_outbound_data.aggregate(Sum('number_of_order_not_yet_picked'))['number_of_order_not_yet_picked__sum'] or 0
-
-        context['total_number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress'] = transportation_outbound_data.aggregate(Sum('number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress'))['number_of_orders_picked_but_not_yet_ready_for_disptch_in_progress__sum'] or 0
-
-        context['total_number_of_orders_waiting_for_qc'] = transportation_outbound_data.aggregate(Sum('number_of_orders_waiting_for_qc'))['number_of_orders_waiting_for_qc__sum'] or 0
-
-        context['total_number_of_orders_that_are_ready_for_dispatch'] = transportation_outbound_data.aggregate(Sum('number_of_orders_that_are_ready_for_dispatch'))['number_of_orders_that_are_ready_for_dispatch__sum'] or 0
-
         context['total_piked_order'] = transportation_outbound_data.aggregate(Sum('piked_order'))['piked_order__sum'] or 0
-
-        context['total_justification_for_the_delay_order_by_order'] = transportation_outbound_data.aggregate(Sum('justification_for_the_delay_order_by_order'))['justification_for_the_delay_order_by_order__sum'] or 0
-
-        context['total_total_skus_picked'] = transportation_outbound_data.aggregate(Sum('total_skus_picked'))['total_skus_picked__sum'] or 0
-
-        context['total_total_number_of_SKU_discripancy_in_Order'] = transportation_outbound_data.aggregate(Sum('total_number_of_SKU_discripancy_in_Order'))['total_number_of_SKU_discripancy_in_Order__sum'] or 0
 
         context['total_number_of_PODs_collected_on_time'] = transportation_outbound_data.aggregate(Sum('number_of_PODs_collected_on_time'))['number_of_PODs_collected_on_time__sum'] or 0
 
@@ -187,8 +162,6 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
                 'number_of_PODs_collected_on_time__sum'] or 0
         context['total_number_of_PODs_collected_Late'] = wh_outbound_data.aggregate(Sum('number_of_PODs_collected_Late'))[
                                                              'number_of_PODs_collected_Late__sum'] or 0
-        context['total_total_skus_picked'] = wh_outbound_data.aggregate(Sum('total_skus_picked'))[
-                                                 'total_skus_picked__sum'] or 0
 
 
         # الحصول على جميع بيانات Returns
@@ -229,8 +202,7 @@ class CustomerDashboardView(LoginRequiredMixin, TemplateView):
         context['Total_QTYs_Damaged_by_WH'] = damage_data.aggregate(Sum('Total_QTYs_Damaged_by_WH'))['Total_QTYs_Damaged_by_WH__sum'] or 0
         context['Total_Number_of_Damaged_during_receiving'] = damage_data.aggregate(Sum('Number_of_Damaged_during_receiving'))[
                 'Number_of_Damaged_during_receiving__sum'] or 0
-        context['Total_Damaged_QTYs_Disposed'] = damage_data.aggregate(Sum('Total_Damaged_QTYs_Disposed'))[
-                                                     'Total_Damaged_QTYs_Disposed__sum'] or 0
+        context['Total_Araive_Damaged'] = damage_data.aggregate(Sum('Total_Araive_Damaged'))['Total_Araive_Damaged__sum'] or 0
 
         # Inventory
         context['inventory_data'] = inventory_data
